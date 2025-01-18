@@ -35,11 +35,11 @@ $$one('#app')!.innerHTML = `
         </div>
       </li>
       <li class="nav-item mb-5">
-        <button id="backup-button" class="btn btn-primary">バックアップ</button>
+        <button id="backup-button" class="btn btn-primary">エクスポート</button>
       </li>
       <li class="nav-item row mb-5">
         <div class="col-md-9">
-          <button type="button" class="btn btn-outline-primary" id="upload-button">アップロード</button>
+          <button type="button" class="btn btn-outline-primary" id="upload-button">インポート</button>
         </div>
       </li>
       <li class="nav-item row mb-5">
