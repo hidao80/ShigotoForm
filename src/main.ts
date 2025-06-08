@@ -1,19 +1,131 @@
 import './resume.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
+import '@fontsource/noto-sans-jp/400.css'
+import '@fontsource/noto-serif-jp/400.css'
+import Modal from 'bootstrap/js/dist/modal';
+// window.bootstrapが未定義の場合にModalをセット
+if (!(window as any).bootstrap) {
+  (window as any).bootstrap = { Modal };
+}
 import * as AutoKana from 'vanilla-autokana'
 import * as Resume from './resume.ts'
-import { $$one } from './indolence.ts'
+import { saveFromForm, loadToForm } from './resume.ts'
 import * as Theme from './theme.ts'
-import * as RsumeData from './models/Resume.ts'
+import { saveResume, loadResume, ResumeJson } from './db.ts'
+import { Career, License } from './models/Resume'
 import packageJson from '../package.json';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 
-$$one('#app')!.innerHTML = `
+// ResumeJson→フォーム用Resume形式へ変換
+/**
+ * jsonToFormResume関数
+ * @param {ResumeJson} json - ResumeJson形式のデータ
+ * @returns {Object} フォーム用のResume形式データ
+ * @description
+ * json.resume.careerとjson.careerの両方に対応。
+ * json.resume.careerが存在する場合はそれを優先し、存在しない場合はjson.careerを使用。
+ * json.resume.licenseとjson.licenseの両方に対応。
+ * json.resume.licenseが存在する場合はそれを優先し、存在しない場合はjson.licenseを使用。
+ * 各項目は存在しない場合は空文字列に変換。
+ */
+function jsonToFormResume(json: ResumeJson) {
+  // career, licenseはjson.resume直下・json直下どちらにも対応
+  const careerSrc = (json.resume && Array.isArray(json.resume.career))
+    ? json.resume.career
+    : (Array.isArray(json.career)) ? json.career : [];
+  const licenseSrc = (json.resume && Array.isArray(json.resume.license))
+    ? json.resume.license
+    : (Array.isArray(json.license)) ? json.license : [];
+  return {
+    createdAt: json.createdAt,
+    fullname: json.fullname,
+    fullnameKana: json.fullnameKana,
+    birthday: json.birthday,
+    sex: json.sex,
+    zipCode: json.zipCode,
+    address1: json.address1,
+    address1Kana: json.address1Kana,
+    address2: json.address2,
+    address2Kana: json.address2Kana,
+    tel1: json.tel1,
+    tel2: json.tel2,
+    mail1: json.mail1,
+    mail2: json.mail2,
+    career: Array.isArray(careerSrc)
+      ? careerSrc.filter(Boolean).map((c: Career) => ({
+        start: c.start ?? '',
+        end: c.end ?? '',
+        name: c.name ?? '',
+        position: c.position ?? '',
+        description: c.description ?? ''
+      }))
+      : [],
+    license: Array.isArray(licenseSrc)
+      ? licenseSrc.filter(Boolean).map((l: License) => ({
+        date: l.date ?? '',
+        name: l.name ?? '',
+        pass: l.pass ?? '合格'
+      }))
+      : [],
+  };
+}
+
+/**
+ * フォームの内容をResumeJson形式へ変換
+ * @param {Object} form - フォームの入力データ
+ * @returns {ResumeJson} ResumeJson形式のデータ
+ * @description
+ * フォームの入力値をResumeJson形式に変換します。
+ * 各項目は存在しない場合は空文字列に変換されます。
+ */
+function formResumeToJson(form: any): ResumeJson {
+  return {
+    fullnameKana: form.fullnameKana || '',
+    fullname: form.fullname || '',
+    sex: form.sex || '',
+    birthday: form.birthday || '',
+    age: 0,
+    zipCode: form.zipCode || '',
+    address1Kana: form.address1Kana || '',
+    address1: form.address1 || '',
+    tel1: form.tel1 || '',
+    mail1: form.mail1 || '',
+    address2Kana: form.address2Kana || '',
+    address2: form.address2 || '',
+    tel2: form.tel2 || '',
+    mail2: form.mail2 || '',
+    photo: form.photo || '',
+    createdAt: form.createdAt || '',
+    resume: {
+      education: [],
+      career: (form.career || []),
+      license: (form.license || []),
+      subject: '',
+      condition: '',
+      hobby: '',
+      reason: '',
+      expectations: ''
+    }
+  };
+}
+
+/**
+ * フォームにResumeJson形式のデータを読み込む
+ * @param {ResumeJson} json - ResumeJson形式のデータ
+ * @description
+ * ResumeJson形式のデータをフォームに読み込みます。
+ * 各項目は存在しない場合は空文字列に変換されます。
+ * 履歴書の学歴・職歴と免許・資格は、フォームの対応するセクションに追加されます。
+ */
+window.addEventListener('DOMContentLoaded', async () => {
+  document.querySelector('#app')!.innerHTML = `
 <nav class="navbar navbar-expand-lg px-3 py-2 fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">
       <img src="./img/favicon32.webp" alt="ShigotoForm" width="30" height="30" class="d-inline-block align-text-top me-2">
-      <ruby>ShigotoForm<rt>シゴトフォーム</rt></rb><span class="fs-6 d-none d-md-block">&emsp;履歴書メーカー&emsp;</span><span id="version-no" class="fs-6 d-none d-md-block"></span>
+      <ruby>ShigotoForm<rt>シゴトフォーム</rt></ruby><span class="fs-6 d-none d-md-block">&emsp;履歴書メーカー&emsp;</span><span id="version-no" class="fs-6 d-none d-md-block"></span>
     </a>
     <button class="navbar-toggler d-block" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
       <span class="navbar-toggler-icon"></span>
@@ -58,7 +170,7 @@ $$one('#app')!.innerHTML = `
 
 <div class="resume">
   <div class="main-content">
-    <h1 class="mb-5">履歴書</h1>
+    <h1 class="">履歴書</h1>
     <form>
       <div class="row mb-3">
         <label for="date-input" class="col-md-3 col-form-label-sm text-right required">年月日入力欄</label>
@@ -97,15 +209,28 @@ $$one('#app')!.innerHTML = `
         </div>
       </div>
       <div class="row mb-3">
-        <label for="address-input" class="col-md-3 col-form-label-sm text-right required">郵便番号</label>
+        <label for="zip-code-input" class="col-md-3 col-form-label-sm text-right required">郵便番号</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="address-input" name="zip-code" pattern="\d{3}-?\d{4}" placeholder="郵便番号を入力してください" required pattern="\\d{7}" title="7桁の数字を入力してください">
+          <input type="text" class="form-control" id="zip-code-input" name="zip-code" pattern="\d{3}-?\d{4}" placeholder="郵便番号を入力してください" required pattern="\\d{7}" title="7桁の数字を入力してください">
         </div>
       </div>
       <div class="row mb-3">
-        <label for="address-input" class="col-md-3 col-form-label-sm text-right required">住所</label>
+        <label for="address1-input" class="col-md-3 col-form-label-sm text-right required">住所</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="address-input" name="address1" pattern=".*\S+.*" placeholder="住所を入力してください" required>
+          <input type="text" class="form-control" id="address1-input" name="address1" pattern=".*\S+.*" placeholder="住所を入力してください" required>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="tel1-input" class="col-md-3 col-form-label-sm text-right">電話番号</label>
+        <div class="col-md-9">
+          <input type="tel" class="form-control" id="tel1-input" name="tel1" pattern="\d{2,4}-?\d{2,4}-?\d{3,4}" placeholder="電話番号を入力してください">
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="mail1-input" class="col-md-3 col-form-label-sm text-right">メールアドレス</label>
+        <div class="col-md-9">
+          <input type="email" class="form-control" id="mail1-input" name="mail1" placeholder="メールアドレスを入力してください"
+            pattern="^[a-zA-Z0-9._+\\-]+@[a-zA-Z0-9.\\-]+(\\.[a-zA-Z]{2,})+$" title="有効なメールアドレスを入力してください">
         </div>
       </div>
       <div class="accordion mb-3" id="accordionExample">
@@ -118,15 +243,15 @@ $$one('#app')!.innerHTML = `
           <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
             <div class="accordion-body">
               <div class="row mb-3">
-                <label for="alt-address-input" class="col-md-3 col-form-label-sm text-right">住所</label>
+                <label for="address2-input" class="col-md-3 col-form-label-sm text-right">住所</label>
                 <div class="col-md-9">
-                  <input type="text" class="form-control" id="alt-address-input" name="address2" placeholder="住所を入力してください">
+                  <input type="text" class="form-control" id="address2-input" name="address2" placeholder="住所を入力してください">
                 </div>
               </div>
               <div class="row mb-3">
-                <label for="alt-phone-input" class="col-md-3 col-form-label-sm text-right">電話番号</label>
+                <label for="tel2-input" class="col-md-3 col-form-label-sm text-right">電話番号</label>
                 <div class="col-md-9">
-                  <input type="tel" class="form-control" id="alt-phone-input" pattern="\d{2,4}-?\d{2,4}-?\d{3,4}" placeholder="電話番号を入力してください">
+                  <input type="tel" class="form-control" id="tel2-input" pattern="\d{2,4}-?\d{2,4}-?\d{3,4}" placeholder="電話番号を入力してください">
                 </div>
               </div>
             </div>
@@ -155,10 +280,17 @@ $$one('#app')!.innerHTML = `
   <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="confirmDeleteModalLabel">確認</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header">
+        <h5 class="modal-title" id="resumeModalLabel">履歴書プレビュー</h5>
+        <div class="ms-auto d-flex align-items-center" style="gap:0.5em;">
+          <label class="me-1 mb-0" for="font-select" style="white-space:nowrap;">フォント:</label>
+          <select id="font-select" class="form-select form-select-sm" style="width:auto;">
+            <option value="gothic">ゴシック体</option>
+            <option value="mincho">明朝体</option>
+          </select>
         </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+      </div>
         <div class="modal-body">
           入力内容を削除します。よろしいですか？
         </div>
@@ -172,28 +304,297 @@ $$one('#app')!.innerHTML = `
 </div>
 `
 
-AutoKana.bind('#name-input', '#furigana-input')
+  AutoKana.bind('#name-input', '#furigana-input');
 
-Resume.addHistoryEventListener()
-Resume.addLicenseEventListener()
-Theme.addThemeSwitchEventListener()
+  Theme.addThemeSwitchEventListener();
 
-Resume.initCreatedAt()
-Resume.addInputEventListeners()
-Resume.addDownloadButtonEventListener()
-Resume.addDeleteConfirmButtonEventListener()
-Resume.addUploadButtonEventListener()
+  // IndexedDBから初期化・復元
+  const resumeJson = await loadResume();
+  if (resumeJson) {
+    loadToForm(jsonToFormResume(resumeJson));
+  }
+  Resume.addHistoryEventListener();
+  Resume.addLicenseEventListener();
+  // 「履歴書を表示」ボタンを有効化
+  const showResumeBtn = document.querySelector('#show-resume') as HTMLButtonElement | null;
+  if (showResumeBtn) showResumeBtn.disabled = false;
 
-$$one('#version-no')!.textContent = packageJson.version
+  /**
+   * 入力・変更イベントで自動保存
+   * すべてのinput, textarea, select要素にchangeイベントを付与
+   * 生年月日入力時は満年齢も自動計算
+   */
+  const formEl = document.querySelector('form');
+  if (formEl) {
+    const saveHandler = async () => {
+      const data = saveFromForm();
+      await saveResume(formResumeToJson(data));
+    };
+    const elements = formEl.querySelectorAll('input, textarea, select');
+    elements.forEach(el => {
+      el.addEventListener('change', saveHandler);
+      // 年月入力にもイベントを追加
+      if (el instanceof HTMLInputElement && (el.type === 'month' || el.type === 'date')) {
+        el.addEventListener('input', saveHandler);
+      }
+    });
 
-if (localStorage.getItem('theme') === 'dark') {
-  document.body.classList.add('dark')
-}
+    // 動的追加項目にも保存イベントを付与
+    const observeTargets = [
+      document.getElementById('career-history'),
+      document.getElementById('license-history')
+    ];
+    observeTargets.forEach(target => {
+      if (!target) return;
+      const observer = new MutationObserver(() => {
+        // 新しく追加されたinput, textarea, select全てにイベントを付与
+        const newInputs = target.querySelectorAll('input, textarea, select');
+        newInputs.forEach(el => {
+          el.removeEventListener('change', saveHandler);
+          el.removeEventListener('input', saveHandler);
+          el.addEventListener('change', saveHandler);
+          el.addEventListener('input', saveHandler);
+        });
+      });
+      observer.observe(target, { childList: true, subtree: true });
+    });
 
-let resume = JSON.parse(localStorage.getItem('resume')!)
-if (resume) {
-  Resume.loadFromLocalStorage()
-} else {
-  resume = new RsumeData.Resume()
-  localStorage.setItem('resume', JSON.stringify(resume))
-}
+    // 生年月日入力時に満年齢を計算して表示
+    const birthInput = document.querySelector('#birthdate-input') as HTMLInputElement | null;
+    const ageDisplay = document.querySelector('#age-display');
+    if (birthInput && ageDisplay) {
+      birthInput.addEventListener('change', async () => {
+        const val = birthInput.value;
+        let age = '';
+        if (val) {
+          const today = new Date();
+          const birth = new Date(val);
+          let calcAge = today.getFullYear() - birth.getFullYear();
+          const m = today.getMonth() - birth.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+            calcAge--;
+          }
+          age = isNaN(calcAge) ? '' : String(calcAge);
+        }
+        ageDisplay.textContent = age;
+
+        // 年齢再計算時にDBへ保存
+        const data = saveFromForm();
+        const json = formResumeToJson(data);
+        json.age = age ? Number(age) : 0;
+        await saveResume(json);
+      });
+      // 初期表示時も反映
+      if (birthInput.value) {
+        const val = birthInput.value;
+        const today = new Date();
+        const birth = new Date(val);
+        let age = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+          age--;
+        }
+        ageDisplay.textContent = isNaN(age) ? '' : String(age);
+      }
+    }
+  }
+
+  /**
+   * エクスポートボタン
+   */
+  document.querySelector('#backup-button')?.addEventListener('click', async () => {
+    const data = saveFromForm();
+    // 入力年月日取得
+    const date = (data.createdAt || '').replace(/-/g, '');
+    const filename = `resume_${date}.json`;
+    // エクスポートは従来のjson形式
+    const blob = new Blob([JSON.stringify(formResumeToJson(data), null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  });
+
+  /**
+   * インポートボタン
+   */
+  document.querySelector('#upload-button')?.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = async (e: any) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const text = await file.text();
+      const data = JSON.parse(text);
+      loadToForm(jsonToFormResume(data));
+      await saveResume(data);
+    };
+    input.click();
+  });
+
+  // 履歴書プレビュー用モーダルHTMLをbody直下に追加
+  const resumeModalHtml = `
+<div class="modal fade" id="resumeModal" tabindex="-1" aria-labelledby="resumeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resumeModalLabel">履歴書プレビュー</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+      </div>
+      <div class="modal-body d-flex justify-content-center align-items-center">
+        <div id="resume-modal-content" class="w-100 d-flex justify-content-center" style="padding-top:500px;"></div>
+      </div>
+      <div class="modal-footer">
+        <div class="font-switcher">
+          <label class="me-2">フォント:</label>
+          <select id="font-select" class="form-select form-select-sm d-inline-block" style="width:auto;">
+            <option value="gothic">ゴシック体</option>
+            <option value="mincho">明朝体</option>
+          </select>
+        </div>
+
+        <button id="download-resume-html" class="btn btn-primary">履歴書PDFダウンロード</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+  document.body.insertAdjacentHTML('beforeend', resumeModalHtml);
+
+  // 「履歴書を表示」ボタンイベント
+  document.querySelector('#show-resume')?.addEventListener('click', async () => {
+    const resumeJson = await loadResume();
+    if (!resumeJson) return;
+    const data = jsonToFormResume(resumeJson);
+    // フォント選択状態を取得
+    const fontType = (document.querySelector('#resumeModal .modal-footer #font-select') as HTMLSelectElement)?.value
+      || (document.getElementById('font-select') as HTMLSelectElement)?.value
+      || 'gothic';
+    // 履歴書HTML生成
+    const html = Resume.generateResumeHtml(data, fontType as 'gothic' | 'mincho');
+    const content = document.querySelector('#resume-modal-content');
+    if (content) {
+      content.innerHTML = html;
+    }
+    // モーダル内font-selectイベントリスナーを付与
+    const modalFontSelect = document.querySelector('#resumeModal .modal-footer #font-select') as HTMLSelectElement | null;
+    if (modalFontSelect) {
+      modalFontSelect.addEventListener('change', () => {
+        const preview = document.querySelector('#resume-modal-content .resume-preview') as HTMLElement | null;
+        if (preview) {
+          preview.classList.remove('font-gothic', 'font-mincho');
+          if (modalFontSelect.value === 'gothic') {
+            preview.classList.add('font-gothic');
+          } else if (modalFontSelect.value === 'mincho') {
+            preview.classList.add('font-mincho');
+          }
+        }
+      });
+    }
+    // モーダル表示
+    const modal = new (window as any).bootstrap.Modal(document.querySelector('#resumeModal'));
+    modal.show();
+  });
+
+  // モーダル内ダウンロードボタン
+  document.body.addEventListener('click', async (e) => {
+    if ((e.target as HTMLElement).id === 'download-resume-html') {
+      // 最新データ取得
+      const resumeJson = await loadResume();
+      let date = '';
+      let name = '';
+      if (resumeJson) {
+        date = (resumeJson.createdAt || '').replace(/-/g, '');
+        name = resumeJson.fullname || '';
+      }
+      // .resume-previewのみPDF化
+      const preview = document.querySelector('#resume-modal-content .resume-preview') as HTMLElement | null;
+      if (preview) {
+        // 背景色の斑を防ぐためのオプション設定
+        const opt = {
+          margin: 0,
+          filename: `履歴書_${name}_${date}.pdf`,
+          image: {
+            type: 'jpeg',
+            quality: 1.0  // 品質を最大に
+          },
+          html2canvas: {
+            scale: 3,  // スケールを上げて解像度向上
+            // backgroundColor: '#ffffff',  // 明示的に白背景設定
+            useCORS: true,
+            allowTaint: true,
+            width: Math.round(212 * 96 / 25.4),  // 212mm × 96dpi ÷ 25.4
+            height: Math.round(299 * 96 / 25.4), // 299mm × 96dpi ÷ 25.4
+            dpi: 192,  // DPIを192に設定
+            letterRendering: true,  // 文字レンダリング改善
+            removeContainer: true,  // コンテナ削除
+            foreignObjectRendering: false,  // SVG関連の問題回避
+            onclone: function(clonedDoc: Document) {              
+              // クローンされたドキュメントでテーブル線幅を調整
+              clonedDoc.body.style.backgroundColor = '#fff';  // 背景色を白に設定
+              clonedDoc.body.style.color = '#000';  // 文字色を黒に設定
+              const tables = clonedDoc.querySelectorAll('table, th, td, tr');
+              tables.forEach((el: Element) => {
+                const style = (el as HTMLElement).style;
+                style.border = '0.1px solid #ddd';  // 極細の線幅
+                style.backgroundColor = '#fff';  // 背景色を白に
+                style.color = '#000';  // 文字色を黒に
+              });
+            }
+          },
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait',
+            putOnlyUsedFonts: true,
+            compress: false  // 圧縮無効で品質保持
+          }
+        };
+
+        try {
+          // 少し待ってからPDF生成（レンダリング完了を待つ）
+          // await new Promise(resolve => setTimeout(resolve, 100));
+          await html2pdf().set(opt).from(preview).save();
+        } finally {
+        }
+      }
+    }
+  });
+
+  const versionNo = document.querySelector('#version-no');
+  if (versionNo) versionNo.textContent = packageJson.version;
+
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark')
+  }
+
+  // フォント切替イベント
+  const fontSelect = document.getElementById('font-select') as HTMLSelectElement | null;
+  if (fontSelect) {
+    fontSelect.addEventListener('change', () => {
+      // プレビュー内のフォントクラスを切り替え
+      const preview = document.querySelector('#resume-modal-content .resume-preview') as HTMLElement | null;
+      if (preview) {
+        preview.classList.remove('font-gothic', 'font-mincho');
+        if (fontSelect.value === 'gothic') {
+          preview.classList.add('font-gothic');
+        } else if (fontSelect.value === 'mincho') {
+          preview.classList.add('font-mincho');
+        }
+      }
+    });
+  }
+});
+
+// IndexedDBから初期化
+(async () => {
+  const resumeJson = await loadResume();
+  if (resumeJson) {
+    loadToForm(jsonToFormResume(resumeJson));
+  }
+  // 「履歴書を表示」ボタンを有効化
+  const showResumeBtn = document.querySelector('#show-resume') as HTMLButtonElement | null;
+  if (showResumeBtn) showResumeBtn.disabled = false;
+})();

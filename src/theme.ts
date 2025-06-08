@@ -1,7 +1,5 @@
-import { $$one } from './indolence.js';
-
 export const addThemeSwitchEventListener = () => {
-    const themeSwitch = $$one('#theme-switch') as HTMLInputElement;
+    const themeSwitch = document.querySelector('#theme-switch') as HTMLInputElement;
     const theme = localStorage.getItem('theme');
     if (theme) {
         document.body.dataset.bsTheme = theme;

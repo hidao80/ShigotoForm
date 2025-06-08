@@ -1,240 +1,376 @@
-import { $$one, $$all, $$new } from './indolence.ts'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import * as bootstrap from 'bootstrap'
-import { Resume, Education, Career, License, isEducation, isCareer } from './models/Resume.ts'
+import { Resume, Career, License } from './models/Resume.ts';
 
+/**
+ * 指定した要素に対して、変更や入力イベントのリスナーを追加します。
+ * @param el - イベントを追加する要素
+ * @param handler - イベント発生時に呼び出されるハンドラ関数
+ */
+function addSaveListeners(el: HTMLElement, handler: () => void) {
+  ['change', 'input'].forEach(type => {
+    el.removeEventListener(type, handler as EventListener);
+    el.addEventListener(type, handler as EventListener);
+  });
+}
+
+/**
+ * 学歴・職歴の追加ボタンにイベントリスナーを追加します。
+ * ボタンがクリックされると、新しい学歴・職歴の行を生成し、コンテナに追加します。
+ * 行には、開始年月、終了年月、会社・学校名、役職・学科、説明の入力フィールドが含まれます。
+ * また、行には削除ボタンも含まれ、クリックするとその行を削除します。
+ * 行の各入力フィールドには、変更や入力イベントのリスナーが追加され、変更があった場合にイベントを発火します。
+ * @returns {void}
+ * @example
+ * addHistoryEventListener();
+ * 
+ */
 export function addHistoryEventListener() {
-    $$one('#add-career-history')!.addEventListener('click', () => {
-        const historyContainer = $$one('#career-history')!;
-        const newCard = $$new('div');
-        newCard.className = 'card mt-2';
-        newCard.innerHTML = `
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <input type="month" class="form-control mb-2" name="endDate" placeholder="年月">
-                    </div>
-                    <div class="col-md-7 d-flex justify-content-between">
-                        <input type="text" class="form-control" name="name" placeholder="内容を入力してください">
-                    </div>
-                    <div class="col-md-1 d-flex justify-content-between text-nowrap">
-                        <button type="button" class="btn btn-danger ml-2 remove-history">削除</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        historyContainer.appendChild(newCard);
-
-        newCard.querySelector('.remove-history')!.addEventListener('click', () => {
-            historyContainer.removeChild(newCard);
-        });
+  const btn = document.querySelector('#add-career-history');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const container = document.querySelector('#career-history');
+      if (container) {
+        const div = createCareerRow();
+        container.appendChild(div);
+        attachCareerRowListeners(div);
+      }
     });
-};
+  }
+}
 
+/**]
+ * 免許・資格の追加ボタンにイベントリスナーを追加します。
+ * ボタンがクリックされると、新しい免許・資格の行を生成し、コンテナに追加します。
+ * 行には、年月、内容、合格・取得の選択肢が含まれます。
+ * 行には削除ボタンも含まれ、クリックするとその行を削除します。
+ * 行の各入力フィールドには、変更や入力イベントのリスナーが追加され、変更があった場合にイベントを発火します。
+ * @returns {void}
+ * @example
+ * addLicenseEventListener();
+ */
 export function addLicenseEventListener() {
-    $$one('#add-license-history')!.addEventListener('click', () => {
-        const careerContainer = $$one('#license-history')!;
-        const newCard = $$new('div');
-        newCard.className = 'card mt-2';
-        newCard.innerHTML = `
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <input type="month" class="form-control mb-2" name="endDate" placeholder="年月">
-                    </div>
-                    <div class="col-md-7 d-flex justify-content-between">
-                        <input type="text" class="form-control" name="name" placeholder="内容を入力してください">
-                    </div>
-                    <div class="col-md-1 d-flex justify-content-between text-nowrap">
-                        <button type="button" class="btn btn-danger ml-2 remove-history">削除</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        careerContainer.appendChild(newCard);
-
-        newCard.querySelector('.remove-history')!.addEventListener('click', () => {
-            careerContainer.removeChild(newCard);
-        });
+  const btn = document.querySelector('#add-license-history');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const container = document.querySelector('#license-history');
+      if (container) {
+        const div = createLicenseRow();
+        container.appendChild(div);
+        attachLicenseRowListeners(div);
+      }
     });
+  }
 }
 
-export function initCreatedAt() {
-    const date = new Date()
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const today = String(date.getDate()).padStart(2, '0')
-    const elem = $$one<HTMLInputElement>('#created-at')
-    elem!.value = `${year}-${month}-${today}`
+/**
+ * 学歴・職歴の1行生成
+ * @param {Career} [item] - 初期値として設定するCareerオブジェクト
+ * @returns {HTMLDivElement} - 生成された行のHTML要素
+ * @example
+ * const careerRow = createCareerRow({ start: '2020-04', end: '2022-03', name: 'ABC株式会社', position: 'エンジニア', description: 'システム開発' });
+ * document.querySelector('#career-history').appendChild(careerRow);
+ */
+function createCareerRow(item?: Career): HTMLDivElement {
+  const div = document.createElement('div');
+  div.className = 'card mb-2';
+  div.innerHTML = `
+    <div class="card-body row align-items-center flex-nowrap">
+      <div class="col-auto d-flex align-items-center gap-1" style="min-width:264px;">
+        <input type="month" class="form-control" name="start" placeholder="開始年月" value="${item?.start || ''}" style="width:120px;" />
+        <span>～</span>
+        <input type="month" class="form-control" name="end" placeholder="終了年月" value="${item?.end || ''}" style="width:120px;" />
+      </div>
+      <div class="col px-0">
+        <input type="text" class="form-control" name="name" placeholder="会社・学校名" value="${item?.name || ''}" />
+      </div>
+      <div class="col px-0">
+        <input type="text" class="form-control" name="position" placeholder="役職・学科" value="${item?.position || ''}" />
+      </div>
+      <div class="col px-0">
+        <input type="text" class="form-control" name="description" placeholder="説明" value="${item?.description || ''}" />
+      </div>
+      <div class="col-auto ps-1">
+        <button type="button" class="btn btn-danger btn-sm remove-row">削除</button>
+      </div>
+    </div>
+  `;
+  return div;
 }
 
-export function saveToLocalStorage() {
-    const inputs = $$all<HTMLInputElement>('input[type="text"], input[type="month"], input[type="date"]')!
-    const data: { [key: string]: string } = {};
-
-    for (const input of inputs) {
-        if (!input.name) {
-            continue;
-        }
-        data[input.name] = input.value;
-    }
-
-    localStorage.setItem('resume', JSON.stringify(data));
+/**
+ * 免許・資格の1行生成
+ * @param {License} [item] - 初期値として設定するLicenseオブジェクト
+ * @returns {HTMLDivElement} - 生成された行のHTML要素
+ * @example
+ * const licenseRow = createLicenseRow({ date: '2023-10', name: '普通自動車免許', pass: '合格' });
+ * document.querySelector('#license-history').appendChild(licenseRow);
+ */
+function createLicenseRow(item?: License): HTMLDivElement {
+  const div = document.createElement('div');
+  div.className = 'card mb-2';
+  div.innerHTML = `
+    <div class="card-body row align-items-center">
+      <div class="col-auto" style="min-width:120px;">
+        <input type="month" class="form-control" name="endDate" placeholder="年月" value="${item?.date || ''}" />
+      </div>
+      <div class="col px-0">
+        <input type="text" class="form-control" name="name" placeholder="内容" value="${item?.name || ''}" />
+      </div>
+      <div class="col-auto ps-1 d-flex gap-1 align-items-center">
+        <select class="form-select form-select-sm status-select" style="width:auto;min-width:70px;">
+          <option value="合格"${item?.pass === '合格' || !item?.pass ? ' selected' : ''}>合格</option>
+          <option value="取得"${item?.pass === '取得' ? ' selected' : ''}>取得</option>
+        </select>
+        <button type="button" class="btn btn-danger btn-sm remove-row">削除</button>
+      </div>
+    </div>
+  `;
+  return div;
 }
 
-export function addInputEventListeners() {
-    const inputs = $$all<HTMLInputElement>('input[type="text"], input[type="month"], input[type="date"]')!
-    for (const input of inputs) {
-        input.addEventListener('input', saveToLocalStorage)
-    }
+/**
+ * 学歴・職歴の行にイベントリスナーを追加します。
+ * 各入力フィールドに対して、変更や入力イベントのリスナーを追加し、変更があった場合にイベントを発火します。
+ * また、削除ボタンがクリックされた場合、その行を削除します。
+ * @param {HTMLElement} div - 学歴・職歴の行のHTML要素
+ * @returns {void}
+ * @example
+ * attachCareerRowListeners(document.querySelector('.career-row'));
+ */
+function attachCareerRowListeners(div: HTMLElement) {
+  const handler = () => {
+    const event = new Event('career-row-updated', { bubbles: true });
+    div.dispatchEvent(event);
+  };
+  ['start', 'end', 'name', 'position', 'description'].forEach(name => {
+    const input = div.querySelector(`[name="${name}"]`);
+    if (input) addSaveListeners(input as HTMLElement, handler);
+  });
+  const removeBtn = div.querySelector('.remove-row');
+  if (removeBtn) removeBtn.addEventListener('click', () => div.remove());
 }
 
-export function loadFromLocalStorage() {
-    const data = localStorage.getItem('resume')
-    if (!data) {
-        return;
-    }
-
-    // 既存の学歴・職歴、免許・資格項目を削除
-    const historyCards = $$all<HTMLElement>('div.card')!;
-    for (const card of historyCards) {
-        card.remove();
-    }
-
-    // const resume = Object.assign(new Resume(), JSON.parse(data)) as Resume
-    const resume = JSON.parse(data)
-    for (const key in resume) {
-        if (key === 'resume') {
-            for (const item in resume[key]) {
-                if (item === 'education' || item === 'career' || item === 'license') {
-                    loadHistory(resume[key][item])
-                }
-            }
-        } else {
-            const input = $$one<HTMLInputElement>(`[name="${key}"]`)
-            if (input && key !== 'createdAt') {
-                input.value = resume[key]
-            }
-        }
-    }
-
-    // 年齢を画面に表示
-    const age = $$one<HTMLInputElement>('#age-display')
-    age!.innerHTML = isNaN(resume.birthday) ? Resume.calculateAge(resume.birthday).toString() : '&emsp;'
+/**
+ * 免許・資格の行にイベントリスナーを追加します。
+ * 各入力フィールドに対して、変更や入力イベントのリスナーを追加し、変更があった場合にイベントを発火します。
+ * また、削除ボタンがクリックされた場合、その行を削除します。
+ * @param {HTMLElement} div - 免許・資格の行のHTML要素
+ * @returns {void}
+ * @example
+ * attachLicenseRowListeners(document.querySelector('.license-row'));
+ */
+function attachLicenseRowListeners(div: HTMLElement) {
+  const handler = () => {
+    const event = new Event('license-row-updated', { bubbles: true });
+    div.dispatchEvent(event);
+  };
+  ['endDate', 'name', 'status-select'].forEach(name => {
+    const input = div.querySelector(`[name="${name}"], .${name}`);
+    if (input) addSaveListeners(input as HTMLElement, handler);
+  });
+  const removeBtn = div.querySelector('.remove-row');
+  if (removeBtn) removeBtn.addEventListener('click', () => div.remove());
 }
 
-function loadHistory(resume: Education[] | Career[] | License[]) {
-    if (!resume) {
-        return;
-    }
-    if (resume.length === 0) {
-        return;
-    }
+/**
+ * 履歴書データをHTML形式で生成します。
+ * @param {Resume} data - 履歴書のデータ
+ * @param {'gothic' | 'mincho'} fontType - 使用するフォントの種類（デフォルトは'gothic'）
+ * @returns {string} - 生成されたHTML文字列
+ * @example
+ * const resumeHtml = generateResumeHtml(resumeData, 'mincho');
+ * document.querySelector('#resume-preview').innerHTML = resumeHtml;
+ */
+export function generateResumeHtml(data: Resume, fontType: 'gothic' | 'mincho' = 'gothic'): string {
+  const fontClass = fontType === 'mincho' ? 'font-mincho' : 'font-gothic';
+  // 日付を「YYYY年MM月DD日」形式に変換する関数
+  function formatDate(dateStr: string): string {
+    if (!dateStr) return '';
+    // YYYY-MM-DD or YYYY-MM
+    const [y, m = '', d = ''] = dateStr.split(/-|\//);
+    if (!y) return '';
+    if (m && d) return `${y}年${m}月${d}日`;
+    if (m) return `${y}年${m}月`;
+    return `${y}年`;
+  }
 
-    let historyContainer: HTMLElement;
-    let button: HTMLInputElement;
-    let getDate: Function
-    if (isEducation(resume[0]) || isCareer(resume[0])) {
-        historyContainer = $$one('#career-history')!;
-        button = $$one<HTMLInputElement>('#add-career-history')!;
-        getDate = (history: Education | Career) => history.endDate?.split('-').slice(0, 2).join('-')!
-    } else {
-        historyContainer = $$one('#license-history')!;
-        button = $$one<HTMLInputElement>('#add-license-history')!;
-        getDate = (history: License) => history.date.split('-').slice(0, 2).join('-')!
-    }
-    for (const history of resume) {
-        button!.click()
-        const newCard = historyContainer.lastElementChild!
-        const endDate = newCard.querySelector<HTMLInputElement>('input[name="endDate"]')!
-        const name = newCard.querySelector<HTMLInputElement>('input[name="name"]')!
-        endDate.value = getDate(history)
-        name.value = history.name;
-    }
+  /**
+   * 郵便番号をハイフン付きの形式にフォーマットします。
+   * 7桁以上の場合は、4文字目にハイフンを挿入します。
+   * @param {string} zip - フォーマットする郵便番号
+   * @returns {string} - フォーマットされた郵便番号
+   * @example
+   * const formattedZip = formatZipCode('1234567'); // '123-4567'
+   * const formattedZipWithHyphen = formatZipCode('123-4567'); // '123-4567'
+   * const formattedZipShort = formatZipCode('12345'); // '12345'
+   * const formattedZipEmpty = formatZipCode(''); // ''
+   */
+  function formatZipCode(zip: string): string {
+    if (!zip) return '';
+    // すでにハイフンが含まれていればそのまま
+    if (zip.includes('-')) return zip;
+    // 7桁以上の場合のみ4文字目にハイフンを挿入
+    if (zip.length >= 7) return zip.slice(0, 3) + '-' + zip.slice(3);
+    return zip;
+  }
+
+  return `
+    <div class="resume-preview p-4 rounded shadow ${fontClass}" style="width:210mm; height:297mm; margin:auto; box-sizing:border-box; position:relative;">
+      <h1 class="mb-3">履歴書</h1>
+      <table class="table table-bordered mb-4">
+        <tbody>
+          <tr>
+            <th style="width:140px;">ふりがな</th>
+            <td>
+              <ruby>
+                ${data.fullname || ''}
+                ${data.fullnameKana ? `<rt>${data.fullnameKana}</rt>` : ''}
+              </ruby>
+            </td>
+            <th style="width:140px;">生年月日</th>
+            <td>${formatDate(data.birthday || '')}</td>
+          </tr>
+          <tr>
+            <th>性別</th>
+            <td>${data.sex || ''}</td>
+            <th>作成日</th>
+            <td>${formatDate(data.createdAt || '')}</td>
+          </tr>
+          <tr>
+            <th>郵便番号</th>
+            <td>${formatZipCode(data.zipCode || '')}</td>
+            <th>住所</th>
+            <td>${data.address1 || ''}</td>
+          </tr>
+          <tr>
+            <th>電話番号</th>
+            <td>${data.tel1 || ''}</td>
+            <th>メールアドレス</th>
+            <td>${data.mail1 || ''}</td>
+          </tr>
+          <tr>
+            <th>連絡先住所</th>
+            <td>${data.address2 || ''}</td>
+            <th>連絡先電話番号</th>
+            <td>${data.tel2 || ''}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h2 class="mt-4">学歴・職歴</h2>
+      <ul>
+        ${(data.career || []).map(c => 
+          `<li>
+            ${formatDate(c.start)} ～ ${(c.end && c.end.trim() !== '') ? formatDate(c.end) : '現在'} ${c.name} 
+            ${c.position ? ' / ' + c.position : ''} 
+            ${c.description ? '<span style="margin-left:2em;">' + c.description + '</span>' : ''}
+          </li>`
+        ).join('')}
+      </ul>
+      <h2 class="mt-4">免許・資格</h2>
+      <ul>
+        ${(data.license || []).map(l => `<li>${formatDate(l.date)} ${l.name}${l.pass ? '　' + l.pass : ''}</li>`).join('')}
+      </ul>
+    </div>
+  `;
 }
 
-export function addDownloadButtonEventListener() {
-    $$one('#backup-button')!.addEventListener('click', () => {
-        const data = localStorage.getItem('resume');
-        if (!data) {
-            return;
-        }
+/**
+ * フォームからResumeデータを生成します。
+ * フォームの各入力フィールドから値を取得し、CareerとLicenseの配列を生成します。
+ * @returns {Resume} - 生成されたResumeオブジェクト
+ * @example
+ * const resumeData = saveFromForm();
+ */
+export function saveFromForm(): Resume {
+  const getValue = (selector: string) =>
+    (document.querySelector(selector) as HTMLInputElement)?.value || '';
 
-        // 今日の日付をYYYYMMDD形式で取得
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const today = String(date.getDate()).padStart(2, '0');
-        // ファイル名を「履歴書_作成日.json」とする
-        const fileName = `履歴書_${year}${month}${today}.json`;
+  const career: Career[] = Array.from(document.querySelectorAll('#career-history .card') || []).map(card => {
+    const startInput = card.querySelector('input[name="start"]') as HTMLInputElement;
+    const endInput = card.querySelector('input[name="end"]') as HTMLInputElement;
+    const nameInput = card.querySelector('input[name="name"]') as HTMLInputElement;
+    const positionInput = card.querySelector('input[name="position"]') as HTMLInputElement;
+    const descriptionInput = card.querySelector('input[name="description"]') as HTMLInputElement;
+    return {
+      start: startInput?.value || '',
+      end: endInput?.value || '',
+      name: nameInput?.value || '',
+      position: positionInput?.value || '',
+      description: descriptionInput?.value || ''
+    };
+  });
 
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = $$new<HTMLAnchorElement>('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
+  const license: License[] = Array.from(document.querySelectorAll('#license-history .card') || []).map(card => {
+    const endDateInput = card.querySelector('input[name="endDate"]') as HTMLInputElement;
+    const nameInput = card.querySelector('input[name="name"]') as HTMLInputElement;
+    const statusSelect = card.querySelector('.status-select') as HTMLSelectElement;
+    return {
+      date: endDateInput?.value || '',
+      name: nameInput?.value || '',
+      pass: statusSelect?.value || '合格'
+    };
+  });
+
+  return {
+    createdAt: getValue('#created-at'),
+    fullname: getValue('#name-input'),
+    fullnameKana: getValue('#furigana-input'),
+    birthday: getValue('#birthdate-input'),
+    sex: getValue('#sex-input'),
+    zipCode: getValue('#zip-code-input'),
+    address1: getValue('#address1-input'),
+    address2: getValue('#address2-input'),
+    tel1: getValue('#tel1-input'),
+    tel2: getValue('#tel2-input'),
+    mail1: getValue('#mail1-input'),
+    mail2: getValue('#mail2-input'),
+    career,
+    license,
+  };
+}
+
+/**
+ * フォームにResumeデータをロードします。
+ * 各入力フィールドにResumeオブジェクトの値を設定し、学歴・職歴と免許・資格の履歴を生成します。
+ * @param {Resume} resume - ロードするResumeオブジェクト
+ * @returns {void}
+ * @example
+ * loadToForm(resumeData);
+ */
+export function loadToForm(resume: Resume) {
+  const setValue = (selector: string, value: string) => {
+    const el = document.querySelector(selector) as HTMLInputElement;
+    if (el) el.value = value || '';
+  };
+  setValue('#created-at', resume.createdAt);
+  setValue('#name-input', resume.fullname);
+  setValue('#furigana-input', resume.fullnameKana);
+  setValue('#birthdate-input', resume.birthday);
+  setValue('#sex-input', resume.sex);
+  setValue('#zip-code-input', resume.zipCode);
+  setValue('#address1-input', resume.address1);
+  setValue('#address2-input', resume.address2);
+  setValue('#tel1-input', resume.tel1);
+  setValue('#tel2-input', resume.tel2);
+  setValue('#mail1-input', resume.mail1);
+
+  // 学歴・職歴
+  const careerContainer = document.querySelector('#career-history');
+  if (careerContainer) {
+    careerContainer.innerHTML = '';
+    (resume.career || []).forEach(item => {
+      const div = createCareerRow(item);
+      careerContainer.appendChild(div);
+      attachCareerRowListeners(div);
     });
-}
-
-export function addDeleteConfirmButtonEventListener() {
-    $$one('#delete-content')!.addEventListener('click', () => {
-        const modal = new bootstrap.Modal($$one('#confirmDeleteModal')!);
-        modal.show();
-
-        $$one('#confirm-delete')!.addEventListener('click', () => {
-            localStorage.removeItem('resume');
-            const inputs = $$all<HTMLInputElement>('input[type="text"], input[type="month"], input[type="date"]')!;
-            for (const input of inputs) {
-                input.value = '';
-            }
-            const age = $$one<HTMLInputElement>('#age-display')
-            age!.innerHTML = '&emsp;'
-
-            const historyCards = $$all<HTMLElement>('div.card')!;
-            for (const card of historyCards) {
-                card.remove();
-            }
-            modal.hide();
-        });
+  }
+  // 免許・資格
+  const licenseContainer = document.querySelector('#license-history');
+  if (licenseContainer) {
+    licenseContainer.innerHTML = '';
+    (resume.license || []).forEach(item => {
+      const div = createLicenseRow(item);
+      licenseContainer.appendChild(div);
+      attachLicenseRowListeners(div);
     });
-}
-
-export function addUploadButtonEventListener() {
-    $$one('#upload-button')!.addEventListener('click', () => {
-        const input = $$new<HTMLInputElement>('input')
-        input.type = 'file'
-        input.accept = 'application/json'
-        input.addEventListener('change', (event) => {
-            const file = (event.target as HTMLInputElement).files?.[0]
-            if (!file) {
-                return
-            }
-
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                const content = e.target?.result as string
-                const parsedContent = JSON.parse(content)
-                const validData = Object.assign(new Resume(), parsedContent)
-                validData.updateAge()
-
-                localStorage.setItem('resume', JSON.stringify(validData));
-                loadFromLocalStorage();
-
-                // jsonのキーにマッチするinput要素に値をセット
-                for (const key in parsedContent) {
-                    const input = $$one<HTMLInputElement>(`[name="${key}"]`)
-                    if (input && key !== 'createdAt') {
-                        input.value = parsedContent[key]
-                    }
-                }
-                
-                // 年齢を画面に表示
-                const age = $$one<HTMLInputElement>('#age-display')
-                age!.innerHTML = !isNaN(validData.age) ? validData.age.toString() : '&emsp;'
-            };
-            reader.readAsText(file);
-        });
-        input.click();
-    });
+  }
 }

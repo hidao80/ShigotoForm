@@ -1,25 +1,73 @@
 /* styles.css */
 body {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 80px 0 0 0;
 }
 
 .resume {
-    width: 80%;
-    margin: 20px auto;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  margin: 0 auto 20px;
+  padding: 20px;
 }
 
 label.required::after {
-    content: " *";
-    color: red;
+  content: " *";
+  color: red;
 }
 
 .navbar {
-    background-color: var(--bs-body-bg)
+  background-color: var(--bs-body-bg)
 }
 
 #app {
-    padding-top: 60px;
+  padding-top: 10px;
+}
+
+.navbar-brand {
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand img {
+  border-radius: 6px;
+  transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover img {
+  transform: scale(1.1);
+}
+
+ruby {
+  font-size: 1.25rem;
+}
+
+rt {
+  font-size: 0.7rem;
+}
+
+#version-no {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 300;
+}
+
+.resume-preview.font-gothic {
+  font-family:
+    "帳票 UDPゴシック",
+    "Noto Sans JP",
+    "Meiryo",
+    "Yu Gothic",
+    "MS PGothic",
+    sans-serif;
+}
+
+.resume-preview.font-mincho {
+  font-family:
+    "帳票 UDP明朝",
+    "Noto Serif JP",
+    "MS Mincho",
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    serif;
 }
