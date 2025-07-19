@@ -44,6 +44,45 @@ npm start
 
 This will start the application on `http://localhost:3000`.
 
+### Input Instructions
+
+1. **Full Name**: Enter your full name in the text box. Furigana will be auto-filled to some extent.
+2. **Date of Birth**: Select a date from the calendar or enter it in YYYY/MM/DD format.
+3. **Address**: Enter your postal code for auto-completion. Please enter the detailed address manually.
+4. **Phone Number**: Enter numbers in half-width digits without hyphens.
+5. **Email Address**: Enter a valid email address format.
+6. **Education/Work History**: Enter your educational and work history in a list format. You can add or remove rows using the "Add" or "Delete" buttons.
+7. **Qualifications/Licenses**: Enter your qualifications and licenses in a list format. You can add or remove rows using the "Add" or "Delete" buttons.
+
+### Import/Export
+
+You can export the entered resume information to a JSON file or import a previously exported JSON file.  
+Open the menu from the hamburger button at the top right and click the "Export" or "Import" button.
+
+When exporting, a JSON file will be downloaded.  
+When importing, select a JSON file from your device and the input screen will be updated immediately.
+
+### Preview
+
+The content entered on the input screen can be previewed in A4 paper size.  
+At this time, you can select either Gothic or Mincho font.
+
+By clicking the "Download Resume PDF" button at the bottom right of the preview screen, you can download the preview content as a PDF.
+
+## Screenshots
+
+1. **Input Screen**:  
+<img width="600" alt="Input Screen" src="https://github.com/user-attachments/assets/01a0c251-604e-4536-8c74-9b74bed8fff6">
+
+2. **Menu**:  
+<img width="200" alt="Menu" src="https://github.com/user-attachments/assets/f52b7b3f-87c2-44e7-8fd0-eb458391a5f9">
+
+3. **Preview (Gothic Font)**:  
+<img width="600" alt="Preview (Gothic Font)" src="https://github.com/user-attachments/assets/50bf681b-34f1-4d8d-9ddd-0efa1905d911">
+
+4. **Preview (Mincho Font)**:  
+<img width="600" alt="Preview (Mincho Font)" src="https://github.com/user-attachments/assets/f2ab3688-2c8c-437e-b42c-7424b81b87ee">
+
 ## Contributing
 
 We welcome contributions to ShigotoForm! To contribute, follow these steps:
