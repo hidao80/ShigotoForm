@@ -1,0 +1,26 @@
+---
+name: Feature Request
+about: Propose a new feature
+title: "[FEATURE] "
+labels: ["enhancement"]
+assignees: ""
+
+---
+
+## What
+Overview of the proposed feature
+
+## Why
+Why this feature is needed
+
+## How
+How it should be implemented (if you have any ideas)
+
+## Acceptance Criteria
+Completion conditions:
+- [ ]
+- [ ]
+- [ ]
+
+## Additional Context
+Additional information or mockups, if any

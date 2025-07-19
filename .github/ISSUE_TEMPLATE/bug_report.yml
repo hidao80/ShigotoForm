@@ -1,0 +1,31 @@
+---
+name: Bug Report
+about: Report a bug
+title: "[BUG] "
+labels: ["bug"]
+assignees: ""
+
+---
+
+## What
+Summary of the issue
+
+## Expected Behavior
+Expected behavior
+
+## Actual Behavior
+Actual behavior
+
+## Steps to Reproduce
+Steps to reproduce:
+1. 
+2. 
+3. 
+
+## Environment
+- OS: 
+- Browser/Node.js version: 
+- Application version: 
+
+## Additional Context
+Additional information or screenshots if available
