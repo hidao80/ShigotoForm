@@ -18,17 +18,13 @@ import packageJson from '../package.json';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
-// ResumeJson→フォーム用Resume形式へ変換
 /**
- * jsonToFormResume関数
+ * ResumeJson形式のデータをフォーム用Resume形式へ変換します。
  * @param {ResumeJson} json - ResumeJson形式のデータ
- * @returns {Object} フォーム用のResume形式データ
- * @description
- * json.resume.careerとjson.careerの両方に対応。
- * json.resume.careerが存在する場合はそれを優先し、存在しない場合はjson.careerを使用。
- * json.resume.licenseとjson.licenseの両方に対応。
- * json.resume.licenseが存在する場合はそれを優先し、存在しない場合はjson.licenseを使用。
- * 各項目は存在しない場合は空文字列に変換。
+ * @returns {Object} フォーム用Resume形式データ
+ * @throws なし
+ * @example
+ * const formData = jsonToFormResume(json);
  */
 function jsonToFormResume(json: ResumeJson) {
   // career, licenseはjson.resume直下・json直下どちらにも対応
@@ -73,12 +69,12 @@ function jsonToFormResume(json: ResumeJson) {
 }
 
 /**
- * フォームの内容をResumeJson形式へ変換
+ * フォームの内容をResumeJson形式へ変換します。
  * @param {Object} form - フォームの入力データ
  * @returns {ResumeJson} ResumeJson形式のデータ
- * @description
- * フォームの入力値をResumeJson形式に変換します。
- * 各項目は存在しない場合は空文字列に変換されます。
+ * @throws なし
+ * @example
+ * const json = formResumeToJson(form);
  */
 function formResumeToJson(form: any): ResumeJson {
   return {
@@ -588,7 +584,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// IndexedDBから初期化
+/**
+ * 非同期でIndexedDBから履歴書データを初期化・復元します。
+ * @returns {Promise<void>}
+ * @throws なし
+ */
 (async () => {
   const resumeJson = await loadResume();
   if (resumeJson) {

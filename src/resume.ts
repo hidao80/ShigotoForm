@@ -2,8 +2,10 @@ import { Resume, Career, License } from './models/Resume.ts';
 
 /**
  * 指定した要素に対して、変更や入力イベントのリスナーを追加します。
- * @param el - イベントを追加する要素
- * @param handler - イベント発生時に呼び出されるハンドラ関数
+ * @param {HTMLElement} el - イベントを追加する要素
+ * @param {() => void} handler - イベント発生時に呼び出されるハンドラ関数
+ * @returns {void}
+ * @throws なし
  */
 function addSaveListeners(el: HTMLElement, handler: () => void) {
   ['change', 'input'].forEach(type => {
@@ -14,14 +16,10 @@ function addSaveListeners(el: HTMLElement, handler: () => void) {
 
 /**
  * 学歴・職歴の追加ボタンにイベントリスナーを追加します。
- * ボタンがクリックされると、新しい学歴・職歴の行を生成し、コンテナに追加します。
- * 行には、開始年月、終了年月、会社・学校名、役職・学科、説明の入力フィールドが含まれます。
- * また、行には削除ボタンも含まれ、クリックするとその行を削除します。
- * 行の各入力フィールドには、変更や入力イベントのリスナーが追加され、変更があった場合にイベントを発火します。
  * @returns {void}
+ * @throws なし
  * @example
  * addHistoryEventListener();
- * 
  */
 export function addHistoryEventListener() {
   const btn = document.querySelector('#add-career-history');
@@ -37,13 +35,10 @@ export function addHistoryEventListener() {
   }
 }
 
-/**]
+/**
  * 免許・資格の追加ボタンにイベントリスナーを追加します。
- * ボタンがクリックされると、新しい免許・資格の行を生成し、コンテナに追加します。
- * 行には、年月、内容、合格・取得の選択肢が含まれます。
- * 行には削除ボタンも含まれ、クリックするとその行を削除します。
- * 行の各入力フィールドには、変更や入力イベントのリスナーが追加され、変更があった場合にイベントを発火します。
  * @returns {void}
+ * @throws なし
  * @example
  * addLicenseEventListener();
  */
@@ -65,9 +60,9 @@ export function addLicenseEventListener() {
  * 学歴・職歴の1行生成
  * @param {Career} [item] - 初期値として設定するCareerオブジェクト
  * @returns {HTMLDivElement} - 生成された行のHTML要素
+ * @throws なし
  * @example
- * const careerRow = createCareerRow({ start: '2020-04', end: '2022-03', name: 'ABC株式会社', position: 'エンジニア', description: 'システム開発' });
- * document.querySelector('#career-history').appendChild(careerRow);
+ * const row = createCareerRow({ ... });
  */
 function createCareerRow(item?: Career): HTMLDivElement {
   const div = document.createElement('div');
@@ -100,9 +95,9 @@ function createCareerRow(item?: Career): HTMLDivElement {
  * 免許・資格の1行生成
  * @param {License} [item] - 初期値として設定するLicenseオブジェクト
  * @returns {HTMLDivElement} - 生成された行のHTML要素
+ * @throws なし
  * @example
- * const licenseRow = createLicenseRow({ date: '2023-10', name: '普通自動車免許', pass: '合格' });
- * document.querySelector('#license-history').appendChild(licenseRow);
+ * const row = createLicenseRow({ ... });
  */
 function createLicenseRow(item?: License): HTMLDivElement {
   const div = document.createElement('div');
@@ -129,12 +124,11 @@ function createLicenseRow(item?: License): HTMLDivElement {
 
 /**
  * 学歴・職歴の行にイベントリスナーを追加します。
- * 各入力フィールドに対して、変更や入力イベントのリスナーを追加し、変更があった場合にイベントを発火します。
- * また、削除ボタンがクリックされた場合、その行を削除します。
  * @param {HTMLElement} div - 学歴・職歴の行のHTML要素
  * @returns {void}
+ * @throws なし
  * @example
- * attachCareerRowListeners(document.querySelector('.career-row'));
+ * attachCareerRowListeners(div);
  */
 function attachCareerRowListeners(div: HTMLElement) {
   const handler = () => {
@@ -151,12 +145,11 @@ function attachCareerRowListeners(div: HTMLElement) {
 
 /**
  * 免許・資格の行にイベントリスナーを追加します。
- * 各入力フィールドに対して、変更や入力イベントのリスナーを追加し、変更があった場合にイベントを発火します。
- * また、削除ボタンがクリックされた場合、その行を削除します。
  * @param {HTMLElement} div - 免許・資格の行のHTML要素
  * @returns {void}
+ * @throws なし
  * @example
- * attachLicenseRowListeners(document.querySelector('.license-row'));
+ * attachLicenseRowListeners(div);
  */
 function attachLicenseRowListeners(div: HTMLElement) {
   const handler = () => {
@@ -174,15 +167,20 @@ function attachLicenseRowListeners(div: HTMLElement) {
 /**
  * 履歴書データをHTML形式で生成します。
  * @param {Resume} data - 履歴書のデータ
- * @param {'gothic' | 'mincho'} fontType - 使用するフォントの種類（デフォルトは'gothic'）
+ * @param {'gothic' | 'mincho'} [fontType='gothic'] - 使用するフォントの種類
  * @returns {string} - 生成されたHTML文字列
+ * @throws なし
  * @example
- * const resumeHtml = generateResumeHtml(resumeData, 'mincho');
- * document.querySelector('#resume-preview').innerHTML = resumeHtml;
+ * const html = generateResumeHtml(data, 'mincho');
  */
 export function generateResumeHtml(data: Resume, fontType: 'gothic' | 'mincho' = 'gothic'): string {
   const fontClass = fontType === 'mincho' ? 'font-mincho' : 'font-gothic';
-  // 日付を「YYYY年MM月DD日」形式に変換する関数
+  /**
+   * 日付を「YYYY年MM月DD日」形式に変換します。
+   * @param {string} dateStr - 日付文字列
+   * @returns {string} - フォーマット済み日付
+   * @throws なし
+   */
   function formatDate(dateStr: string): string {
     if (!dateStr) return '';
     // YYYY-MM-DD or YYYY-MM
@@ -195,14 +193,9 @@ export function generateResumeHtml(data: Resume, fontType: 'gothic' | 'mincho' =
 
   /**
    * 郵便番号をハイフン付きの形式にフォーマットします。
-   * 7桁以上の場合は、4文字目にハイフンを挿入します。
    * @param {string} zip - フォーマットする郵便番号
    * @returns {string} - フォーマットされた郵便番号
-   * @example
-   * const formattedZip = formatZipCode('1234567'); // '123-4567'
-   * const formattedZipWithHyphen = formatZipCode('123-4567'); // '123-4567'
-   * const formattedZipShort = formatZipCode('12345'); // '12345'
-   * const formattedZipEmpty = formatZipCode(''); // ''
+   * @throws なし
    */
   function formatZipCode(zip: string): string {
     if (!zip) return '';
@@ -275,10 +268,10 @@ export function generateResumeHtml(data: Resume, fontType: 'gothic' | 'mincho' =
 
 /**
  * フォームからResumeデータを生成します。
- * フォームの各入力フィールドから値を取得し、CareerとLicenseの配列を生成します。
  * @returns {Resume} - 生成されたResumeオブジェクト
+ * @throws なし
  * @example
- * const resumeData = saveFromForm();
+ * const resume = saveFromForm();
  */
 export function saveFromForm(): Resume {
   const getValue = (selector: string) =>
@@ -330,11 +323,11 @@ export function saveFromForm(): Resume {
 
 /**
  * フォームにResumeデータをロードします。
- * 各入力フィールドにResumeオブジェクトの値を設定し、学歴・職歴と免許・資格の履歴を生成します。
  * @param {Resume} resume - ロードするResumeオブジェクト
  * @returns {void}
+ * @throws なし
  * @example
- * loadToForm(resumeData);
+ * loadToForm(resume);
  */
 export function loadToForm(resume: Resume) {
   const setValue = (selector: string, value: string) => {
