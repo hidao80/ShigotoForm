@@ -1,5 +1,8 @@
 # ShigotoForm
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/d7518453-f8ce-435d-a995-aecb75f57f44/deploy-status)](https://app.netlify.com/projects/shigotoform/deploys)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ShigotoForm is a project designed to streamline and simplify job application processes. This README provides an overview of the project, how to set it up, and how to contribute.
 
 ## Table of Contents
