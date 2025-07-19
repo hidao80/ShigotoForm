@@ -13,22 +13,22 @@ export default {
                 theme_color: '#ffffff',
                 icons: [
                     {
-                        src: 'public/favicon512.webp',
+                        src: 'public/img/favicon512.webp',
                         sizes: '512x512',
                         type: 'image/webp'
                     },
                     {
-                        src: 'public/favicon256.webp',
+                        src: 'public/img/favicon256.webp',
                         sizes: '256x256',
                         type: 'image/webp'
                     },
                     {
-                        src: 'public/favicon72.webp',
+                        src: 'public/img/favicon72.webp',
                         sizes: '72x72',
                         type: 'image/webp'
                     },
                     {
-                        src: 'public/favicon32.webp',
+                        src: 'public/img/favicon32.webp',
                         sizes: '32x32',
                         type: 'image/webp'
                     }
