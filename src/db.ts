@@ -41,9 +41,17 @@ export interface ResumeRecord {
   json: ResumeJson;
 }
 
+/**
+ * IndexedDB操作用のDBクラス
+ */
 export class ResumeDB extends Dexie {
   resumes!: Table<ResumeRecord, number>;
 
+  /**
+   * ResumeDBのインスタンスを生成します。
+   * @constructor
+   * @throws Dexie関連の例外
+   */
   constructor() {
     super('ResumeDB');
     // createdAtで一意
@@ -55,7 +63,14 @@ export class ResumeDB extends Dexie {
 
 const db = new ResumeDB();
 
-// 保存
+/**
+ * 履歴書データを保存します。
+ * @param {ResumeJson} resume - 保存する履歴書データ
+ * @returns {Promise<void>}
+ * @throws DexieのDBエラー
+ * @example
+ * await saveResume(resume);
+ */
 export async function saveResume(resume: ResumeJson) {
   await db.resumes.where('createdAt').equals(resume.createdAt).delete();
   await db.resumes.put({
@@ -64,12 +79,25 @@ export async function saveResume(resume: ResumeJson) {
   });
 }
 
-// 復元
+/**
+ * 最新の履歴書データを復元します。
+ * @returns {Promise<ResumeJson | undefined>} 復元した履歴書データ。なければundefined。
+ * @throws DexieのDBエラー
+ * @example
+ * const resume = await loadResume();
+ */
 export async function loadResume(): Promise<ResumeJson | undefined> {
   const rec = await db.resumes.orderBy('createdAt').reverse().first();
   return rec?.json;
 }
 
+/**
+ * 履歴書データを全て削除します。
+ * @returns {Promise<void>}
+ * @throws DexieのDBエラー
+ * @example
+ * await clearResume();
+ */
 export async function clearResume() {
   await db.resumes.clear();
 }
