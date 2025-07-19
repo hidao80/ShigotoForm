@@ -1,7 +1,45 @@
 /* styles.css */
+:root {
+  /* Base colors */
+  --light-bg: #ffffff;
+  --light-text: #1a1a1a;
+  --light-primary: #007bff;
+  --light-secondary: #6c757d;
+  --light-accent: #4CAF50;
+  --light-border: #dee2e6;
+  --light-hover: #f8f9fa;
+  --light-required: #dc3545;
+  --light-version: rgba(0, 0, 0, 0.7);
+  
+  --dark-bg: #1a1a1a;
+  --dark-text: #ffffff;
+  --dark-primary: #0095ff;
+  --dark-secondary: #adb5bd;
+  --dark-accent: #66bb6a;
+  --dark-border: #444444;
+  --dark-hover: #2d2d2d;
+  --dark-required: #ff4444;
+  --dark-version: rgba(255, 255, 255, 0.7);
+}
+
+/* Mix colors based on light/dark mode */
+:root {
+  --bg-color: color-mix(in srgb, var(--light-bg) 70%, var(--dark-bg) 30%);
+  --text-color: color-mix(in srgb, var(--light-text) 70%, var(--dark-text) 30%);
+  --primary-color: color-mix(in srgb, var(--light-primary) 70%, var(--dark-primary) 30%);
+  --secondary-color: color-mix(in srgb, var(--light-secondary) 70%, var(--dark-secondary) 30%);
+  --accent-color: color-mix(in srgb, var(--light-accent) 70%, var(--dark-accent) 30%);
+  --border-color: color-mix(in srgb, var(--light-border) 70%, var(--dark-border) 30%);
+  --hover-bg: color-mix(in srgb, var(--light-hover) 70%, var(--dark-hover) 30%);
+  --required-color: color-mix(in srgb, var(--light-required) 70%, var(--dark-required) 30%);
+  --version-color: color-mix(in srgb, var(--light-version) 70%, var(--dark-version) 30%);
+}
+
 body {
   margin: 0;
   padding: 80px 0 0 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 .resume {
@@ -12,11 +50,11 @@ body {
 
 label.required::after {
   content: " *";
-  color: red;
+  color: var(--required-color);
 }
 
 .navbar {
-  background-color: var(--bs-body-bg)
+  background-color: var(--bg-color)
 }
 
 #app {
@@ -48,7 +86,7 @@ rt {
 }
 
 #version-no {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--version-color);
   font-weight: 300;
 }
 
