@@ -4,6 +4,11 @@ import 'bootstrap'
 import '@fontsource/noto-sans-jp/400.css'
 import '@fontsource/noto-serif-jp/400.css'
 import Modal from 'bootstrap/js/dist/modal';
+// Font Awesome CDNを動的に追加
+const fa = document.createElement('link');
+fa.rel = 'stylesheet';
+fa.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+document.head.appendChild(fa);
 // window.bootstrapが未定義の場合にModalをセット
 if (!(window as any).bootstrap) {
   (window as any).bootstrap = { Modal };
@@ -117,12 +122,48 @@ function formResumeToJson(form: any): ResumeJson {
  */
 window.addEventListener('DOMContentLoaded', async () => {
   document.querySelector('#app')!.innerHTML = `
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="helpModalLabel">ヘルプ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+      </div>
+      <div class="modal-body">
+        <h6>入力方法</h6>
+        <ol>
+          <li><b>氏名</b>: 氏名を入力。ふりがなはある程度自動補完されます。</li>
+          <li><b>生年月日</b>: カレンダーから選択またはYYYY/MM/DD形式で入力。</li>
+          <li><b>住所</b>: 住所を入力。</li>
+          <li><b>電話番号</b>: 半角数字で入力。</li>
+          <li><b>メールアドレス</b>: 有効なメールアドレスの形式で入力。</li>
+          <li><b>学歴・職歴</b>: 開始年月から修了年月と所属先名、役職や学科、備考をリスト形式で入力。追加・削除可。</li>
+          <li><b>免許・資格</b>: 取得年月と内容をリスト形式で入力。取得なのか合格なのかを選択。追加・削除可。</li>
+        </ol>
+        <h6 class="mt-4">インポート・エクスポート</h6>
+        <ul>
+          <li>入力内容をJSONでエクスポート・インポート可能。</li>
+          <li>右上のメニューから「エクスポート」「インポート」ボタンを利用。</li>
+        </ul>
+        <h6 class="mt-4">プレビュー</h6>
+        <ul>
+          <li>入力内容をA4サイズでプレビュー可能。</li>
+          <li>ゴシック体・明朝体を選択可。</li>
+          <li>「履歴書PDFをダウンロード」ボタンでPDF保存。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
 <nav class="navbar navbar-expand-lg px-3 py-2 fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">
       <img src="./img/favicon32.webp" alt="ShigotoForm" width="30" height="30" class="d-inline-block align-text-top me-2">
       <ruby>ShigotoForm<rt>シゴトフォーム</rt></ruby><span class="fs-6 d-none d-md-block">&emsp;履歴書メーカー&emsp;</span><span id="version-no" class="fs-6 d-none d-md-block"></span>
     </a>
+    <button type="button" class="btn p-0 border-0 bg-transparent shadow-none ms-auto me-3" id="help-modal-btn" aria-label="ヘルプ">
+      <i class="fa-regular fa-circle-question"></i>
+    </button>
     <button class="navbar-toggler d-block" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -132,7 +173,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="offcanvasNavbarLabel">メニュー</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    <button type="button" class="btn p-0 border-0 bg-transparent shadow-none ms-auto me-3" id="help-modal-in-menu-btn" aria-label="ヘルプ">
+      <i class="fa-regular fa-circle-question"></i>
+    </button>
+    <button type="button" class="btn-close ms-0" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body d-flex flex-column">
     <ul class="navbar-nav flex-grow-1">
@@ -298,7 +342,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     </div>
   </div>
 </div>
-`
+`;
+
+  // ヘルプボタンとメニュー内のヘルプボタンでモーダル表示
+  const helpBtn = document.getElementById('help-modal-btn');
+  const helpInMenuBtn = document.getElementById('help-modal-in-menu-btn');
+  if (helpBtn && helpInMenuBtn) {
+    const func = () => {
+      const modalEl = document.getElementById('helpModal');
+      if (!modalEl) return;
+      const modal = new (window as any).bootstrap.Modal(modalEl, { backdrop: true });
+      modal.show();
+    };
+
+    helpBtn.addEventListener('click', func);
+    helpInMenuBtn.addEventListener('click', func);
+  }
 
   AutoKana.bind('#name-input', '#furigana-input');
 
