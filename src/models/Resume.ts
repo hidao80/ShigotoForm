@@ -7,6 +7,8 @@ export interface Career {
   name: string;       // 会社・学校名
   position: string;   // 役職・学年
   description: string;// 詳細説明
+  startDate?: string;
+  endDate?: string;
 }
 
 /**

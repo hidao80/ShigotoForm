@@ -51,8 +51,8 @@ function jsonToFormResume(json: ResumeJson) {
     mail2: json.mail2,
     career: Array.isArray(careerSrc)
       ? careerSrc.filter(Boolean).map((c: Career) => ({
-        start: c.start ?? '',
-        end: c.end ?? '',
+        start: c.start ?? c.startDate ?? '',
+        end: c.end ?? c.endDate ?? '',
         name: c.name ?? '',
         position: c.position ?? '',
         description: c.description ?? ''
