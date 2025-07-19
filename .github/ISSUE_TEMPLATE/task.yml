@@ -1,0 +1,23 @@
+---
+name: Task
+about: Create a work task
+title: "[TASK] "
+labels: ["task"]
+assignees: ""
+
+---
+
+## What
+Overview of the task to be performed
+
+## Why
+Reason why this task is necessary
+
+## Definition of Done
+Completion criteria:
+- [ ]
+- [ ]
+- [ ]
+
+## Additional Notes
+Additional notes or reference materials
