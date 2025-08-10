@@ -4,7 +4,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Accessibility](https://img.shields.io/badge/Accessibility-Validated-blue)](#)
 
-ShigotoForm is a project designed to streamline and simplify job application processes. This README provides an overview of the project, how to set it up, and how to contribute.
+ShigotoForm is a project designed to help job seekers, students, and career changers easily and quickly create professional PDF resumes and streamline the job application process. With an intuitive interface and no technical skills required, users can build a professional-quality resume efficiently. All user data is stored locally in the browser and never transmitted to any servers, ensuring maximum privacy. Saved resume data can be exported and imported as JSON files for easy backup or transfer.
+
+This README provides an overview of the project, setup instructions, and contribution guidelines.
 
 ## Table of Contents
 
