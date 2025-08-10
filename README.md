@@ -2,6 +2,7 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/d7518453-f8ce-435d-a995-aecb75f57f44/deploy-status)](https://app.netlify.com/projects/shigotoform/deploys)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Accessibility](https://img.shields.io/badge/Accessibility-Validated-blue)](#)
 
 ShigotoForm is a project designed to streamline and simplify job application processes. This README provides an overview of the project, how to set it up, and how to contribute.
 
@@ -9,8 +10,11 @@ ShigotoForm is a project designed to streamline and simplify job application pro
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+- [Screenshots](#camera_flash-screenshots)
+- [Performance Metrics](#zap-performance-metrics)
+- [Accessibility Compliance](#wheelchair-accessibility-compliance)
+- [Contributing](#busts_in_silhouette-contributing)
+- [License](#page_facing_up-license)
 
 ## Installation
 
@@ -69,7 +73,7 @@ At this time, you can select either Gothic or Mincho font.
 
 By clicking the "Download Resume PDF" button at the bottom right of the preview screen, you can download the preview content as a PDF.
 
-## Screenshots
+## :camera_flash: Screenshots
 
 1. **Input Screen**:  
 <img width="600" alt="Input Screen" src="https://github.com/user-attachments/assets/01a0c251-604e-4536-8c74-9b74bed8fff6">
@@ -83,7 +87,47 @@ By clicking the "Download Resume PDF" button at the bottom right of the preview 
 4. **Preview (Mincho Font)**:  
 <img width="600" alt="Preview (Mincho Font)" src="https://github.com/user-attachments/assets/f2ab3688-2c8c-437e-b42c-7424b81b87ee">
 
-## Contributing
+## :zap: Performance Metrics
+
+### 📱 Mobile Results
+- 🟢 **Performance**: 80/100
+- 🟡 **Accessibility**: 88/100
+- 🟢 **Best Practices**: 96/100
+- 🟢 **SEO**: 91/100
+
+#### Core Web Vitals
+- 🔴 **First Contentful Paint**: 3.5s
+- 🟡 **Largest Contentful Paint**: 3.8s
+- 🟢 **Total Blocking Time**: 0ms
+- 🟢 **Cumulative Layout Shift**: 0
+- 🟡 **Speed Index**: 4.4s
+
+### 💻️ Desktop Results
+- 🟢 **Performance**: 95/100
+- 🟡 **Accessibility**: 83/100
+- 🟢 **Best Practices**: 100/100
+- 🟢 **SEO**: 91/100
+
+#### Core Web Vitals
+- 🟡 **First Contentful Paint**: 1.0s
+- 🟢 **Largest Contentful Paint**: 1.0s
+- 🟢 **Total Blocking Time**: 0ms
+- 🟢 **Cumulative Layout Shift**: 0
+- 🟡 **Speed Index**: 1.6s
+
+*Tested on: 2025-08-11 using Google PageSpeed Insights*
+
+## :wheelchair: Accessibility Compliance
+
+**WAVE Accessibility Evaluation Results:**
+- ✅ **0 Errors** - No accessibility violations detected
+- ✅ **0 Contrast Errors** - All text meets WCAG color contrast requirements  
+- ⚠️ **2 Alerts** - Minor suggestions for enhancement
+- 🎯 **1 Feature** - Accessibility features properly implemented
+
+*Tested with WAVE Web Accessibility Evaluator on 2025-08-11*
+
+## :busts_in_silhouette: Contributing
 
 We welcome contributions to ShigotoForm! To contribute, follow these steps:
 
@@ -108,6 +152,6 @@ We welcome contributions to ShigotoForm! To contribute, follow these steps:
 
 5. Create a pull request.
 
-## License
+## :page_facing_up: License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
