@@ -8,6 +8,7 @@ ShigotoForm is a project designed to streamline and simplify job application pro
 
 ## Table of Contents
 
+- [Security & Privacy](#lock-security--privacy)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Screenshots](#camera_flash-screenshots)
@@ -16,6 +17,13 @@ ShigotoForm is a project designed to streamline and simplify job application pro
 - [Accessibility Compliance](#wheelchair-accessibility-compliance)
 - [Contributing](#busts_in_silhouette-contributing)
 - [License](#page_facing_up-license)
+
+## :lock: Security & Privacy
+
+- **Client-side only**: No data transmission to external servers
+- **Local storage**: All data remains in your browser
+- **Privacy-first**: Designed with personal data protection in mind
+- **Future enhancement**: Local encryption planned for additional security
 
 ## Installation
 
