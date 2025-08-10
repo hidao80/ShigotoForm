@@ -11,6 +11,7 @@ ShigotoForm is a project designed to streamline and simplify job application pro
 - [Installation](#installation)
 - [Usage](#usage)
 - [Screenshots](#camera_flash-screenshots)
+- [Technology choices](#hammer_and_wrench-technology-choices)
 - [Performance Metrics](#zap-performance-metrics)
 - [Accessibility Compliance](#wheelchair-accessibility-compliance)
 - [Contributing](#busts_in_silhouette-contributing)
@@ -87,43 +88,55 @@ By clicking the "Download Resume PDF" button at the bottom right of the preview 
 4. **Preview (Mincho Font)**:  
 <img width="600" alt="Preview (Mincho Font)" src="https://github.com/user-attachments/assets/f2ab3688-2c8c-437e-b42c-7424b81b87ee">
 
+## :hammer_and_wrench: Technology Choices
+
+### Why Dexie over localStorage?
+- Larger storage capacity for resume data
+- Better async handling with Promise-based API
+- TypeScript integration for type safety
+
+### Why html2pdf.js?
+- Client-side processing (no server required)
+- High-quality Japanese font rendering
+- Customizable PDF layout control
+
 ## :zap: Performance Metrics
 
-### 📱 Mobile Results
-- 🟢 **Performance**: 80/100
-- 🟡 **Accessibility**: 88/100
-- 🟢 **Best Practices**: 96/100
-- 🟢 **SEO**: 91/100
+### :iphone: Mobile Results
+- :green_circle: **Performance**: 80/100
+- :yellow_circle: **Accessibility**: 88/100
+- :green_circle: **Best Practices**: 96/100
+- :green_circle: **SEO**: 91/100
 
 #### Core Web Vitals
-- 🔴 **First Contentful Paint**: 3.5s
-- 🟡 **Largest Contentful Paint**: 3.8s
-- 🟢 **Total Blocking Time**: 0ms
-- 🟢 **Cumulative Layout Shift**: 0
-- 🟡 **Speed Index**: 4.4s
+- :red_circle: **First Contentful Paint**: 3.5s
+- :yellow_circle: **Largest Contentful Paint**: 3.8s
+- :green_circle: **Total Blocking Time**: 0ms
+- :green_circle: **Cumulative Layout Shift**: 0
+- :yellow_circle: **Speed Index**: 4.4s
 
-### 💻️ Desktop Results
-- 🟢 **Performance**: 95/100
-- 🟡 **Accessibility**: 83/100
-- 🟢 **Best Practices**: 100/100
-- 🟢 **SEO**: 91/100
+### :desktop_computer: Desktop Results
+- :green_circle: **Performance**: 95/100
+- :yellow_circle: **Accessibility**: 83/100
+- :green_circle: **Best Practices**: 100/100
+- :green_circle: **SEO**: 91/100
 
 #### Core Web Vitals
-- 🟡 **First Contentful Paint**: 1.0s
-- 🟢 **Largest Contentful Paint**: 1.0s
-- 🟢 **Total Blocking Time**: 0ms
-- 🟢 **Cumulative Layout Shift**: 0
-- 🟡 **Speed Index**: 1.6s
+- :yellow_circle: **First Contentful Paint**: 1.0s
+- :green_circle: **Largest Contentful Paint**: 1.0s
+- :green_circle: **Total Blocking Time**: 0ms
+- :green_circle: **Cumulative Layout Shift**: 0
+- :yellow_circle: **Speed Index**: 1.6s
 
 *Tested on: 2025-08-11 using Google PageSpeed Insights*
 
 ## :wheelchair: Accessibility Compliance
 
 **WAVE Accessibility Evaluation Results:**
-- ✅ **0 Errors** - No accessibility violations detected
-- ✅ **0 Contrast Errors** - All text meets WCAG color contrast requirements  
-- ⚠️ **2 Alerts** - Minor suggestions for enhancement
-- 🎯 **1 Feature** - Accessibility features properly implemented
+- :white_check_mark: **0 Errors** - No accessibility violations detected
+- :white_check_mark: **0 Contrast Errors** - All text meets WCAG color contrast requirements  
+- :warning: **2 Alerts** - Minor suggestions for enhancement
+- :dart: **1 Feature** - Accessibility features properly implemented
 
 *Tested with WAVE Web Accessibility Evaluator on 2025-08-11*
 
@@ -151,6 +164,12 @@ We welcome contributions to ShigotoForm! To contribute, follow these steps:
     ```
 
 5. Create a pull request.
+
+## :world_map: Roadmap
+
+### Planned Improvements
+- [ ] React + TypeScript migration
+- [ ] Enhanced accessibility testing
 
 ## :page_facing_up: License
 
