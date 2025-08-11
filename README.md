@@ -113,7 +113,7 @@ By clicking the "Download Resume PDF" button at the bottom right of the preview 
 ## :zap: Performance Metrics
 
 ### :iphone: Mobile Results
-- :green_circle: **Performance**: 80/100
+- :yellow_circle: **Performance**: 80/100
 - :yellow_circle: **Accessibility**: 88/100
 - :green_circle: **Best Practices**: 96/100
 - :green_circle: **SEO**: 91/100
