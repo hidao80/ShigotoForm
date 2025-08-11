@@ -134,25 +134,24 @@ rt {
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
   padding: 10px 12px;
   min-width: 280px;
-
-  &.success { 
-    border: 1px solid var(--success-color);
-    background-color: color-mix(in srgb, var(--success-color) 50%, white);
-    color: var(--success-color);
-  }
-  &.info { 
-    border-color: var(--info-color);
-    background-color: color-mix(in srgb, var(--info-color) 50%, white);
-    color: var(--info-color);
-  }
-  &.warn { 
-    border-color: var(--warn-color);
-    background-color: color-mix(in srgb, var(--warn-color) 50%, white);
-    color: var(--warn-color);
-  }
-  &.error { 
-    border-color: var(--error-color);
-    background-color: color-mix(in srgb, var(--error-color) 50%, white);
-    color: var(--error-color);
-  }
+}
+.sf-toast.success { 
+  border: 1px solid var(--success-color);
+  background-color: color-mix(in srgb, var(--success-color) 75%, white);
+  color: var(--success-color);
+}
+.sf-toast.info { 
+  border-color: var(--info-color);
+  background-color: color-mix(in srgb, var(--info-color) 75%, white);
+  color: var(--info-color);
+}
+.sf-toast.warn { 
+  border-color: var(--warn-color);
+  background-color: color-mix(in srgb, var(--warn-color) 75%, white);
+  color: var(--warn-color);
+}
+.sf-toast.error { 
+  border-color: var(--error-color);
+  background-color: color-mix(in srgb, var(--error-color) 75%, white);
+  color: var(--error-color);
 }
