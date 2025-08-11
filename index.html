@@ -6,23 +6,32 @@
     <!-- VitePWA が manifest.webmanifest を自動挿入します -->
     <meta name="theme-color" content="#ffffff" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+    <meta name="description" content="履歴書をブラウザで簡単作成・保存・PDF出力できる無料Webアプリ『ShigotoForm』。オフライン対応・ダークモード・データは端末内に安全保存。" />
     <script>
       // JavaScript 有効時の判定用: no-js -> js
       document.documentElement.classList.replace('no-js', 'js');
     </script>
-    <meta property="og:title" content="ShigotoForm | 履歴書メーカー" />
-    <meta property="og:description" content="履歴書を簡単に作成できるWebアプリ ShigotoForm" />
+    <meta property="og:title" content="履歴書メーカー（無料・PDF出力・オフライン対応） | ShigotoForm" />
+    <meta property="og:description" content="履歴書をブラウザで簡単作成・保存・PDF出力できる無料Webアプリ『ShigotoForm』。オフライン対応・ダークモード・データは端末内に安全保存。" />
     <meta property="og:type" content="webapp" />
+    <meta property="og:site_name" content="ShigotoForm" />
     <meta property="og:url" content="https://shigotoform.netlify.app/" />
     <meta property="og:image" content="https://shigotoform.netlify.app/img/favicon64.webp" />
+    <meta property="og:image:alt" content="ShigotoForm 履歴書メーカーのアイコン" />
     <meta property="og:locale" content="ja_JP" />
-    <title>ShigotoForm | 履歴書メーカー</title>
+    <title>履歴書メーカー（無料・PDF出力・オフライン対応） | ShigotoForm</title>
     <script type="speculationrules">
       {
         "prerender": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }],
         "prefetch": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }]
       }
     </script>
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="履歴書メーカー（無料・PDF出力・オフライン対応） | ShigotoForm" />
+    <meta name="twitter:description" content="履歴書をブラウザで簡単作成・保存・PDF出力できる無料Webアプリ『ShigotoForm』。オフライン対応・ダークモード・データは端末内に安全保存。" />
+    <meta name="twitter:image" content="https://shigotoform.netlify.app/img/favicon64.webp" />
   </head>
   <body>
     <a href="#main" class="skip-link">本文へスキップ</a>
