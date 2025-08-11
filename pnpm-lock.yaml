@@ -14,6 +14,9 @@ importers:
       '@fontsource/noto-serif-jp':
         specifier: ^5.2.5
         version: 5.2.5
+      '@fortawesome/fontawesome-free':
+        specifier: 6.4.0
+        version: 6.4.0
       '@vitejs/plugin-basic-ssl':
         specifier: ^1.2.0
         version: 1.2.0(vite@6.0.7(terser@5.37.0))
@@ -698,6 +701,10 @@ packages:
 
   '@fontsource/noto-serif-jp@5.2.5':
     resolution: {integrity: sha512-SL1XItZarPv+3KXo/D0Xa8hXChZN7kkuWuAqrRqilWLn/UKbCPIPoDr/rnbqmVMlCGzshX7PAPR+FW1ka5oKIw==}
+
+  '@fortawesome/fontawesome-free@6.4.0':
+    resolution: {integrity: sha512-0NyytTlPJwB/BF5LtRV8rrABDbe3TdTXqNB3PdZ+UUUZAEIrdOJdmABqKjt4AXwIoJNaRVVZEXxpNrqvE1GAYQ==}
+    engines: {node: '>=6'}
 
   '@jridgewell/gen-mapping@0.3.8':
     resolution: {integrity: sha512-imAbBGkb+ebQyxKgzv5Hu2nmROxoDOXHh80evxdoXNOrvAnVx7zimzc1Oo5h9RlfV4vPXaE2iM5pOFbvOCClWA==}
@@ -2642,6 +2649,8 @@ snapshots:
   '@fontsource/noto-sans-jp@5.2.5': {}
 
   '@fontsource/noto-serif-jp@5.2.5': {}
+
+  '@fortawesome/fontawesome-free@6.4.0': {}
 
   '@jridgewell/gen-mapping@0.3.8':
     dependencies:

@@ -46,10 +46,17 @@ export default defineConfig(({ command }) => ({
                 'img/favicon512.webp'
             ],
             workbox: {
+                clientsClaim: true,
+                skipWaiting: true,
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
                 // Android Edge でのオフライン遷移安定化: index.html を確実に precache
                 additionalManifestEntries: [
-                    { url: '/index.html', revision: null }
+                    { url: '/index.html', revision: null },
+                    // Font Awesome（CDN）をオフラインでも確実に使えるよう precache
+                    { url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', revision: '6.4.0' },
+                    { url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2', revision: '6.4.0' },
+                    { url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2', revision: '6.4.0' },
+                    { url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2', revision: '6.4.0' }
                 ],
                 navigateFallback: '/index.html',
                 cleanupOutdatedCaches: true,

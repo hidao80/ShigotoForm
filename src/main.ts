@@ -4,11 +4,8 @@ import 'bootstrap'
 import '@fontsource/noto-sans-jp/400.css'
 import '@fontsource/noto-serif-jp/400.css'
 import Modal from 'bootstrap/js/dist/modal';
-// Font Awesome CDNを動的に追加
-const fa = document.createElement('link');
-fa.rel = 'stylesheet';
-fa.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-document.head.appendChild(fa);
+// Font Awesome をローカルにバンドル
+import '@fortawesome/fontawesome-free/css/all.min.css';
 // window.bootstrapが未定義の場合にModalをセット
 if (!(window as any).bootstrap) {
   (window as any).bootstrap = { Modal };
