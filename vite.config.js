@@ -8,7 +8,33 @@ export default defineConfig(({ command }) => ({
         VitePWA({
             // workbox-window を使うため自動登録は行わない
             injectRegister: false,
-            // 静的 public/manifest.json を使用するため、ここではmanifestを定義しない
+            // VitePWA が生成する manifest.webmanifest を優先
+            useCredentials: true,
+            manifest: {
+                name: 'ShigotoForm',
+                short_name: 'ShigotoForm',
+                description: '履歴書を簡単に作成できるWebアプリ ShigotoForm',
+                id: '/',
+                start_url: '/',
+                scope: '/',
+                display: 'standalone',
+                orientation: 'portrait-primary',
+                lang: 'ja',
+                dir: 'ltr',
+                theme_color: '#ffffff',
+                background_color: '#ffffff',
+                categories: ['productivity', 'business'],
+                icons: [
+                    { src: '/img/favicon512.webp', sizes: '512x512', type: 'image/webp', purpose: 'any' },
+                    { src: '/img/favicon256.webp', sizes: '256x256', type: 'image/webp', purpose: 'any' },
+                    { src: '/img/favicon128.webp', sizes: '128x128', type: 'image/webp', purpose: 'any' },
+                    { src: '/img/favicon72.webp',  sizes: '72x72',  type: 'image/webp', purpose: 'any' },
+                    { src: '/img/favicon64.webp',  sizes: '64x64',  type: 'image/webp', purpose: 'any' },
+                    { src: '/img/favicon48.webp',  sizes: '48x48',  type: 'image/webp', purpose: 'any' },
+                    { src: '/img/favicon32.webp',  sizes: '32x32',  type: 'image/webp', purpose: 'any' },
+                    { src: '/img/favicon32.png',   sizes: '32x32',  type: 'image/png',  purpose: 'any' }
+                ]
+            },
             includeAssets: [
                 'img/favicon32.webp',
                 'img/favicon32.png',
@@ -21,6 +47,10 @@ export default defineConfig(({ command }) => ({
             ],
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+                // Android Edge でのオフライン遷移安定化: index.html を確実に precache
+                additionalManifestEntries: [
+                    { url: '/index.html', revision: null }
+                ],
                 navigateFallback: '/index.html',
                 cleanupOutdatedCaches: true,
                 runtimeCaching: [
