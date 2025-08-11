@@ -22,6 +22,10 @@ import { Career, License } from './models/Resume'
 import packageJson from '../package.json';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
+import { registerSW } from 'virtual:pwa-register';
+
+// PWA Service Worker を明示登録（オフライン対応のため）
+registerSW({ immediate: true });
 
 /**
  * ResumeJson形式のデータをフォーム用Resume形式へ変換します。

@@ -35,6 +35,41 @@ export default {
                                 statuses: [0, 200]
                             }
                         }
+                    },
+                    {
+                        urlPattern: /^https:\/\/cdnjs\.cloudflare\.com\/.*\.css$/, // Font Awesome CSS など
+                        handler: 'StaleWhileRevalidate',
+                        method: 'GET',
+                        options: {
+                            cacheName: 'cdn-styles',
+                            cacheableResponse: { statuses: [0, 200] }
+                        }
+                    },
+                    {
+                        urlPattern: /^https:\/\/cdnjs\.cloudflare\.com\/.*\.(?:woff2?|ttf|otf|eot)$/, // Webフォント
+                        handler: 'CacheFirst',
+                        method: 'GET',
+                        options: {
+                            cacheName: 'cdn-fonts',
+                            expiration: {
+                                maxEntries: 50,
+                                maxAgeSeconds: 60 * 60 * 24 * 365
+                            },
+                            cacheableResponse: { statuses: [0, 200] }
+                        }
+                    },
+                    {
+                        urlPattern: /^https:\/\/shigotoform\.netlify\.app\/img\/.*\.(?:png|webp|jpg|jpeg|svg|gif|ico)$/, // 外部ホスト画像
+                        handler: 'CacheFirst',
+                        method: 'GET',
+                        options: {
+                            cacheName: 'remote-images',
+                            expiration: {
+                                maxEntries: 50,
+                                maxAgeSeconds: 60 * 60 * 24 * 30
+                            },
+                            cacheableResponse: { statuses: [0, 200] }
+                        }
                     }
                 ]
             },
