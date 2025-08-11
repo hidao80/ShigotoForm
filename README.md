@@ -113,30 +113,30 @@ By clicking the "Download Resume PDF" button at the bottom right of the preview 
 ## :zap: Performance Metrics
 
 ### :iphone: Mobile Results
-- :yellow_circle: **Performance**: 80/100
-- :yellow_circle: **Accessibility**: 88/100
+- :yellow_circle: **Performance**: 73/100
+- :green_circle: **Accessibility**: 100/100
 - :green_circle: **Best Practices**: 96/100
-- :green_circle: **SEO**: 91/100
+- :green_circle: **SEO**: 100/100
 
 #### Core Web Vitals
-- :red_circle: **First Contentful Paint**: 3.5s
-- :yellow_circle: **Largest Contentful Paint**: 3.8s
+- :red_circle: **First Contentful Paint**: 4.2s
+- :red_circle: **Largest Contentful Paint**: 4.6s
 - :green_circle: **Total Blocking Time**: 0ms
 - :green_circle: **Cumulative Layout Shift**: 0
-- :yellow_circle: **Speed Index**: 4.4s
+- :red_circle: **Speed Index**: 4.2s
 
 ### :desktop_computer: Desktop Results
-- :green_circle: **Performance**: 95/100
-- :yellow_circle: **Accessibility**: 83/100
+- :green_circle: **Performance**: 99/100
+- :green_circle: **Accessibility**: 96/100
 - :green_circle: **Best Practices**: 100/100
-- :green_circle: **SEO**: 91/100
+- :green_circle: **SEO**: 100/100
 
 #### Core Web Vitals
-- :yellow_circle: **First Contentful Paint**: 1.0s
-- :green_circle: **Largest Contentful Paint**: 1.0s
+- :green_circle: **First Contentful Paint**: 0.8s
+- :green_circle: **Largest Contentful Paint**: 0.9s
 - :green_circle: **Total Blocking Time**: 0ms
 - :green_circle: **Cumulative Layout Shift**: 0
-- :yellow_circle: **Speed Index**: 1.6s
+- :green_circle: **Speed Index**: 0.9s
 
 *Tested on: 2025-08-11 using Google PageSpeed Insights*
 
