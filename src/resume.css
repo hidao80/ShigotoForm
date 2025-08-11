@@ -33,6 +33,11 @@
   --hover-bg: color-mix(in srgb, var(--light-hover) 70%, var(--dark-hover) 30%);
   --required-color: color-mix(in srgb, var(--light-required) 70%, var(--dark-required) 30%);
   --version-color: color-mix(in srgb, var(--light-version) 70%, var(--dark-version) 30%);
+  --success-color: #28a745;
+  --info-color: #0d6efd;
+  --warn-color: #ffc107;
+  --error-color: #dc3545;
+
 }
 
 body {
@@ -125,15 +130,29 @@ rt {
   z-index: 2147483647; /* サイドバー等より常に前面 */
 }
 .sf-toast {
-  background: var(--bg-color);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
   padding: 10px 12px;
   min-width: 280px;
+
+  &.success { 
+    border: 1px solid var(--success-color);
+    background-color: color-mix(in srgb, var(--success-color) 80%, white);
+    color: var(--success-color);
+  }
+  &.sf-toast.info { 
+    border-color: var(--info-color);
+    background-color: color-mix(in srgb, var(--info-color) 80%, white);
+    color: var(--info-color);
+  }
+  &.sf-toast.warn { 
+    border-color: var(--warn-color);
+    background-color: color-mix(in srgb, var(--warn-color) 80%, white);
+    color: var(--warn-color);
+  }
+  &.sf-toast.error { 
+    border-color: var(--error-color);
+    background-color: color-mix(in srgb, var(--error-color) 80%, white);
+    color: var(--error-color);
+  }
 }
-.sf-toast.success { border-color: #28a745; }
-.sf-toast.info { border-color: #0d6efd; }
-.sf-toast.warn { border-color: #ffc107; }
-.sf-toast.error { border-color: #dc3545; }
