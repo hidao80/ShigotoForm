@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",
+    "@vite-pwa/workbox-window": "^8.0.0",
     "typescript": "~5.6.2",
     "vite": "^6.0.5",
     "vite-plugin-pwa": "^0.21.1"
