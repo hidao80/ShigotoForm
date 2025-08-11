@@ -11,6 +11,12 @@
     <meta property="og:image" content="https://shigotoform.netlify.app/img/favicon64.webp" />
     <meta property="og:locale" content="ja_JP" />
     <title>ShigotoForm | 履歴書メーカー</title>
+    <script type="speculationrules">
+      {
+        "prerender": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }],
+        "prefetch": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }]
+      }
+    </script>
   </head>
   <body>
     <div id="app">
