@@ -137,22 +137,22 @@ rt {
 
   &.success { 
     border: 1px solid var(--success-color);
-    background-color: color-mix(in srgb, var(--success-color) 80%, white);
+    background-color: color-mix(in srgb, var(--success-color) 20%, white);
     color: var(--success-color);
   }
   &.sf-toast.info { 
     border-color: var(--info-color);
-    background-color: color-mix(in srgb, var(--info-color) 80%, white);
+    background-color: color-mix(in srgb, var(--info-color) 20%, white);
     color: var(--info-color);
   }
   &.sf-toast.warn { 
     border-color: var(--warn-color);
-    background-color: color-mix(in srgb, var(--warn-color) 80%, white);
+    background-color: color-mix(in srgb, var(--warn-color) 20%, white);
     color: var(--warn-color);
   }
   &.sf-toast.error { 
     border-color: var(--error-color);
-    background-color: color-mix(in srgb, var(--error-color) 80%, white);
+    background-color: color-mix(in srgb, var(--error-color) 20%, white);
     color: var(--error-color);
   }
 }
