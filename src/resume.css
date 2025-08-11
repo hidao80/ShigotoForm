@@ -146,6 +146,21 @@ html.js .no-js-only { display: none !important; }
   text-align: center;
 }
 
+/* アイコンCSS遅延読み込み中のフォールバック表示 */
+html:not(.icons-loaded) i[class^="fa-"],
+html:not(.icons-loaded) i[class*=" fa-"] {
+  display: inline-block;
+  width: 1em;
+  text-align: center;
+  font-style: normal; /* 斜体抑制 */
+  line-height: 1;
+}
+html:not(.icons-loaded) i.fa-circle-question::before,
+html:not(.icons-loaded) i[class^="fa-"]::before,
+html:not(.icons-loaded) i[class*=" fa-"]::before {
+  content: "?"; /* 読み込み前の簡易代替 */
+}
+
 /* スキップリンク（キーボード操作で可視化） */
 .skip-link {
   position: absolute;

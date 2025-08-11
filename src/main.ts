@@ -1,11 +1,9 @@
 import './resume.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
-import '@fontsource/noto-sans-jp/400.css'
-import '@fontsource/noto-serif-jp/400.css'
 import Modal from 'bootstrap/js/dist/modal';
 // Font Awesome をローカルにバンドル
-import '@fortawesome/fontawesome-free/css/all.min.css';
+// Font Awesome は遅延読み込み
 // window.bootstrapが未定義の場合にModalをセット
 if (!(window as any).bootstrap) {
   (window as any).bootstrap = { Modal };
@@ -20,6 +18,39 @@ import packageJson from '../package.json';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 import { Workbox } from '@vite-pwa/workbox-window';
+
+// フォントの遅延読み込み（初期レンダリング後に読込）
+const lazyLoadNotoFonts = (() => {
+  let loaded = false;
+  return async () => {
+    if (loaded) return;
+    try {
+      await Promise.all([
+        import('@fontsource/noto-sans-jp/400.css'),
+        import('@fontsource/noto-serif-jp/400.css')
+      ]);
+      loaded = true;
+      document.documentElement.classList.add('fonts-loaded');
+    } catch {
+      // 失敗してもフォールバックフォントで継続
+    }
+  };
+})();
+
+// Font Awesome（アイコン）の遅延読み込み
+const lazyLoadIcons = (() => {
+  let loaded = false;
+  return async () => {
+    if (loaded) return;
+    try {
+      await import('@fortawesome/fontawesome-free/css/all.min.css');
+      loaded = true;
+      document.documentElement.classList.add('icons-loaded');
+    } catch {
+      // 失敗してもテキスト代替とARIAで継続
+    }
+  };
+})();
 
 // Workbox インスタンス（手動更新用に外でも参照）
 let wb: Workbox | null = null;
@@ -178,6 +209,31 @@ function formResumeToJson(form: any): ResumeJson {
  * 履歴書の学歴・職歴と免許・資格は、フォームの対応するセクションに追加されます。
  */
 window.addEventListener('DOMContentLoaded', async () => {
+  // 初期レンダリング後のアイドル時間にフォントを遅延読み込み
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(() => { lazyLoadNotoFonts(); lazyLoadIcons(); });
+  } else {
+    setTimeout(() => { lazyLoadNotoFonts(); lazyLoadIcons(); }, 0);
+  }
+
+  // 初回のアイコン使用時に即時ロード（FOUT軽減）
+  const loadIconsOnFirstInteraction = () => { lazyLoadIcons(); detach(); };
+  const helpTriggerBtn = document.getElementById('help-modal-btn');
+  const helpTriggerBtnInMenu = document.getElementById('help-modal-in-menu-btn');
+  const offcanvas = document.getElementById('offcanvasNavbar');
+  const detach = () => {
+    helpTriggerBtn?.removeEventListener('pointerover', loadIconsOnFirstInteraction);
+    helpTriggerBtn?.removeEventListener('focusin', loadIconsOnFirstInteraction);
+    helpTriggerBtnInMenu?.removeEventListener('pointerover', loadIconsOnFirstInteraction);
+    helpTriggerBtnInMenu?.removeEventListener('focusin', loadIconsOnFirstInteraction);
+    offcanvas?.removeEventListener('show.bs.offcanvas' as any, loadIconsOnFirstInteraction as any);
+  };
+  helpTriggerBtn?.addEventListener('pointerover', loadIconsOnFirstInteraction, { once: true } as any);
+  helpTriggerBtn?.addEventListener('focusin', loadIconsOnFirstInteraction, { once: true } as any);
+  helpTriggerBtnInMenu?.addEventListener('pointerover', loadIconsOnFirstInteraction, { once: true } as any);
+  helpTriggerBtnInMenu?.addEventListener('focusin', loadIconsOnFirstInteraction, { once: true } as any);
+  // Offcanvas メニューを開いたら確実に読み込み
+  offcanvas?.addEventListener('show.bs.offcanvas' as any, loadIconsOnFirstInteraction as any, { once: true } as any);
   document.querySelector('#app')!.innerHTML = `
 <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -631,6 +687,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // 「履歴書を表示」ボタンイベント
   document.querySelector('#show-resume')?.addEventListener('click', async () => {
+    // プレビュー使用前にフォントを確実に読み込み
+    await lazyLoadNotoFonts();
     const resumeJson = await loadResume();
     if (!resumeJson) return;
     const data = jsonToFormResume(resumeJson);
