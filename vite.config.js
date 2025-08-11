@@ -1,9 +1,10 @@
+import { defineConfig } from 'vite'
 import basicSsl from '@vitejs/plugin-basic-ssl'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default {
+export default defineConfig(({ command }) => ({
     plugins: [
-        basicSsl(),
+        ...(command === 'serve' ? [basicSsl()] : []),
         VitePWA({
             registerType: 'autoUpdate',
             // 静的 public/manifest.json を使用するため、ここではmanifestを定義しない
@@ -19,7 +20,7 @@ export default {
             ],
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
-                navigateFallback: 'index.html',
+                navigateFallback: '/index.html',
                 cleanupOutdatedCaches: true,
                 runtimeCaching: [
                     {
@@ -74,8 +75,8 @@ export default {
                 ]
             },
             devOptions: {
-                enabled: true
+                enabled: command === 'serve'
             }
         })
     ]
-}
+}))
