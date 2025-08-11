@@ -113,30 +113,28 @@ By clicking the "Download Resume PDF" button at the bottom right of the preview 
 ## :zap: Performance Metrics
 
 ### :iphone: Mobile Results
-- :yellow_circle: **Performance**: 73/100
-- :green_circle: **Accessibility**: 100/100
-- :green_circle: **Best Practices**: 96/100
-- :green_circle: **SEO**: 100/100
+[![Performance-73-yellow](https://img.shields.io/badge/Performance-73-yellow)](#)
+[![Accessibility-100-green](https://img.shields.io/badge/Accessibility-100-green)](#)
+[![Best_Practices-96-green](https://img.shields.io/badge/Best_Practices-96-green)](#)
+[![SEO-100-green](https://img.shields.io/badge/SEO-100-green)](#)
 
-#### Core Web Vitals
-- :red_circle: **First Contentful Paint**: 4.2s
-- :red_circle: **Largest Contentful Paint**: 4.6s
-- :green_circle: **Total Blocking Time**: 0ms
-- :green_circle: **Cumulative Layout Shift**: 0
-- :red_circle: **Speed Index**: 4.2s
+[![First_Contentful_Paint-4.2s-red](https://img.shields.io/badge/First_Contentful_Paint-4.2s-red)](#)
+[![Largest_Contentful_Paint-4.6s-red](https://img.shields.io/badge/Largest_Contentful_Paint-4.6s-red)](#)
+[![Total_Blocking_Time-0ms-green](https://img.shields.io/badge/Total_Blocking_Time-0ms-green)](#)
+[![Cumulative_Layout_Shift-0-green](https://img.shields.io/badge/Cumulative_Layout_Shift-0-green)](#)
+[![Speed_Index-4.2s-red](https://img.shields.io/badge/Speed_Index-4.2s-red)](#)
 
 ### :desktop_computer: Desktop Results
-- :green_circle: **Performance**: 99/100
-- :green_circle: **Accessibility**: 96/100
-- :green_circle: **Best Practices**: 100/100
-- :green_circle: **SEO**: 100/100
+[![Performance-99-green](https://img.shields.io/badge/Performance-99-green)](#)
+[![Accessibility-96-green](https://img.shields.io/badge/Accessibility-96-green)](#)
+[![Best_Practices-100-green](https://img.shields.io/badge/Best_Practices-100-green)](#)
+[![SEO-100-green](https://img.shields.io/badge/SEO-100-green)](#)
 
-#### Core Web Vitals
-- :green_circle: **First Contentful Paint**: 0.8s
-- :green_circle: **Largest Contentful Paint**: 0.9s
-- :green_circle: **Total Blocking Time**: 0ms
-- :green_circle: **Cumulative Layout Shift**: 0
-- :green_circle: **Speed Index**: 0.9s
+[![First_Contentful_Paint-0.8s-green](https://img.shields.io/badge/First_Contentful_Paint-0.8s-green)](#)
+[![Largest_Contentful_Paint-0.9s-green](https://img.shields.io/badge/Largest_Contentful_Paint-0.9s-green)](#)
+[![Total_Blocking_Time-0ms-green](https://img.shields.io/badge/Total_Blocking_Time-0ms-gree)](#)
+[![Cumulative_Layout_Shift-0-green](https://img.shields.io/badge/Cumulative_Layout_Shift-0-green)](#)
+[![Speed_Index-0.9s-green](https://img.shields.io/badge/Speed_Index-0.9s-green)](#)
 
 *Tested on: 2025-08-11 using Google PageSpeed Insights*
 
