@@ -22,10 +22,31 @@ import { Career, License } from './models/Resume'
 import packageJson from '../package.json';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
-import { registerSW } from 'virtual:pwa-register';
+import { Workbox } from '@vite-pwa/workbox-window';
 
-// PWA Service Worker を明示登録（オフライン対応のため）
-registerSW({ immediate: true });
+// Workbox インスタンス（手動更新用に外でも参照）
+let wb: Workbox | null = null;
+let updateReady = false;
+
+// PWA Service Worker を workbox-window で登録（手動更新フロー）
+if ('serviceWorker' in navigator) {
+  const options = (import.meta as any).env?.DEV ? { type: 'module' as const } : undefined;
+  wb = new Workbox('/sw.js', options as any);
+
+  // 新バージョンが waiting になったら、リンクから手動適用できる状態にする
+  wb.addEventListener('waiting', () => {
+    updateReady = true;
+    const status = document.getElementById('pwa-update-status');
+    if (status) status.textContent = '新しいバージョンがあります';
+  });
+
+  // コントロール切替後にリロードして最新反映
+  wb.addEventListener('controlling', () => {
+    window.location.reload();
+  });
+
+  wb.register();
+}
 
 /**
  * ResumeJson形式のデータをフォーム用Resume形式へ変換します。
@@ -155,6 +176,13 @@ window.addEventListener('DOMContentLoaded', async () => {
           <li>ゴシック体・明朝体を選択可。</li>
           <li>「履歴書PDFをダウンロード」ボタンでPDF保存。</li>
         </ul>
+        <h6 class="mt-4">アプリのアップデート</h6>
+        <ul>
+          <li>メニュー（≡）を開き、左上の「アプリのアップデート」をクリックすると最新版の確認・適用を行います。</li>
+          <li>更新がある場合は「新しいバージョンがあります」と表示され、クリックで即時適用され自動的に再読み込みされます。</li>
+          <li>更新がない場合は確認のみ行われます。</li>
+          <li>オフライン時は更新確認ができません。オンラインにして再試行してください。</li>
+        </ul>
       </div>
     </div>
   </div>
@@ -183,6 +211,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     <button type="button" class="btn-close ms-0" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body d-flex flex-column">
+    <div class="mb-2">
+      <a href="#" id="pwa-update-link" class="link-primary small">アプリのアップデート</a>
+      <span id="pwa-update-status" class="text-muted small ms-2"></span>
+    </div>
     <ul class="navbar-nav flex-grow-1">
       <li class="nav-item mb-5">
         <div class="form-check form-switch ms-auto">
@@ -361,6 +393,33 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     helpBtn.addEventListener('click', func);
     helpInMenuBtn.addEventListener('click', func);
+  }
+
+  // アプリのアップデート（手動更新）リンク
+  const updateLink = document.getElementById('pwa-update-link');
+  const updateStatus = document.getElementById('pwa-update-status');
+  if (updateLink) {
+    updateLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!wb) {
+        // SW未対応環境は単純リロード
+        window.location.reload();
+        return;
+      }
+      if (updateStatus) updateStatus.textContent = '更新を確認中…';
+      try {
+        if (updateReady) {
+          // すでにwaitingなら即適用
+          await wb.messageSkipWaiting();
+        } else {
+          // 更新チェックを実行
+          await wb.update();
+        }
+      } finally {
+        // 状態表示をクリア（waiting時は上書きされる）
+        if (!updateReady && updateStatus) updateStatus.textContent = '';
+      }
+    });
   }
 
   AutoKana.bind('#name-input', '#furigana-input');

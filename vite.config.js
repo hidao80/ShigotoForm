@@ -6,7 +6,8 @@ export default defineConfig(({ command }) => ({
     plugins: [
         ...(command === 'serve' ? [basicSsl()] : []),
         VitePWA({
-            registerType: 'autoUpdate',
+            // workbox-window を使うため自動登録は行わない
+            injectRegister: false,
             // 静的 public/manifest.json を使用するため、ここではmanifestを定義しない
             includeAssets: [
                 'img/favicon32.webp',
@@ -75,7 +76,10 @@ export default defineConfig(({ command }) => ({
                 ]
             },
             devOptions: {
-                enabled: command === 'serve'
+                // HTTPS dev + SWテスト用に開発時も有効化
+                enabled: command === 'serve',
+                // workbox-windowのコンストラクタに合わせ module 型にする
+                type: 'module'
             }
         })
     ]
