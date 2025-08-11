@@ -119,6 +119,58 @@ rt {
 .modal { z-index: 20000; }
 .modal-backdrop { z-index: 19900; }
 
+/* JS可否フック: JS必須要素の表示/非表示を制御 */
+html.no-js .js-only { display: none !important; }
+html.js .no-js-only { display: none !important; }
+
+/* 低視覚負荷: アニメーションを抑制（環境設定に追従） */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* JS無効時の案内バナー */
+.no-js-banner {
+  position: sticky;
+  top: 0;
+  z-index: 21000;
+  background: #fff3cd; /* Bootstrap warn bg 相当 */
+  color: #664d03;      /* Bootstrap warn text 相当 */
+  border-bottom: 1px solid #ffe69c;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* スキップリンク（キーボード操作で可視化） */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: #0b5ed7;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  z-index: 22000;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  left: 10px;
+  outline: 3px solid #ffbf47;
+  outline-offset: 2px;
+}
+
+/* フォーカスの可視性を強化 */
+:where(a, button, input, select, textarea, [role="button"], .btn, .form-control):focus-visible {
+  outline: 3px solid #ffbf47 !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
 /* トースト通知（手動更新の進行/結果表示用） */
 #sf-toast-container {
   position: fixed;

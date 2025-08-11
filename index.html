@@ -1,11 +1,15 @@
 <!doctype html>
-<html lang="ja">
+<html lang="ja-JP" dir="ltr" class="no-js">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/webp" href="/img/favicon32.webp" />
     <!-- VitePWA が manifest.webmanifest を自動挿入します -->
     <meta name="theme-color" content="#ffffff" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // JavaScript 有効時の判定用: no-js -> js
+      document.documentElement.classList.replace('no-js', 'js');
+    </script>
     <meta property="og:title" content="ShigotoForm | 履歴書メーカー" />
     <meta property="og:description" content="履歴書を簡単に作成できるWebアプリ ShigotoForm" />
     <meta property="og:type" content="webapp" />
@@ -21,6 +25,12 @@
     </script>
   </head>
   <body>
+    <a href="#main" class="skip-link">本文へスキップ</a>
+    <noscript>
+      <div class="no-js-banner" role="alert" aria-live="assertive">
+        このアプリは JavaScript を必要とします。ブラウザ設定で JavaScript を有効にしてください。
+      </div>
+    </noscript>
     <div id="app">
       <script type="module" src="/src/main.ts"></script>
     </div>

@@ -219,7 +219,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     </div>
   </div>
 </div>
-<nav class="navbar navbar-expand-lg px-3 py-2 fixed-top">
+<nav class="navbar navbar-expand-lg px-3 py-2 fixed-top" role="navigation" aria-label="主要ナビゲーション">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">
       <img src="./img/favicon32.webp" alt="ShigotoForm" width="30" height="30" class="d-inline-block align-text-top me-2">
@@ -228,13 +228,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     <button type="button" class="btn p-0 border-0 bg-transparent shadow-none ms-auto me-3" id="help-modal-btn" aria-label="ヘルプ">
       <i class="fa-regular fa-circle-question"></i>
     </button>
-    <button class="navbar-toggler d-block" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+    <button class="navbar-toggler d-block" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="メニュー" aria-expanded="false">
       <span class="navbar-toggler-icon"></span>
     </button>
   </div>
 </nav>
 
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel" role="navigation" aria-label="アプリメニュー">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="offcanvasNavbarLabel">メニュー</h5>
     <button type="button" class="btn p-0 border-0 bg-transparent shadow-none ms-auto me-3" id="help-modal-in-menu-btn" aria-label="ヘルプ">
@@ -245,7 +245,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   <div class="offcanvas-body d-flex flex-column">
     <div class="mb-2">
       <a href="#" id="pwa-update-link" class="link-primary small">アプリのアップデート</a>
-      <span id="pwa-update-status" class="text-muted small ms-2"></span>
+      <span id="pwa-update-status" class="text-muted small ms-2" role="status" aria-live="polite"></span>
     </div>
     <ul class="navbar-nav flex-grow-1">
       <li class="nav-item mb-5">
@@ -277,14 +277,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 </div>
 
 <div class="resume">
-  <div class="main-content">
+  <div class="main-content" id="main" role="main">
     <h1 class="">履歴書</h1>
     <form>
       <div class="row mb-3">
-        <label for="date-input" class="col-md-3 col-form-label-sm text-right required">年月日入力欄</label>
+        <label for="created-at" class="col-md-3 col-form-label-sm text-right required">年月日入力欄</label>
         <div class="col-md-9">
           <div class="input-group">
-            <input type="date" class="form-control" id="created-at" name="createdAt" required>
+            <input type="date" class="form-control" id="created-at" name="createdAt" required autocomplete="off">
             <div class="input-group-text">現在</div>
           </div>
         </div>
@@ -292,20 +292,20 @@ window.addEventListener('DOMContentLoaded', async () => {
       <div class="row mb-3">
         <label for="furigana-input" class="col-md-3 col-form-label-sm text-right required">ふりがな</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="furigana-input" name="fullname-kana" pattern="(?=.*?[\u3041-\u309F])[\u3041-\u309F\s]*" placeholder="ふりがなを入力してください" required>
+          <input type="text" class="form-control" id="furigana-input" name="fullname-kana" pattern="(?=.*?[\u3041-\u309F])[\u3041-\u309F\s]*" placeholder="ふりがなを入力してください" required autocomplete="off">
         </div>
       </div>
       <div class="row mb-3">
         <label for="name-input" class="col-md-3 col-form-label-sm text-right required">氏名</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="name-input" name="fullname" pattern=".*\S+.*" placeholder="氏名を入力してください" required>
+          <input type="text" class="form-control" id="name-input" name="fullname" pattern=".*\S+.*" placeholder="氏名を入力してください" required autocomplete="name">
         </div>
       </div>
       <div class="row mb-3">
         <label for="birthdate-input" class="col-md-3 col-form-label-sm text-right required">生年月日</label>
         <div class="col-md-9">
           <div class="input-group">
-            <input type="date" class="form-control" id="birthdate-input" name="birthday" required>
+            <input type="date" class="form-control" id="birthdate-input" name="birthday" required autocomplete="bday">
             <div class="input-group-text">（満 <span id="age-display">&emsp;</span> 歳）</div>
           </div>
         </div>
@@ -319,26 +319,26 @@ window.addEventListener('DOMContentLoaded', async () => {
       <div class="row mb-3">
         <label for="zip-code-input" class="col-md-3 col-form-label-sm text-right required">郵便番号</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="zip-code-input" name="zip-code" pattern="\d{3}-?\d{4}" placeholder="郵便番号を入力してください" required pattern="\\d{7}" title="7桁の数字を入力してください">
+          <input type="text" class="form-control" id="zip-code-input" name="zip-code" pattern="\d{3}-?\d{4}" placeholder="郵便番号を入力してください" required pattern="\\d{7}" title="7桁の数字を入力してください" autocomplete="postal-code">
         </div>
       </div>
       <div class="row mb-3">
         <label for="address1-input" class="col-md-3 col-form-label-sm text-right required">住所</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="address1-input" name="address1" pattern=".*\S+.*" placeholder="住所を入力してください" required>
+          <input type="text" class="form-control" id="address1-input" name="address1" pattern=".*\S+.*" placeholder="住所を入力してください" required autocomplete="street-address">
         </div>
       </div>
       <div class="row mb-3">
         <label for="tel1-input" class="col-md-3 col-form-label-sm text-right">電話番号</label>
         <div class="col-md-9">
-          <input type="tel" class="form-control" id="tel1-input" name="tel1" pattern="\d{2,4}-?\d{2,4}-?\d{3,4}" placeholder="電話番号を入力してください">
+          <input type="tel" class="form-control" id="tel1-input" name="tel1" pattern="\d{2,4}-?\d{2,4}-?\d{3,4}" placeholder="電話番号を入力してください" autocomplete="tel">
         </div>
       </div>
       <div class="row mb-3">
         <label for="mail1-input" class="col-md-3 col-form-label-sm text-right">メールアドレス</label>
         <div class="col-md-9">
           <input type="email" class="form-control" id="mail1-input" name="mail1" placeholder="メールアドレスを入力してください"
-            pattern="^[a-zA-Z0-9._+\\-]+@[a-zA-Z0-9.\\-]+(\\.[a-zA-Z]{2,})+$" title="有効なメールアドレスを入力してください">
+            pattern="^[a-zA-Z0-9._+\\-]+@[a-zA-Z0-9.\\-]+(\\.[a-zA-Z]{2,})+$" title="有効なメールアドレスを入力してください" autocomplete="email">
         </div>
       </div>
       <div class="accordion mb-3" id="accordionExample">
@@ -353,13 +353,13 @@ window.addEventListener('DOMContentLoaded', async () => {
               <div class="row mb-3">
                 <label for="address2-input" class="col-md-3 col-form-label-sm text-right">住所</label>
                 <div class="col-md-9">
-                  <input type="text" class="form-control" id="address2-input" name="address2" placeholder="住所を入力してください">
+                  <input type="text" class="form-control" id="address2-input" name="address2" placeholder="住所を入力してください" autocomplete="address-line2">
                 </div>
               </div>
               <div class="row mb-3">
                 <label for="tel2-input" class="col-md-3 col-form-label-sm text-right">電話番号</label>
                 <div class="col-md-9">
-                  <input type="tel" class="form-control" id="tel2-input" pattern="\d{2,4}-?\d{2,4}-?\d{3,4}" placeholder="電話番号を入力してください">
+                  <input type="tel" class="form-control" id="tel2-input" pattern="\d{2,4}-?\d{2,4}-?\d{3,4}" placeholder="電話番号を入力してください" autocomplete="tel">
                 </div>
               </div>
             </div>
