@@ -3,6 +3,8 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/d7518453-f8ce-435d-a995-aecb75f57f44/deploy-status)](https://app.netlify.com/projects/shigotoform/deploys)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Accessibility](https://img.shields.io/badge/Accessibility-Validated-blue)](#)
+![Lint](https://github.com/hidao80/ShigotoForm/actions/workflows/lint.yml/badge.svg)
+![Audit](https://github.com/hidao80/ShigotoForm/actions/workflows/audit.yml/badge.svg)
 
 ShigotoForm is a project designed to help job seekers, students, and career changers easily and quickly create professional PDF resumes and streamline the job application process. With an intuitive interface and no technical skills required, users can build a professional-quality resume efficiently. All user data is stored locally in the browser and never transmitted to any servers, ensuring maximum privacy. Saved resume data can be exported and imported as JSON files for easy backup or transfer.
 
@@ -49,15 +51,29 @@ To install ShigotoForm, follow these steps:
     npm install
     ```
 
-## Usage
+## Quick Start
 
-To start using ShigotoForm, run the following command:
+### Run with Docker
 
 ```bash
-npm start
+# Development with hot reload
+docker compose up dev
+
+# Production build
+docker build -t shigotoform .
+docker run -p 80:80 shigotoform
 ```
 
-This will start the application on `http://localhost:3000`.
+### Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+This will start the development server on `https://localhost:5173`.
+
+## Usage
 
 ### Input Instructions
 
