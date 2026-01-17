@@ -1,2 +1,6 @@
 onlyBuiltDependencies:
   - esbuild
+
+overrides:
+  html2pdf.js@<0.14.0: '>=0.14.0'
+  jspdf@<=3.0.4: '>=4.0.0'
