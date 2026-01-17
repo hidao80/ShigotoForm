@@ -741,7 +741,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           margin: 0,
           filename: `履歴書_${name}_${date}.pdf`,
           image: {
-            type: 'jpeg',
+            type: 'jpeg' as const,
             quality: 1.0  // 品質を最大に
           },
           html2canvas: {
@@ -771,7 +771,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           jsPDF: {
             unit: 'mm',
             format: 'a4',
-            orientation: 'portrait',
+            orientation: 'portrait' as const,
             putOnlyUsedFonts: true,
             compress: false  // 圧縮無効で品質保持
           }
