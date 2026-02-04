@@ -6,6 +6,7 @@
 ![Lint](https://github.com/hidao80/ShigotoForm/actions/workflows/lint.yml/badge.svg)
 ![Build](https://github.com/hidao80/ShigotoForm/actions/workflows/build.yml/badge.svg)
 ![Audit](https://github.com/hidao80/ShigotoForm/actions/workflows/audit.yml/badge.svg)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hidao80/ShigotoForm)
 
 ShigotoForm is a project designed to help job seekers, students, and career changers easily and quickly create professional PDF resumes and streamline the job application process. With an intuitive interface and no technical skills required, users can build a professional-quality resume efficiently. All user data is stored locally in the browser and never transmitted to any servers, ensuring maximum privacy. Saved resume data can be exported and imported as JSON files for easy backup or transfer.
 
