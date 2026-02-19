@@ -1,4 +1,4 @@
-import { Resume, Career, License } from './models/Resume.ts';
+import type { Career, License, Resume } from './models/Resume.ts';
 
 /**
  * 指定した要素に対して、変更や入力イベントのリスナーを追加します。
@@ -8,10 +8,10 @@ import { Resume, Career, License } from './models/Resume.ts';
  * @throws なし
  */
 function addSaveListeners(el: HTMLElement, handler: () => void) {
-  ['change', 'input'].forEach(type => {
+  for (const type of ['change', 'input']) {
     el.removeEventListener(type, handler as EventListener);
     el.addEventListener(type, handler as EventListener);
-  });
+  }
 }
 
 /**
@@ -135,10 +135,10 @@ function attachCareerRowListeners(div: HTMLElement) {
     const event = new Event('career-row-updated', { bubbles: true });
     div.dispatchEvent(event);
   };
-  ['start', 'end', 'name', 'position', 'description'].forEach(name => {
+  for (const name of ['start', 'end', 'name', 'position', 'description']) {
     const input = div.querySelector(`[name="${name}"]`);
     if (input) addSaveListeners(input as HTMLElement, handler);
-  });
+  }
   const removeBtn = div.querySelector('.remove-row');
   if (removeBtn) removeBtn.addEventListener('click', () => div.remove());
 }
@@ -156,10 +156,10 @@ function attachLicenseRowListeners(div: HTMLElement) {
     const event = new Event('license-row-updated', { bubbles: true });
     div.dispatchEvent(event);
   };
-  ['endDate', 'name', 'status-select'].forEach(name => {
+  for (const name of ['endDate', 'name', 'status-select']) {
     const input = div.querySelector(`[name="${name}"], .${name}`);
     if (input) addSaveListeners(input as HTMLElement, handler);
-  });
+  }
   const removeBtn = div.querySelector('.remove-row');
   if (removeBtn) removeBtn.addEventListener('click', () => div.remove());
 }
@@ -202,7 +202,7 @@ export function generateResumeHtml(data: Resume, fontType: 'gothic' | 'mincho' =
     // すでにハイフンが含まれていればそのまま
     if (zip.includes('-')) return zip;
     // 7桁以上の場合のみ4文字目にハイフンを挿入
-    if (zip.length >= 7) return zip.slice(0, 3) + '-' + zip.slice(3);
+    if (zip.length >= 7) return `${zip.slice(0, 3)}-${zip.slice(3)}`;
     return zip;
   }
 
@@ -250,17 +250,20 @@ export function generateResumeHtml(data: Resume, fontType: 'gothic' | 'mincho' =
       </table>
       <h2 class="mt-4">学歴・職歴</h2>
       <ul>
-        ${(data.career || []).map(c => 
-          `<li>
-            ${formatDate(c.start)} ～ ${(c.end && c.end.trim() !== '') ? formatDate(c.end) : '現在'} ${c.name} 
-            ${c.position ? ' / ' + c.position : ''} 
-            ${c.description ? '<span style="margin-left:2em;">' + c.description + '</span>' : ''}
-          </li>`
-        ).join('')}
+        ${(data.career || [])
+          .map(
+            (c) =>
+              `<li>
+            ${formatDate(c.start)} ～ ${c.end && c.end.trim() !== '' ? formatDate(c.end) : '現在'} ${c.name} 
+            ${c.position ? ` / ${c.position}` : ''} 
+            ${c.description ? `<span style="margin-left:2em;">${c.description}</span>` : ''}
+          </li>`,
+          )
+          .join('')}
       </ul>
       <h2 class="mt-4">免許・資格</h2>
       <ul>
-        ${(data.license || []).map(l => `<li>${formatDate(l.date)} ${l.name}${l.pass ? '　' + l.pass : ''}</li>`).join('')}
+        ${(data.license || []).map((l) => `<li>${formatDate(l.date)} ${l.name}${l.pass ? `　${l.pass}` : ''}</li>`).join('')}
       </ul>
     </div>
   `;
@@ -274,10 +277,9 @@ export function generateResumeHtml(data: Resume, fontType: 'gothic' | 'mincho' =
  * const resume = saveFromForm();
  */
 export function saveFromForm(): Resume {
-  const getValue = (selector: string) =>
-    (document.querySelector(selector) as HTMLInputElement)?.value || '';
+  const getValue = (selector: string) => (document.querySelector(selector) as HTMLInputElement)?.value || '';
 
-  const career: Career[] = Array.from(document.querySelectorAll('#career-history .card') || []).map(card => {
+  const career: Career[] = Array.from(document.querySelectorAll('#career-history .card') || []).map((card) => {
     const startInput = card.querySelector('input[name="start"]') as HTMLInputElement;
     const endInput = card.querySelector('input[name="end"]') as HTMLInputElement;
     const nameInput = card.querySelector('input[name="name"]') as HTMLInputElement;
@@ -288,18 +290,18 @@ export function saveFromForm(): Resume {
       end: endInput?.value || '',
       name: nameInput?.value || '',
       position: positionInput?.value || '',
-      description: descriptionInput?.value || ''
+      description: descriptionInput?.value || '',
     };
   });
 
-  const license: License[] = Array.from(document.querySelectorAll('#license-history .card') || []).map(card => {
+  const license: License[] = Array.from(document.querySelectorAll('#license-history .card') || []).map((card) => {
     const endDateInput = card.querySelector('input[name="endDate"]') as HTMLInputElement;
     const nameInput = card.querySelector('input[name="name"]') as HTMLInputElement;
     const statusSelect = card.querySelector('.status-select') as HTMLSelectElement;
     return {
       date: endDateInput?.value || '',
       name: nameInput?.value || '',
-      pass: statusSelect?.value || '合格'
+      pass: statusSelect?.value || '合格',
     };
   });
 
@@ -350,20 +352,20 @@ export function loadToForm(resume: Resume) {
   const careerContainer = document.querySelector('#career-history');
   if (careerContainer) {
     careerContainer.innerHTML = '';
-    (resume.career || []).forEach(item => {
+    for (const item of resume.career || []) {
       const div = createCareerRow(item);
       careerContainer.appendChild(div);
       attachCareerRowListeners(div);
-    });
+    }
   }
   // 免許・資格
   const licenseContainer = document.querySelector('#license-history');
   if (licenseContainer) {
     licenseContainer.innerHTML = '';
-    (resume.license || []).forEach(item => {
+    for (const item of resume.license || []) {
       const div = createLicenseRow(item);
       licenseContainer.appendChild(div);
       attachLicenseRowListeners(div);
-    });
+    }
   }
 }

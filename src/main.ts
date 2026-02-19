@@ -1,23 +1,22 @@
-import './resume.css'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap'
+import './resume.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap';
 import Modal from 'bootstrap/js/dist/modal';
 // Font Awesome をローカルにバンドル
 // Font Awesome は遅延読み込み
 // window.bootstrapが未定義の場合にModalをセット
-if (!(window as any).bootstrap) {
-  (window as any).bootstrap = { Modal };
+if (!(window as unknown as Record<string, unknown>).bootstrap) {
+  (window as unknown as Record<string, unknown>).bootstrap = { Modal };
 }
-import * as AutoKana from 'vanilla-autokana'
-import * as Resume from './resume.ts'
-import { saveFromForm, loadToForm } from './resume.ts'
-import * as Theme from './theme.ts'
-import { saveResume, loadResume, ResumeJson } from './db.ts'
-import { Career, License } from './models/Resume'
-import packageJson from '../package.json';
-// @ts-ignore
-import html2pdf from 'html2pdf.js';
 import { Workbox } from '@vite-pwa/workbox-window';
+import html2pdf from 'html2pdf.js';
+import * as AutoKana from 'vanilla-autokana';
+import packageJson from '../package.json';
+import { type ResumeJson, loadResume, saveResume } from './db.ts';
+import type { Career, License, Resume as ResumeData } from './models/Resume';
+import * as Resume from './resume.ts';
+import { loadToForm, saveFromForm } from './resume.ts';
+import * as Theme from './theme.ts';
 
 // フォントの遅延読み込み（初期レンダリング後に読込）
 const lazyLoadNotoFonts = (() => {
@@ -25,10 +24,7 @@ const lazyLoadNotoFonts = (() => {
   return async () => {
     if (loaded) return;
     try {
-      await Promise.all([
-        import('@fontsource/noto-sans-jp/400.css'),
-        import('@fontsource/noto-serif-jp/400.css')
-      ]);
+      await Promise.all([import('@fontsource/noto-sans-jp/400.css'), import('@fontsource/noto-serif-jp/400.css')]);
       loaded = true;
       document.documentElement.classList.add('fonts-loaded');
     } catch {
@@ -67,7 +63,7 @@ function ensureToastContainer() {
   }
   return el;
 }
-function showToast(message: string, kind: 'info'|'success'|'warn'|'error' = 'info', ttl = 3000) {
+function showToast(message: string, kind: 'info' | 'success' | 'warn' | 'error' = 'info', ttl = 3000) {
   const container = ensureToastContainer();
   const div = document.createElement('div');
   div.className = `sf-toast ${kind}`;
@@ -76,13 +72,16 @@ function showToast(message: string, kind: 'info'|'success'|'warn'|'error' = 'inf
   const timer = setTimeout(() => {
     div.remove();
   }, ttl);
-  return () => { clearTimeout(timer); div.remove(); };
+  return () => {
+    clearTimeout(timer);
+    div.remove();
+  };
 }
 
 // PWA Service Worker を workbox-window で登録（手動更新フロー）
 if ('serviceWorker' in navigator) {
-  const options = (import.meta as any).env?.DEV ? { type: 'module' as const } : undefined;
-  wb = new Workbox('/sw.js', options as any);
+  const options = import.meta.env.DEV ? { type: 'module' as const } : undefined;
+  wb = new Workbox('/sw.js', options);
 
   // 新バージョンが waiting になったら、リンクから手動適用できる状態にする
   wb.addEventListener('waiting', () => {
@@ -100,7 +99,7 @@ if ('serviceWorker' in navigator) {
   });
 
   // インストール完了（更新なし/初回インストール）
-  wb.addEventListener('installed', (event: any) => {
+  wb.addEventListener('installed', (event) => {
     if (manualCheck) {
       if (event?.isUpdate === false) {
         showToast('最新の状態です。', 'success', 2500);
@@ -121,12 +120,18 @@ if ('serviceWorker' in navigator) {
  */
 function jsonToFormResume(json: ResumeJson) {
   // career, licenseはjson.resume直下・json直下どちらにも対応
-  const careerSrc = (json.resume && Array.isArray(json.resume.career))
-    ? json.resume.career
-    : (Array.isArray(json.career)) ? json.career : [];
-  const licenseSrc = (json.resume && Array.isArray(json.resume.license))
-    ? json.resume.license
-    : (Array.isArray(json.license)) ? json.license : [];
+  const careerSrc =
+    json.resume && Array.isArray(json.resume.career)
+      ? json.resume.career
+      : Array.isArray(json.career)
+        ? json.career
+        : [];
+  const licenseSrc =
+    json.resume && Array.isArray(json.resume.license)
+      ? json.resume.license
+      : Array.isArray(json.license)
+        ? json.license
+        : [];
   return {
     createdAt: json.createdAt,
     fullname: json.fullname,
@@ -144,19 +149,19 @@ function jsonToFormResume(json: ResumeJson) {
     mail2: json.mail2,
     career: Array.isArray(careerSrc)
       ? careerSrc.filter(Boolean).map((c: Career) => ({
-        start: c.start ?? c.startDate ?? '',
-        end: c.end ?? c.endDate ?? '',
-        name: c.name ?? '',
-        position: c.position ?? '',
-        description: c.description ?? ''
-      }))
+          start: c.start ?? c.startDate ?? '',
+          end: c.end ?? c.endDate ?? '',
+          name: c.name ?? '',
+          position: c.position ?? '',
+          description: c.description ?? '',
+        }))
       : [],
     license: Array.isArray(licenseSrc)
       ? licenseSrc.filter(Boolean).map((l: License) => ({
-        date: l.date ?? '',
-        name: l.name ?? '',
-        pass: l.pass ?? '合格'
-      }))
+          date: l.date ?? '',
+          name: l.name ?? '',
+          pass: l.pass ?? '合格',
+        }))
       : [],
   };
 }
@@ -169,7 +174,7 @@ function jsonToFormResume(json: ResumeJson) {
  * @example
  * const json = formResumeToJson(form);
  */
-function formResumeToJson(form: any): ResumeJson {
+function formResumeToJson(form: ResumeData): ResumeJson {
   return {
     fullnameKana: form.fullnameKana || '',
     fullname: form.fullname || '',
@@ -177,26 +182,26 @@ function formResumeToJson(form: any): ResumeJson {
     birthday: form.birthday || '',
     age: 0,
     zipCode: form.zipCode || '',
-    address1Kana: form.address1Kana || '',
+    address1Kana: '',
     address1: form.address1 || '',
     tel1: form.tel1 || '',
     mail1: form.mail1 || '',
-    address2Kana: form.address2Kana || '',
+    address2Kana: '',
     address2: form.address2 || '',
     tel2: form.tel2 || '',
     mail2: form.mail2 || '',
-    photo: form.photo || '',
+    photo: '',
     createdAt: form.createdAt || '',
     resume: {
       education: [],
-      career: (form.career || []),
-      license: (form.license || []),
+      career: form.career || [],
+      license: form.license || [],
       subject: '',
       condition: '',
       hobby: '',
       reason: '',
-      expectations: ''
-    }
+      expectations: '',
+    },
   };
 }
 
@@ -211,13 +216,22 @@ function formResumeToJson(form: any): ResumeJson {
 window.addEventListener('DOMContentLoaded', async () => {
   // 初期レンダリング後のアイドル時間にフォントを遅延読み込み
   if ('requestIdleCallback' in window) {
-    (window as any).requestIdleCallback(() => { lazyLoadNotoFonts(); lazyLoadIcons(); });
+    window.requestIdleCallback(() => {
+      lazyLoadNotoFonts();
+      lazyLoadIcons();
+    });
   } else {
-    setTimeout(() => { lazyLoadNotoFonts(); lazyLoadIcons(); }, 0);
+    setTimeout(() => {
+      lazyLoadNotoFonts();
+      lazyLoadIcons();
+    }, 0);
   }
 
   // 初回のアイコン使用時に即時ロード（FOUT軽減）
-  const loadIconsOnFirstInteraction = () => { lazyLoadIcons(); detach(); };
+  const loadIconsOnFirstInteraction = () => {
+    lazyLoadIcons();
+    detach();
+  };
   const helpTriggerBtn = document.getElementById('help-modal-btn');
   const helpTriggerBtnInMenu = document.getElementById('help-modal-in-menu-btn');
   const offcanvas = document.getElementById('offcanvasNavbar');
@@ -226,15 +240,17 @@ window.addEventListener('DOMContentLoaded', async () => {
     helpTriggerBtn?.removeEventListener('focusin', loadIconsOnFirstInteraction);
     helpTriggerBtnInMenu?.removeEventListener('pointerover', loadIconsOnFirstInteraction);
     helpTriggerBtnInMenu?.removeEventListener('focusin', loadIconsOnFirstInteraction);
-    offcanvas?.removeEventListener('show.bs.offcanvas' as any, loadIconsOnFirstInteraction as any);
+    offcanvas?.removeEventListener('show.bs.offcanvas', loadIconsOnFirstInteraction);
   };
-  helpTriggerBtn?.addEventListener('pointerover', loadIconsOnFirstInteraction, { once: true } as any);
-  helpTriggerBtn?.addEventListener('focusin', loadIconsOnFirstInteraction, { once: true } as any);
-  helpTriggerBtnInMenu?.addEventListener('pointerover', loadIconsOnFirstInteraction, { once: true } as any);
-  helpTriggerBtnInMenu?.addEventListener('focusin', loadIconsOnFirstInteraction, { once: true } as any);
+  helpTriggerBtn?.addEventListener('pointerover', loadIconsOnFirstInteraction, { once: true });
+  helpTriggerBtn?.addEventListener('focusin', loadIconsOnFirstInteraction, { once: true });
+  helpTriggerBtnInMenu?.addEventListener('pointerover', loadIconsOnFirstInteraction, { once: true });
+  helpTriggerBtnInMenu?.addEventListener('focusin', loadIconsOnFirstInteraction, { once: true });
   // Offcanvas メニューを開いたら確実に読み込み
-  offcanvas?.addEventListener('show.bs.offcanvas' as any, loadIconsOnFirstInteraction as any, { once: true } as any);
-  document.querySelector('#app')!.innerHTML = `
+  offcanvas?.addEventListener('show.bs.offcanvas', loadIconsOnFirstInteraction, { once: true });
+  const appEl = document.querySelector('#app');
+  if (!appEl) return;
+  appEl.innerHTML = `
 <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered">
     <div class="modal-content">
@@ -475,7 +491,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const func = () => {
       const modalEl = document.getElementById('helpModal');
       if (!modalEl) return;
-      const modal = new (window as any).bootstrap.Modal(modalEl, { backdrop: true });
+      const modal = new Modal(modalEl, { backdrop: true });
       modal.show();
     };
 
@@ -553,33 +569,30 @@ window.addEventListener('DOMContentLoaded', async () => {
       await saveResume(formResumeToJson(data));
     };
     const elements = formEl.querySelectorAll('input, textarea, select');
-    elements.forEach(el => {
+    for (const el of elements) {
       el.addEventListener('change', saveHandler);
       // 年月入力にもイベントを追加
       if (el instanceof HTMLInputElement && (el.type === 'month' || el.type === 'date')) {
         el.addEventListener('input', saveHandler);
       }
-    });
+    }
 
     // 動的追加項目にも保存イベントを付与
-    const observeTargets = [
-      document.getElementById('career-history'),
-      document.getElementById('license-history')
-    ];
-    observeTargets.forEach(target => {
-      if (!target) return;
+    const observeTargets = [document.getElementById('career-history'), document.getElementById('license-history')];
+    for (const target of observeTargets) {
+      if (!target) continue;
       const observer = new MutationObserver(() => {
         // 新しく追加されたinput, textarea, select全てにイベントを付与
         const newInputs = target.querySelectorAll('input, textarea, select');
-        newInputs.forEach(el => {
+        for (const el of newInputs) {
           el.removeEventListener('change', saveHandler);
           el.removeEventListener('input', saveHandler);
           el.addEventListener('change', saveHandler);
           el.addEventListener('input', saveHandler);
-        });
+        }
       });
       observer.observe(target, { childList: true, subtree: true });
-    });
+    }
 
     // 生年月日入力時に満年齢を計算して表示
     const birthInput = document.querySelector('#birthdate-input') as HTMLInputElement | null;
@@ -596,7 +609,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
             calcAge--;
           }
-          age = isNaN(calcAge) ? '' : String(calcAge);
+          age = Number.isNaN(calcAge) ? '' : String(calcAge);
         }
         ageDisplay.textContent = age;
 
@@ -616,7 +629,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
           age--;
         }
-        ageDisplay.textContent = isNaN(age) ? '' : String(age);
+        ageDisplay.textContent = Number.isNaN(age) ? '' : String(age);
       }
     }
   }
@@ -644,8 +657,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json,application/json';
-    input.onchange = async (e: any) => {
-      const file = e.target.files[0];
+    input.onchange = async (e: Event) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
       const text = await file.text();
       const data = JSON.parse(text);
@@ -693,9 +706,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (!resumeJson) return;
     const data = jsonToFormResume(resumeJson);
     // フォント選択状態を取得
-    const fontType = (document.querySelector('#resumeModal .modal-footer #font-select') as HTMLSelectElement)?.value
-      || (document.getElementById('font-select') as HTMLSelectElement)?.value
-      || 'gothic';
+    const fontType =
+      (document.querySelector('#resumeModal .modal-footer #font-select') as HTMLSelectElement)?.value ||
+      (document.getElementById('font-select') as HTMLSelectElement)?.value ||
+      'gothic';
     // 履歴書HTML生成
     const html = Resume.generateResumeHtml(data, fontType as 'gothic' | 'mincho');
     const content = document.querySelector('#resume-modal-content');
@@ -703,7 +717,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       content.innerHTML = html;
     }
     // モーダル内font-selectイベントリスナーを付与
-    const modalFontSelect = document.querySelector('#resumeModal .modal-footer #font-select') as HTMLSelectElement | null;
+    const modalFontSelect = document.querySelector(
+      '#resumeModal .modal-footer #font-select',
+    ) as HTMLSelectElement | null;
     if (modalFontSelect) {
       modalFontSelect.addEventListener('change', () => {
         const preview = document.querySelector('#resume-modal-content .resume-preview') as HTMLElement | null;
@@ -718,7 +734,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       });
     }
     // モーダル表示
-    const modal = new (window as any).bootstrap.Modal(document.querySelector('#resumeModal'));
+    const modal = new Modal(document.querySelector('#resumeModal') as HTMLElement);
     modal.show();
   });
 
@@ -742,39 +758,39 @@ window.addEventListener('DOMContentLoaded', async () => {
           filename: `履歴書_${name}_${date}.pdf`,
           image: {
             type: 'jpeg' as const,
-            quality: 1.0  // 品質を最大に
+            quality: 1.0, // 品質を最大に
           },
           html2canvas: {
-            scale: 3,  // スケールを上げて解像度向上
+            scale: 3, // スケールを上げて解像度向上
             // backgroundColor: '#ffffff',  // 明示的に白背景設定
             useCORS: true,
             allowTaint: true,
-            width: Math.round(212 * 96 / 25.4),  // 212mm × 96dpi ÷ 25.4
-            height: Math.round(299 * 96 / 25.4), // 299mm × 96dpi ÷ 25.4
-            dpi: 192,  // DPIを192に設定
-            letterRendering: true,  // 文字レンダリング改善
-            removeContainer: true,  // コンテナ削除
-            foreignObjectRendering: false,  // SVG関連の問題回避
-            onclone: function(clonedDoc: Document) {              
+            width: Math.round((212 * 96) / 25.4), // 212mm × 96dpi ÷ 25.4
+            height: Math.round((299 * 96) / 25.4), // 299mm × 96dpi ÷ 25.4
+            dpi: 192, // DPIを192に設定
+            letterRendering: true, // 文字レンダリング改善
+            removeContainer: true, // コンテナ削除
+            foreignObjectRendering: false, // SVG関連の問題回避
+            onclone: (clonedDoc: Document) => {
               // クローンされたドキュメントでテーブル線幅を調整
-              clonedDoc.body.style.backgroundColor = '#fff';  // 背景色を白に設定
-              clonedDoc.body.style.color = '#000';  // 文字色を黒に設定
+              clonedDoc.body.style.backgroundColor = '#fff'; // 背景色を白に設定
+              clonedDoc.body.style.color = '#000'; // 文字色を黒に設定
               const tables = clonedDoc.querySelectorAll('table, th, td, tr');
-              tables.forEach((el: Element) => {
+              for (const el of tables) {
                 const style = (el as HTMLElement).style;
-                style.border = '0.1px solid #ddd';  // 極細の線幅
-                style.backgroundColor = '#fff';  // 背景色を白に
-                style.color = '#000';  // 文字色を黒に
-              });
-            }
+                style.border = '0.1px solid #ddd'; // 極細の線幅
+                style.backgroundColor = '#fff'; // 背景色を白に
+                style.color = '#000'; // 文字色を黒に
+              }
+            },
           },
           jsPDF: {
             unit: 'mm',
             format: 'a4',
             orientation: 'portrait' as const,
             putOnlyUsedFonts: true,
-            compress: false  // 圧縮無効で品質保持
-          }
+            compress: false, // 圧縮無効で品質保持
+          },
         };
 
         try {
@@ -791,7 +807,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (versionNo) versionNo.textContent = packageJson.version;
 
   if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark')
+    document.body.classList.add('dark');
   }
 
   // フォント切替イベント

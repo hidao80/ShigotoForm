@@ -5,12 +5,12 @@
   --light-text: #1a1a1a;
   --light-primary: #007bff;
   --light-secondary: #6c757d;
-  --light-accent: #4CAF50;
+  --light-accent: #4caf50;
   --light-border: #dee2e6;
   --light-hover: #f8f9fa;
   --light-required: #dc3545;
   --light-version: rgba(0, 0, 0, 0.7);
-  
+
   --dark-bg: #1a1a1a;
   --dark-text: #ffffff;
   --dark-primary: #0095ff;
@@ -37,7 +37,6 @@
   --info-color: #0d6efd;
   --warn-color: #ffc107;
   --error-color: #dc3545;
-
 }
 
 body {
@@ -59,7 +58,7 @@ label.required::after {
 }
 
 .navbar {
-  background-color: var(--bg-color)
+  background-color: var(--bg-color);
 }
 
 #app {
@@ -96,32 +95,28 @@ rt {
 }
 
 .resume-preview.font-gothic {
-  font-family:
-    "帳票 UDPゴシック",
-    "Noto Sans JP",
-    "Meiryo",
-    "Yu Gothic",
-    "MS PGothic",
-    sans-serif;
+  font-family: "帳票 UDPゴシック", "Noto Sans JP", "Meiryo", "Yu Gothic", "MS PGothic", sans-serif;
 }
 
 .resume-preview.font-mincho {
-  font-family:
-    "帳票 UDP明朝",
-    "Noto Serif JP",
-    "MS Mincho",
-    "Yu Mincho",
-    "Hiragino Mincho ProN",
-    serif;
+  font-family: "帳票 UDP明朝", "Noto Serif JP", "MS Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif;
 }
 
 /* PWA/ヘルプ等のモーダルが他UIに隠れないよう最前面に固定 */
-.modal { z-index: 20000; }
-.modal-backdrop { z-index: 19900; }
+.modal {
+  z-index: 20000;
+}
+.modal-backdrop {
+  z-index: 19900;
+}
 
 /* JS可否フック: JS必須要素の表示/非表示を制御 */
-html.no-js .js-only { display: none !important; }
-html.js .no-js-only { display: none !important; }
+html.no-js .js-only {
+  display: none !important;
+}
+html.js .no-js-only {
+  display: none !important;
+}
 
 /* 低視覚負荷: アニメーションを抑制（環境設定に追従） */
 @media (prefers-reduced-motion: reduce) {
@@ -139,7 +134,7 @@ html.js .no-js-only { display: none !important; }
   top: 0;
   z-index: 21000;
   background: #fff3cd; /* Bootstrap warn bg 相当 */
-  color: #664d03;      /* Bootstrap warn text 相当 */
+  color: #664d03; /* Bootstrap warn text 相当 */
   border-bottom: 1px solid #ffe69c;
   padding: 10px 16px;
   font-size: 0.95rem;
@@ -198,26 +193,26 @@ html:not(.icons-loaded) i[class*=" fa-"]::before {
 }
 .sf-toast {
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   padding: 10px 12px;
   min-width: 280px;
 }
-.sf-toast.success { 
+.sf-toast.success {
   border: 1px solid var(--success-color);
   background-color: color-mix(in srgb, var(--success-color) 10%, white);
   color: var(--success-color);
 }
-.sf-toast.info { 
+.sf-toast.info {
   border-color: var(--info-color);
   background-color: color-mix(in srgb, var(--info-color) 10%, white);
   color: var(--info-color);
 }
-.sf-toast.warn { 
+.sf-toast.warn {
   border-color: var(--warn-color);
   background-color: color-mix(in srgb, var(--warn-color) 10%, white);
   color: var(--warn-color);
 }
-.sf-toast.error { 
+.sf-toast.error {
   border-color: var(--error-color);
   background-color: color-mix(in srgb, var(--error-color) 10%, white);
   color: var(--error-color);

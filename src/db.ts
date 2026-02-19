@@ -1,5 +1,5 @@
-import Dexie, { Table } from 'dexie';
-import { Career, License } from './models/Resume';
+import Dexie, { type Table } from 'dexie';
+import type { Career, License } from './models/Resume';
 
 // JSONスキーマに合わせた型
 export interface ResumeJson {
@@ -24,8 +24,8 @@ export interface ResumeJson {
   license?: License[];
   resume: {
     education: string[];
-    career: Career[],
-    license: License[],
+    career: Career[];
+    license: License[];
     subject: string;
     condition: string;
     hobby: string;
@@ -56,7 +56,7 @@ export class ResumeDB extends Dexie {
     super('ResumeDB');
     // createdAtで一意
     this.version(4).stores({
-      resumes: 'createdAt'
+      resumes: 'createdAt',
     });
   }
 }
@@ -75,7 +75,7 @@ export async function saveResume(resume: ResumeJson) {
   await db.resumes.where('createdAt').equals(resume.createdAt).delete();
   await db.resumes.put({
     createdAt: resume.createdAt,
-    json: resume
+    json: resume,
   });
 }
 
