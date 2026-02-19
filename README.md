@@ -1,28 +1,30 @@
 # ShigotoForm
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/d7518453-f8ce-435d-a995-aecb75f57f44/deploy-status)](https://app.netlify.com/projects/shigotoform/deploys)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Accessibility](https://img.shields.io/badge/Accessibility-Validated-blue)](#)
-![Lint](https://github.com/hidao80/ShigotoForm/actions/workflows/lint.yml/badge.svg)
-![Build](https://github.com/hidao80/ShigotoForm/actions/workflows/build.yml/badge.svg)
-![Audit](https://github.com/hidao80/ShigotoForm/actions/workflows/audit.yml/badge.svg)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hidao80/ShigotoForm)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)&emsp;[![Accessibility](https://img.shields.io/badge/Accessibility-Validated-blue)](#)&emsp;![Audit](https://github.com/hidao80/ShigotoForm/actions/workflows/audit.yml/badge.svg)&emsp;![Lint](https://github.com/hidao80/ShigotoForm/actions/workflows/lint.yml/badge.svg)&emsp;![Build](https://github.com/hidao80/ShigotoForm/actions/workflows/build.yml/badge.svg)&emsp;[![Netlify Status](https://api.netlify.com/api/v1/badges/d7518453-f8ce-435d-a995-aecb75f57f44/deploy-status)](https://app.netlify.com/projects/shigotoform/deploys)&emsp;[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hidao80/ShigotoForm)
 
-ShigotoForm is a project designed to help job seekers, students, and career changers easily and quickly create professional PDF resumes and streamline the job application process. With an intuitive interface and no technical skills required, users can build a professional-quality resume efficiently. All user data is stored locally in the browser and never transmitted to any servers, ensuring maximum privacy. Saved resume data can be exported and imported as JSON files for easy backup or transfer.
+![Accessibility](https://img.shields.io/badge/Accessibility-100-brightgreen?style=flat-square)&emsp;![Best_Practices](https://img.shields.io/badge/Best_Practices-96-brightgreen?style=flat-square)&emsp;![Performance](https://img.shields.io/badge/Performance-84-yellow?style=flat-square)&emsp;![SEO](https://img.shields.io/badge/SEO-100-brightgreen?style=flat-square)&emsp;*Tested on: 2026-02-19 using [lighthouse-badges](https://github.com/hidao80/lighthouse-badges)*
 
-This README provides an overview of the project, setup instructions, and contribution guidelines.
+***Your resume, your device — private by design.***
 
-## Table of Contents
+- **Private**: Your personal data never leaves your device — no accounts, no uploads.
+- **Offline-ready**: Works without internet once installed as a PWA via Service Worker.
+- **Print-perfect**: Exports A4-accurate PDFs with Gothic or Mincho Japanese font choice.
 
-- [Security & Privacy](#lock-security--privacy)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Screenshots](#camera_flash-screenshots)
-- [Technology choices](#hammer_and_wrench-technology-choices)
-- [Performance Metrics](#zap-performance-metrics)
-- [Accessibility Compliance](#wheelchair-accessibility-compliance)
-- [Contributing](#busts_in_silhouette-contributing)
-- [License](#page_facing_up-license)
+## Overview
+
+ShigotoForm is a **client-side PWA** for creating Japanese-style resumes.
+All data is stored in your browser's IndexedDB and never transmitted anywhere.
+Fill in the form, preview in A4 layout, and download a high-resolution PDF —
+no account, no backend, no privacy risk.
+
+## Issues & Reasons
+
+- **Cloud exposure**: Most resume tools upload your data to a server — ShigotoForm runs entirely client-side; nothing is ever transmitted.
+- **No Japanese support**: Western PDF tools lack the JIS-standard resume（履歴書）layout — ShigotoForm renders it with proper Japanese font support.
+- **Paywalled PDF export**: Most tools charge for PDF output — ShigotoForm generates PDFs locally using html2pdf.js, for free.
+- **Data loss on device switch**: Switching devices without a backup means losing your data — use JSON export/import to back up and restore anywhere.
+
+[:rocket: **Live Demo**](https://shigotoform.netlify.app/)
 
 ## :lock: Security & Privacy
 
@@ -31,29 +33,7 @@ This README provides an overview of the project, setup instructions, and contrib
 - **Privacy-first**: Designed with personal data protection in mind
 - **Future enhancement**: Local encryption planned for additional security
 
-## Installation
-
-To install ShigotoForm, follow these steps:
-
-1. Clone the repository:
-
-    ```bash
-    git clone https://github.com/yourusername/ShigotoForm.git
-    ```
-
-2. Navigate to the project directory:
-
-    ```bash
-    cd ShigotoForm
-    ```
-
-3. Install the necessary dependencies:
-
-    ```bash
-    npm install
-    ```
-
-## Quick Start
+## :rocket: Quick Start
 
 ### Run with Docker
 
@@ -69,23 +49,27 @@ docker run -p 80:80 shigotoform
 ### Run locally
 
 ```bash
-npm install
-npm run dev
+git clone https://github.com/hidao80/ShigotoForm.git
+cd ShigotoForm
+pnpm install
+pnpm dev
 ```
 
 This will start the development server on `https://localhost:5173`.
 
-## Usage
+## :open_book: Usage
 
 ### Input Instructions
 
 1. **Full Name**: Enter your full name in the text box. Furigana will be auto-filled to some extent.
 2. **Date of Birth**: Select a date from the calendar or enter it in YYYY/MM/DD format.
-3. **Address**: Enter your postal code for auto-completion. Please enter the detailed address manually.
+3. **Address**: Enter your postal code and full address.
 4. **Phone Number**: Enter numbers in half-width digits without hyphens.
 5. **Email Address**: Enter a valid email address format.
 6. **Education/Work History**: Enter your educational and work history in a list format. You can add or remove rows using the "Add" or "Delete" buttons.
 7. **Qualifications/Licenses**: Enter your qualifications and licenses in a list format. You can add or remove rows using the "Add" or "Delete" buttons.
+
+## :sparkles: Features
 
 ### Import/Export
 
@@ -98,23 +82,34 @@ When importing, select a JSON file from your device and the input screen will be
 ### Preview
 
 The content entered on the input screen can be previewed in A4 paper size.  
-At this time, you can select either Gothic or Mincho font.
+You can select either Gothic or Mincho font.
 
-By clicking the "Download Resume PDF" button at the bottom right of the preview screen, you can download the preview content as a PDF.
+Click "Download Resume PDF" at the bottom of the preview to save as PDF.
 
 ## :camera_flash: Screenshots
 
-1. **Input Screen**:  
+<details>
+<summary><strong>1. Input Screen</strong></summary>
 <img width="600" alt="Input Screen" src="https://github.com/user-attachments/assets/01a0c251-604e-4536-8c74-9b74bed8fff6">
+</details>
+<br>
 
-2. **Menu**:  
+<details>
+<summary><strong>2. Menu</strong></summary>
 <img width="200" alt="Menu" src="https://github.com/user-attachments/assets/f52b7b3f-87c2-44e7-8fd0-eb458391a5f9">
+</details>
+<br>
 
-3. **Preview (Gothic Font)**:  
+<details>
+<summary><strong>3. Preview (Gothic Font)</strong></summary>
 <img width="600" alt="Preview (Gothic Font)" src="https://github.com/user-attachments/assets/50bf681b-34f1-4d8d-9ddd-0efa1905d911">
+</details>
+<br>
 
-4. **Preview (Mincho Font)**:  
+<details>
+<summary><strong>4. Preview (Mincho Font)</strong></summary>
 <img width="600" alt="Preview (Mincho Font)" src="https://github.com/user-attachments/assets/f2ab3688-2c8c-437e-b42c-7424b81b87ee">
+</details>
 
 ## :hammer_and_wrench: Technology Choices
 
@@ -128,34 +123,6 @@ By clicking the "Download Resume PDF" button at the bottom right of the preview 
 - High-quality Japanese font rendering
 - Customizable PDF layout control
 
-## :zap: Performance Metrics
-
-### :iphone: Mobile Results
-[![Performance-73-yellow](https://img.shields.io/badge/Performance-73-yellow)](#)
-[![Accessibility-100-green](https://img.shields.io/badge/Accessibility-100-green)](#)
-[![Best_Practices-96-green](https://img.shields.io/badge/Best_Practices-96-green)](#)
-[![SEO-100-green](https://img.shields.io/badge/SEO-100-green)](#)
-
-[![First_Contentful_Paint-4.2s-red](https://img.shields.io/badge/First_Contentful_Paint-4.2s-red)](#)
-[![Largest_Contentful_Paint-4.6s-red](https://img.shields.io/badge/Largest_Contentful_Paint-4.6s-red)](#)
-[![Total_Blocking_Time-0ms-green](https://img.shields.io/badge/Total_Blocking_Time-0ms-green)](#)
-[![Cumulative_Layout_Shift-0-green](https://img.shields.io/badge/Cumulative_Layout_Shift-0-green)](#)
-[![Speed_Index-4.2s-red](https://img.shields.io/badge/Speed_Index-4.2s-red)](#)
-
-### :desktop_computer: Desktop Results
-[![Performance-99-green](https://img.shields.io/badge/Performance-99-green)](#)
-[![Accessibility-96-green](https://img.shields.io/badge/Accessibility-96-green)](#)
-[![Best_Practices-100-green](https://img.shields.io/badge/Best_Practices-100-green)](#)
-[![SEO-100-green](https://img.shields.io/badge/SEO-100-green)](#)
-
-[![First_Contentful_Paint-0.8s-green](https://img.shields.io/badge/First_Contentful_Paint-0.8s-green)](#)
-[![Largest_Contentful_Paint-0.9s-green](https://img.shields.io/badge/Largest_Contentful_Paint-0.9s-green)](#)
-[![Total_Blocking_Time-0ms-green](https://img.shields.io/badge/Total_Blocking_Time-0ms-gree)](#)
-[![Cumulative_Layout_Shift-0-green](https://img.shields.io/badge/Cumulative_Layout_Shift-0-green)](#)
-[![Speed_Index-0.9s-green](https://img.shields.io/badge/Speed_Index-0.9s-green)](#)
-
-*Tested on: 2025-08-11 using Google PageSpeed Insights*
-
 ## :wheelchair: Accessibility Compliance
 
 **WAVE Accessibility Evaluation Results:**
@@ -166,36 +133,9 @@ By clicking the "Download Resume PDF" button at the bottom right of the preview 
 
 *Tested with WAVE Web Accessibility Evaluator on 2025-08-11*
 
-## :busts_in_silhouette: Contributing
+## :handshake: Contributing
 
-We welcome contributions to ShigotoForm! To contribute, follow these steps:
-
-1. Fork the repository.
-2. Create a new branch:
-
-    ```bash
-    git checkout -b feature-branch
-    ```
-
-3. Make your changes and commit them:
-
-    ```bash
-    git commit -m "Description of changes"
-    ```
-
-4. Push to the branch:
-
-    ```bash
-    git push origin feature-branch
-    ```
-
-5. Create a pull request.
-
-## :world_map: Roadmap
-
-### Planned Improvements
-- [ ] React + TypeScript migration
-- [ ] Enhanced accessibility testing
+Bug reports and pull requests are welcome.
 
 ## :page_facing_up: License
 
