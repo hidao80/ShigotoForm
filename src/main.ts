@@ -785,7 +785,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             },
           },
           jsPDF: {
-            unit: 'mm',
+            unit: 'mm' as const,
             format: 'a4',
             orientation: 'portrait' as const,
             putOnlyUsedFonts: true,
