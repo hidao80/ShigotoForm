@@ -12,4 +12,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: flatt-security/setup-takumi-guard-npm@v1
-      - run: docker build -t ${{ github.repository }}:${{ github.sha }} .
+      - run: echo "REPO_NAME_LC=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+      - run: docker build -t ${{ env.REPO_NAME_LC }}:${{ github.sha }} .
