@@ -42,7 +42,6 @@ docs
 .npm
 .yarn
 .pnpm-store
-pnpm-lock.yaml
 
 # Logs
 logs
@@ -60,7 +59,6 @@ Thumbs.db
 Dockerfile*
 docker-compose*
 .dockerignore
-nginx.conf
 
 # Serena
 .serena
