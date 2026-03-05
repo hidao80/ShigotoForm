@@ -8,10 +8,16 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "biome check src/ && tsc --noEmit",
-    "format": "biome format --write src/"
+    "format": "biome format --write src/",
+    "test": "playwright test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "screenshot": "playwright test tests/e2e/screenshot.spec.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "@playwright/test": "^1.49.0",
     "@types/bootstrap": "^5.2.10",
     "@vite-pwa/workbox-window": "^8.0.0",
     "typescript": "~5.6.3",

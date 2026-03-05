@@ -1,4 +1,4 @@
-name: Lint
+name: Test
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v4
@@ -17,8 +17,8 @@ jobs:
           version: latest
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "pnpm"
+          node-version: '20'
+          cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm format
-      - run: pnpm lint
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test

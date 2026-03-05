@@ -1,6 +1,6 @@
 # ShigotoForm
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)&emsp;[![Accessibility](https://img.shields.io/badge/Accessibility-Validated-blue)](#)&emsp;![Audit](https://github.com/hidao80/ShigotoForm/actions/workflows/audit.yml/badge.svg)&emsp;![Lint](https://github.com/hidao80/ShigotoForm/actions/workflows/lint.yml/badge.svg)&emsp;![Build](https://github.com/hidao80/ShigotoForm/actions/workflows/build.yml/badge.svg)&emsp;[![Netlify Status](https://api.netlify.com/api/v1/badges/d7518453-f8ce-435d-a995-aecb75f57f44/deploy-status)](https://app.netlify.com/projects/shigotoform/deploys)&emsp;[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hidao80/ShigotoForm)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)&emsp;[![Accessibility](https://img.shields.io/badge/Accessibility-Validated-blue)](#)&emsp;![Audit](https://github.com/hidao80/ShigotoForm/actions/workflows/audit.yml/badge.svg)&emsp;![Lint](https://github.com/hidao80/ShigotoForm/actions/workflows/lint.yml/badge.svg)&emsp;![Build](https://github.com/hidao80/ShigotoForm/actions/workflows/build.yml/badge.svg)&emsp;[![Netlify Status](https://api.netlify.com/api/v1/badges/d7518453-f8ce-435d-a995-aecb75f57f44/deploy-status)](https://app.netlify.com/projects/shigotoform/deploys)&emsp;[![Security: Takumi Guard](https://img.shields.io/badge/Security-Takumi%20Guard-blue)](https://github.com/hidao80/mago-vsx/actions/workflows/npm-scan.yml)&emsp;[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hidao80/ShigotoForm)
 
 ![Accessibility](https://img.shields.io/badge/Accessibility-100-brightgreen?style=flat-square)&emsp;![Best_Practices](https://img.shields.io/badge/Best_Practices-96-brightgreen?style=flat-square)&emsp;![Performance](https://img.shields.io/badge/Performance-84-yellow?style=flat-square)&emsp;![SEO](https://img.shields.io/badge/SEO-100-brightgreen?style=flat-square)&emsp;*Tested on: 2026-02-19 using [lighthouse-badges](https://github.com/hidao80/lighthouse-badges)*
 
@@ -136,6 +136,7 @@ Click "Download Resume PDF" at the bottom of the preview to save as PDF.
 ## :handshake: Contributing
 
 Bug reports and pull requests are welcome.
+Please note that this project uses [Takumi Guard](https://github.com/flatt-security/setup-takumi-guard-npm) in CI workflows to scan dependencies for malware and ensure supply chain security. This scanning only applies to CI and does not affect your local development environment.
 
 ## :page_facing_up: License
 

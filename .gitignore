@@ -12,6 +12,16 @@ dist
 dist-ssr
 *.local
 .claude
+.serena
+
+CLAUDE.md
+AGENTS.md
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+screenshots/
 
 # Editor directories and files
 .vscode/*

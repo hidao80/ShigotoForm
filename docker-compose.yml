@@ -11,7 +11,7 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-    command: npm run dev -- --host
+    command: pnpm run dev -- --host
 
   # Production build served with nginx
   prod:

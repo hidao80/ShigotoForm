@@ -1,10 +1,11 @@
 # Build stage
 FROM node:20-alpine AS builder
+RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+COPY pnpm-lock.yaml package.json ./
+RUN pnpm install --frozen-lockfile
 COPY . .
-RUN npm run build
+RUN pnpm run build
 
 # Production stage - serve static files with nginx
 FROM nginx:alpine AS runner
