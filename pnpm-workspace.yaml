@@ -3,3 +3,6 @@ allowBuilds:
   '@fortawesome/fontawesome-free': true
   core-js: true
   esbuild: true
+
+overrides:
+  serialize-javascript: '>=7.0.3'
