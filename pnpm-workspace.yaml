@@ -12,6 +12,8 @@ minimumReleaseAgeExclude:
   - '@babel/plugin-transform-modules-systemjs@7.29.4'
   - '@babel/core@7.29.1'
 
+# Transitive dependency pins to resolve `pnpm audit` findings (all from
+# vite-plugin-pwa > workbox-build). See `pnpm why <pkg>` for the chain.
 overrides:
   '@babel/core@<=7.29.0': ^7.29.1
   '@babel/plugin-transform-modules-systemjs@>=7.12.0 <=7.29.3': ^7.29.4
