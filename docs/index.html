@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <link rel="icon" href="../public/img/favicon32.webp">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ShigotoForm — 個人情報を一切送信しない、ブラウザ完結型の履歴書作成PWA。JIS規格レイアウトのA4 PDFを無料で出力。">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:title" content="ShigotoForm — あなたの履歴書は、あなたのデバイスの中に">
+  <meta property="og:description" content="サーバー送信ゼロ・オフライン対応・無料PDF出力の履歴書作成PWA">
+  <meta property="og:type" content="website">
+  <title>ShigotoForm — あなたの履歴書は、あなたのデバイスの中に</title>
+  <style>
+    :root {
+      --bg: #faf9f7;
+      --surface: #ffffff;
+      --text: #1c1917;
+      --text-sub: #57534e;
+      --accent: #b91c1c;
+      --accent-soft: #fef2f2;
+      --border: #e7e5e4;
+      --shadow: 0 1px 3px rgb(0 0 0 / .06), 0 8px 24px rgb(0 0 0 / .07);
+      color-scheme: light dark;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #171412;
+        --surface: #221f1c;
+        --text: #f5f5f4;
+        --text-sub: #a8a29e;
+        --accent: #f87171;
+        --accent-soft: #3b1a1a;
+        --border: #3a3532;
+        --shadow: 0 1px 3px rgb(0 0 0 / .4), 0 8px 24px rgb(0 0 0 / .35);
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "BIZ UDPGothic", Meiryo, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    /* ---------- ヒーロー ---------- */
+    .hero {
+      min-height: 88svh;
+      display: grid;
+      place-content: center;
+      text-align: center;
+      padding: 4rem 1.5rem 3rem;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, var(--accent-soft), transparent);
+    }
+
+    .hero .hanko {
+      font-size: 4.5rem;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 3.4rem);
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+
+    .hero .tagline {
+      font-size: clamp(1.05rem, 2.5vw, 1.4rem);
+      color: var(--text-sub);
+      margin: 1rem auto 0;
+      max-width: 34em;
+    }
+
+    .hero .tagline strong {
+      color: var(--accent);
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2.5rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: .9rem 2.2rem;
+      border-radius: 999px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-ghost {
+      border: 2px solid var(--border);
+      color: var(--text);
+    }
+
+    .hero .no-signup {
+      margin-top: 1.2rem;
+      font-size: .85rem;
+      color: var(--text-sub);
+    }
+
+    /* ---------- セクション共通 ---------- */
+    section {
+      max-width: 68rem;
+      margin: 0 auto;
+      padding: 4.5rem 1.5rem;
+    }
+
+    section>h2 {
+      font-size: clamp(1.5rem, 4vw, 2.1rem);
+      text-align: center;
+      margin-bottom: .6rem;
+    }
+
+    section>.lead {
+      text-align: center;
+      color: var(--text-sub);
+      max-width: 40em;
+      margin: 0 auto 3rem;
+    }
+
+    h2 .accent {
+      color: var(--accent);
+    }
+
+    /* ---------- 課題 vs 解決 ---------- */
+    .vs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+      gap: 1.2rem;
+    }
+
+    .vs-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.6rem;
+      box-shadow: var(--shadow);
+    }
+
+    .vs-card .problem {
+      color: var(--text-sub);
+      font-size: .92rem;
+      text-decoration: line-through;
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 2px;
+    }
+
+    .vs-card .solution {
+      font-weight: 700;
+      margin-top: .5rem;
+    }
+
+    .vs-card .icon {
+      font-size: 1.8rem;
+      margin-bottom: .5rem;
+      display: block;
+    }
+
+    /* ---------- 使い方 3ステップ ---------- */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+      gap: 1.2rem;
+      counter-reset: step;
+    }
+
+    .step {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 2.4rem 1.6rem 1.6rem;
+      box-shadow: var(--shadow);
+    }
+
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      top: -1rem;
+      left: 1.4rem;
+      width: 2.4rem;
+      height: 2.4rem;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      display: grid;
+      place-content: center;
+    }
+
+    .step h3 {
+      margin-bottom: .4rem;
+    }
+
+    .step p {
+      color: var(--text-sub);
+      font-size: .95rem;
+    }
+
+    /* ---------- スクリーンショット ---------- */
+    .shots {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+      gap: 1.5rem;
+    }
+
+    .shots figure {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .shots img {
+      border-radius: .5rem;
+      width: 100%;
+    }
+
+    .shots figcaption {
+      text-align: center;
+      font-size: .9rem;
+      color: var(--text-sub);
+      margin-top: .6rem;
+    }
+
+    /* ---------- 技術 ---------- */
+    .tech-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      justify-content: center;
+      list-style: none;
+    }
+
+    .tech-list li {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: .4rem 1.1rem;
+      font-size: .9rem;
+    }
+
+    /* ---------- フッター ---------- */
+    footer {
+      text-align: center;
+      padding: 3rem 1.5rem 4rem;
+      color: var(--text-sub);
+      font-size: .9rem;
+      border-top: 1px solid var(--border);
+    }
+
+    footer .cta-row {
+      margin-top: 0;
+      margin-bottom: 2rem;
+    }
+
+    /* ---------- スクロール演出（装飾・プログレッシブエンハンスメント） ---------- */
+    @media (prefers-reduced-motion: no-preference) {
+      @supports ((animation-timeline: view()) and (animation-range: entry)) {
+        @keyframes rise {
+          from {
+            opacity: 0;
+            transform: translateY(2rem);
+          }
+        }
+
+        .vs-card,
+        .step,
+        .shots figure {
+          animation: rise auto ease-out backwards;
+          animation-timeline: view();
+          animation-range: entry 0% entry 60%;
+        }
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="hero">
+    <div class="hanko" aria-hidden="true">📄🖋️</div>
+    <h1>ShigotoForm</h1>
+    <p class="tagline">
+      あなたの履歴書は、<strong>あなたのデバイスの中に</strong>。<br>
+      サーバー送信ゼロで作れる、日本式履歴書作成PWA。
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://shigotoform.netlify.app/">🚀 今すぐ使ってみる</a>
+      <a class="btn btn-ghost" href="https://github.com/hidao80/ShigotoForm">GitHub で見る</a>
+    </div>
+    <p class="no-signup">アカウント登録不要・完全無料・インストール不要（PWA対応）</p>
+  </header>
+
+  <section>
+    <h2>履歴書ツールの<span class="accent">「不安」</span>を、ぜんぶ解決</h2>
+    <p class="lead">氏名・住所・職歴——履歴書は個人情報のかたまりです。ShigotoForm はデータを一切送信しない設計で、その不安を根本から取り除きます。</p>
+    <div class="vs-grid">
+      <div class="vs-card">
+        <span class="icon" aria-hidden="true">🔒</span>
+        <p class="problem">個人情報がクラウドにアップロードされる</p>
+        <p class="solution">完全クライアントサイド。データはブラウザの IndexedDB のみに保存され、外部への通信は一切ありません。</p>
+      </div>
+      <div class="vs-card">
+        <span class="icon" aria-hidden="true">🗾</span>
+        <p class="problem">海外製ツールは日本式履歴書に非対応</p>
+        <p class="solution">履歴書レイアウトを、ゴシック体・明朝体の日本語フォントで表現します。顔写真添付には近日対応予定。</p>
+      </div>
+      <div class="vs-card">
+        <span class="icon" aria-hidden="true">💸</span>
+        <p class="problem">PDF出力は有料プラン限定</p>
+        <p class="solution">html2pdf.js によるローカル生成で、高解像度の A4 PDF を無料でダウンロードできます。</p>
+      </div>
+      <div class="vs-card">
+        <span class="icon" aria-hidden="true">💾</span>
+        <p class="problem">機種変更でデータが消える</p>
+        <p class="solution">JSON エクスポート／インポートでバックアップと復元が自由自在。デバイスをまたいで引き継げます。</p>
+      </div>
+      <div class="vs-card">
+        <span class="icon" aria-hidden="true">📶</span>
+        <p class="problem">ネット環境がないと使えない</p>
+        <p class="solution">Service Worker によるオフライン対応。PWA としてインストールすれば圏外でも編集できます。</p>
+      </div>
+      <div class="vs-card">
+        <span class="icon" aria-hidden="true">♿</span>
+        <p class="problem">アクセシビリティが後回し</p>
+        <p class="solution">Lighthouse アクセシビリティスコア 100、WAVE 検証エラー 0 件。誰にでも使いやすい UI です。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>使い方は、たったの <span class="accent">3ステップ</span></h2>
+    <p class="lead">面倒な設定は不要。開いたらすぐ書き始められます。入力内容は自動保存されるので、途中で閉じても大丈夫。</p>
+    <div class="steps">
+      <div class="step">
+        <h3>✏️ 入力する</h3>
+        <p>氏名・住所・学歴・職歴・資格をフォームに入力。ふりがなの自動補完や行の追加・削除にも対応しています。</p>
+      </div>
+      <div class="step">
+        <h3>👀 プレビューする</h3>
+        <p>A4 用紙サイズで仕上がりを確認。ゴシック体・明朝体をワンクリックで切り替えられます。</p>
+      </div>
+      <div class="step">
+        <h3>📥 PDFで保存する</h3>
+        <p>「履歴書PDFダウンロード」を押すだけ。印刷にそのまま使える高解像度 PDF が手に入ります。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>スクリーンショット</h2>
+    <p class="lead">シンプルな入力画面と、印刷品質のプレビュー。ダークモードにも対応しています。</p>
+    <div class="shots">
+      <figure>
+        <img src="https://github.com/user-attachments/assets/01a0c251-604e-4536-8c74-9b74bed8fff6"
+          alt="ShigotoForm の入力画面" loading="lazy">
+        <figcaption>入力画面 — 自動保存つきフォーム</figcaption>
+      </figure>
+      <figure>
+        <img src="https://github.com/user-attachments/assets/50bf681b-34f1-4d8d-9ddd-0efa1905d911" alt="A4プレビュー（ゴシック体）"
+          loading="lazy">
+        <figcaption>A4 プレビュー（ゴシック体）</figcaption>
+      </figure>
+      <figure>
+        <img src="https://github.com/user-attachments/assets/f2ab3688-2c8c-437e-b42c-7424b81b87ee" alt="A4プレビュー（明朝体）"
+          loading="lazy">
+        <figcaption>A4 プレビュー（明朝体）</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>信頼できる技術スタック</h2>
+    <p class="lead">モダンで実績のあるオープンソース技術のみで構成。CI では依存パッケージのマルウェアスキャン（Takumi Guard）も実施しています。</p>
+    <ul class="tech-list">
+      <li>TypeScript</li>
+      <li>Vite</li>
+      <li>PWA / Service Worker</li>
+      <li>Dexie (IndexedDB)</li>
+      <li>html2pdf.js</li>
+      <li>Bootstrap</li>
+      <li>Biome</li>
+      <li>Playwright E2E</li>
+      <li>MIT License</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://shigotoform.netlify.app/">🚀 ライブデモを開く</a>
+      <a class="btn btn-ghost" href="https://github.com/hidao80/ShigotoForm">⭐ GitHub でスターする</a>
+    </div>
+    <p>ShigotoForm は MIT ライセンスのオープンソースソフトウェアです。<br>
+      バグ報告・プルリクエストを歓迎します。</p>
+  </footer>
+
+</body>
+
+</html>
