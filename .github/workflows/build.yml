@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: flatt-security/setup-takumi-guard-npm@v1
       - run: echo "REPO_NAME_LC=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
       - run: docker build -t ${{ env.REPO_NAME_LC }}:${{ github.sha }} .
