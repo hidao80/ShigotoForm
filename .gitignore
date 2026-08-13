@@ -14,6 +14,7 @@ dist-ssr
 .claude/histories/
 .claude/settings.local.json
 .serena
+graphify-out/
 
 # Playwright
 test-results/
