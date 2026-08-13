@@ -2,17 +2,19 @@ import './resume.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import Modal from 'bootstrap/js/dist/modal';
+
 // Font Awesome をローカルにバンドル
 // Font Awesome は遅延読み込み
 // window.bootstrapが未定義の場合にModalをセット
 if (!(window as unknown as Record<string, unknown>).bootstrap) {
   (window as unknown as Record<string, unknown>).bootstrap = { Modal };
 }
+
 import { Workbox } from '@vite-pwa/workbox-window';
 import html2pdf from 'html2pdf.js';
 import * as AutoKana from 'vanilla-autokana';
 import packageJson from '../package.json';
-import { type ResumeJson, loadResume, saveResume } from './db.ts';
+import { loadResume, type ResumeJson, saveResume } from './db.ts';
 import type { Career, License, Resume as ResumeData } from './models/Resume';
 import * as Resume from './resume.ts';
 import { loadToForm, saveFromForm } from './resume.ts';
@@ -364,13 +366,13 @@ window.addEventListener('DOMContentLoaded', async () => {
       <div class="row mb-3">
         <label for="furigana-input" class="col-md-3 col-form-label-sm text-right required">ふりがな</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="furigana-input" name="fullname-kana" pattern="(?=.*?[\u3041-\u309F])[\u3041-\u309F\s]*" placeholder="ふりがなを入力してください" required autocomplete="off">
+          <input type="text" class="form-control" id="furigana-input" name="fullname-kana" pattern="(?=.*?[\u3041-\u309F])[\u3041-\u309Fs]*" placeholder="ふりがなを入力してください" required autocomplete="off">
         </div>
       </div>
       <div class="row mb-3">
         <label for="name-input" class="col-md-3 col-form-label-sm text-right required">氏名</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="name-input" name="fullname" pattern=".*\S+.*" placeholder="氏名を入力してください" required autocomplete="name">
+          <input type="text" class="form-control" id="name-input" name="fullname" pattern=".*S+.*" placeholder="氏名を入力してください" required autocomplete="name">
         </div>
       </div>
       <div class="row mb-3">
@@ -391,19 +393,19 @@ window.addEventListener('DOMContentLoaded', async () => {
       <div class="row mb-3">
         <label for="zip-code-input" class="col-md-3 col-form-label-sm text-right required">郵便番号</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="zip-code-input" name="zip-code" pattern="\d{3}-?\d{4}" placeholder="郵便番号を入力してください" required pattern="\\d{7}" title="7桁の数字を入力してください" autocomplete="postal-code">
+          <input type="text" class="form-control" id="zip-code-input" name="zip-code" pattern="d{3}-?d{4}" placeholder="郵便番号を入力してください" required pattern="\\d{7}" title="7桁の数字を入力してください" autocomplete="postal-code">
         </div>
       </div>
       <div class="row mb-3">
         <label for="address1-input" class="col-md-3 col-form-label-sm text-right required">住所</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="address1-input" name="address1" pattern=".*\S+.*" placeholder="住所を入力してください" required autocomplete="street-address">
+          <input type="text" class="form-control" id="address1-input" name="address1" pattern=".*S+.*" placeholder="住所を入力してください" required autocomplete="street-address">
         </div>
       </div>
       <div class="row mb-3">
         <label for="tel1-input" class="col-md-3 col-form-label-sm text-right">電話番号</label>
         <div class="col-md-9">
-          <input type="tel" class="form-control" id="tel1-input" name="tel1" pattern="\d{2,4}-?\d{2,4}-?\d{3,4}" placeholder="電話番号を入力してください" autocomplete="tel">
+          <input type="tel" class="form-control" id="tel1-input" name="tel1" pattern="d{2,4}-?d{2,4}-?d{3,4}" placeholder="電話番号を入力してください" autocomplete="tel">
         </div>
       </div>
       <div class="row mb-3">
@@ -431,7 +433,7 @@ window.addEventListener('DOMContentLoaded', async () => {
               <div class="row mb-3">
                 <label for="tel2-input" class="col-md-3 col-form-label-sm text-right">電話番号</label>
                 <div class="col-md-9">
-                  <input type="tel" class="form-control" id="tel2-input" pattern="\d{2,4}-?\d{2,4}-?\d{3,4}" placeholder="電話番号を入力してください" autocomplete="tel">
+                  <input type="tel" class="form-control" id="tel2-input" pattern="d{2,4}-?d{2,4}-?d{3,4}" placeholder="電話番号を入力してください" autocomplete="tel">
                 </div>
               </div>
             </div>
@@ -530,7 +532,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             }
           }, 4000);
         }
-      } catch (err) {
+      } catch {
         showToast('更新の確認に失敗しました。ネットワークを確認してください。', 'error', 5000);
         manualCheck = false;
         if (updateStatus) updateStatus.textContent = '';
