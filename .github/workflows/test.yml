@@ -12,10 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: flatt-security/setup-takumi-guard-npm@v1
-      - uses: pnpm/setup@v1
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 11
-          runtime: node@22
-          cache: true
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run test

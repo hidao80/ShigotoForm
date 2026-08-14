@@ -12,10 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: flatt-security/setup-takumi-guard-npm@v1
-      - uses: pnpm/setup@v1
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 11
-          runtime: node@22
-          cache: true
-      - run: pnpm format
-      - run: pnpm lint
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run format
+      - run: bun run lint
