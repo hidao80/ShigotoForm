@@ -62,8 +62,8 @@ docker run -p 80:80 shigotoform
 ```bash
 git clone https://github.com/hidao80/ShigotoForm.git
 cd ShigotoForm
-pnpm install
-pnpm dev
+bun install
+bun dev
 ```
 
 This will start the development server on `https://localhost:5173`.
