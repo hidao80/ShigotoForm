@@ -127,8 +127,8 @@ lint・ビルド・依存監査・E2E テストを手動実行に頼ると、品
 
 ## ADR-007: パッケージマネージャを pnpm に統一し、workspace overrides で推移的依存を管理
 
-- **Status**: Accepted
-- **Date**: 2026-03-05（`ebbea71`）〜 継続中（`7edbb24`, `d1b0dbe`, `2c8e3b3`, `ddfba73`, 直近作業）
+- **Status**: Superseded by ADR-012
+- **Date**: 2026-03-05（`ebbea71`）〜 2026-08-14（`c148765`）
 
 ### Context
 
@@ -216,6 +216,35 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 ### Consequences
 
 - ソーシャルシェア画像は当初 GitHub raw URL を使っていたが、専用の `social-preview` 画像に差し替える運用に移行中（`make-social-preview` スキル運用と連動）。
+
+---
+
+## ADR-012: パッケージマネージャを pnpm から bun へ移行
+
+- **Status**: Accepted
+- **Date**: 2026-08-14（`c148765`, `d79d8a0`, `21937a0`, `35e9873`, `8ecac8a`, `b98014f`, `ebb0136`, `2ff46ab`）
+
+### Context
+
+ADR-007 で pnpm に統一していたが、より高速なインストール・実行速度を持つ bun へ切り替える判断が下された。pnpm 固有機能（`pnpm-workspace.yaml` の `allowBuilds` / `overrides` セレクタ構文 / `minimumReleaseAgeExclude`）は bun にそのまま移植できず、移行に伴う互換性検討が必要だった。
+
+### Decision
+
+- CI（`.github/workflows/{test,audit,lint}.yml`）: `pnpm/setup@v1` → `oven-sh/setup-bun@v2` に置換、実行コマンドを `bun install` / `bun run <script>` / `bunx` に統一。
+- `Dockerfile`: ベースイメージを `node:24-alpine` + `corepack pnpm` から `oven/bun:1-alpine` に変更。
+- `docker-compose.yml` / `playwright.config.ts`: `pnpm run dev` → `bun run dev`。
+- `pnpm-workspace.yaml` を削除し、内容を `package.json` に統合：
+  - `allowBuilds` → `trustedDependencies` 配列。
+  - `overrides` → npm/bun 互換の `overrides` フィールド。pnpm 固有のバージョン範囲付きセレクタ（例: `lodash@<=4.17.23`）は bun/npm では解釈されないため、パッケージ名のみのキーに単純化した（影響範囲が「特定バージョン以下」から「全バージョン強制」に変わる）。
+  - `minimumReleaseAgeExclude`（サプライチェーン攻撃対策としてのリリース経過日数チェック除外リスト）は bun に相当機能がないため削除。
+- `pnpm-lock.yaml` は `bun install` の自動移行機能で `bun.lock` に変換。
+- `README.md` / `AGENTS.md` のコマンド例を bun 系に更新。
+
+### Consequences
+
+- pnpm が持っていた `minimumReleaseAge`（サプライチェーン攻撃対策：新しすぎるパッケージバージョンの自動採用を防ぐ機能）に相当する防御層が失われた。bun 側で同等機能が追加されない限り、この観点の防御は手動運用に戻る。
+- `overrides` のバージョン範囲指定が失われ、対象パッケージは常に指定バージョンへ強制されるようになった（脆弱性対応目的のため実運用上の影響は限定的）。
+- `bun run lint` / `bun run build` で動作確認済み。`bun audit` コマンドの CI 実運用（`audit.yml`）は今後の CI 実行結果で継続検証が必要。
 
 ---
 
