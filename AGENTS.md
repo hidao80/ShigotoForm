@@ -9,17 +9,17 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 ## Commands
 
 ```bash
-pnpm install          # Install dependencies
-pnpm dev              # HTTPS dev server (https://localhost:5173)
-pnpm build            # tsc type-check → Vite build → dist/
-pnpm preview          # Serve built dist/ locally
-pnpm lint             # Biome check
-pnpm format           # Biome auto-format
-pnpm test             # Playwright E2E tests
-pnpm screenshot       # Capture screenshots across all viewports
+bun install           # Install dependencies
+bun dev               # HTTPS dev server (https://localhost:5173)
+bun run build         # tsc type-check → Vite build → dist/
+bun run preview       # Serve built dist/ locally
+bun run lint          # Biome check
+bun run format        # Biome auto-format
+bun test              # Playwright E2E tests
+bun run screenshot    # Capture screenshots across all viewports
 ```
 
-Type-check only: `pnpm exec tsc --noEmit`
+Type-check only: `bunx tsc --noEmit`
 
 ## Architecture
 
@@ -69,7 +69,7 @@ Backwards-compatible: `jsonToFormResume()` also accepts the legacy flat format (
 - File names: `kebab-case` (exception: type files like `models/Resume.ts`)
 - Imports use relative paths from `src/`. Avoid module-level side effects
 - `any` is `warn`-level (Biome). Only allowed for external libraries without type stubs
-- Formatting (indent width, quotes, semicolons, line width, trailing commas, import sorting) is enforced by `biome.json` and `.editorconfig` — run `pnpm format` / `pnpm lint` rather than hand-formatting
+- Formatting (indent width, quotes, semicolons, line width, trailing commas, import sorting) is enforced by `biome.json` and `.editorconfig` — run `bun run format` / `bun run lint` rather than hand-formatting
 
 ### CSS (resume.css)
 
@@ -91,4 +91,4 @@ Backwards-compatible: `jsonToFormResume()` also accepts the legacy flat format (
 - `noUnusedLocals` / `noUnusedParameters` are enforced in strict mode
 - The `@ts-ignore` on `html2pdf.js` is intentional (no `@types` package exists)
 - Docker production target serves on port 80 via nginx:alpine
-- Ensure `pnpm lint` passes before committing
+- Ensure `bun run lint` passes before committing
