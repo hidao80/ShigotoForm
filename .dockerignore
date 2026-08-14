@@ -43,6 +43,7 @@ graphify-out
 .npm
 .yarn
 .pnpm-store
+.bun
 
 # Logs
 logs
@@ -51,6 +52,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+bun-debug.log*
 
 # OS
 .DS_Store
