@@ -10,14 +10,11 @@ jobs:
   audit:
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: flatt-security/setup-takumi-guard-npm@v1
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/setup@v1
         with:
-          version: latest
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
+          version: 11
+          runtime: node@22
+          cache: true
       - run: pnpm audit --audit-level=high
