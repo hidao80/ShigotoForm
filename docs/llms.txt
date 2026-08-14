@@ -1,0 +1,23 @@
+# ShigotoForm
+
+> クライアントサイド完結のPWA。日本形式の履歴書をブラウザ内で作成する。バックエンド・ネットワーク通信は一切なし。入力データはIndexedDB（Dexie）にのみ保存され、外部へ送信されない。
+
+ShigotoFormはフォーム入力・A4レイアウトプレビュー・高解像度PDF出力を提供する。アカウント登録不要、サーバー不要。JSONエクスポート/インポートによるバックアップ・復元にも対応する。技術スタックはVite + TypeScript + Bootstrap 5、PWA対応（Service Worker）、html2pdf.jsによるPDF生成。
+
+## Docs
+
+- [README](https://github.com/hidao80/ShigotoForm/blob/main/README.md): プロジェクト概要、セットアップ手順、機能一覧、技術選定理由
+- [AGENTS](https://github.com/hidao80/ShigotoForm/blob/main/AGENTS.md): アーキテクチャ、コーディング規約、開発コマンド一覧
+- [ADR](https://github.com/hidao80/ShigotoForm/blob/main/docs/ADR.md): アーキテクチャ決定記録
+
+## Source
+
+- [main.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/main.ts): エントリーポイント。HTML注入・イベント配線・PWA Service Worker登録
+- [resume.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/resume.ts): フォームDOM読み書き、履歴書HTML生成、動的行追加・削除
+- [db.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/db.ts): Dexie（IndexedDB）ラッパー
+- [models/Resume.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/models/Resume.ts): 内部データ型定義（Career / License / Resume）
+
+## Optional
+
+- [Live Demo](https://shigotoform.netlify.app/): 動作確認用デプロイ版
+- [LICENSE](https://github.com/hidao80/ShigotoForm/blob/main/LICENSE): MITライセンス
