@@ -44,107 +44,418 @@
   }
   </script>
   <style>
- :root{ --bg: #faf9f7; --surface: #ffffff; --text: #1c1917; --text-sub: #57534e; --accent: #b91c1c; --accent-soft: #fef2f2; --border: #e7e5e4; --shadow: 0 1px 3px rgb(0 0 0 / .06), 0 8px 24px rgb(0 0 0 / .07); color-scheme: light dark;} @media (prefers-color-scheme: dark){ :root{ --bg: #171412; --surface: #221f1c; --text: #f5f5f4; --text-sub: #a8a29e; --accent: #f87171; --accent-soft: #3b1a1a; --border: #3a3532; --shadow: 0 1px 3px rgb(0 0 0 / .4), 0 8px 24px rgb(0 0 0 / .35);}} *{ margin: 0; padding: 0; box-sizing: border-box;} body{ font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "BIZ UDPGothic", Meiryo, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.8;} img{ max-width: 100%; height: auto;} a{ color: var(--accent);} .hero{ min-height: 88svh; display: grid; place-content: center; text-align: center; padding: 4rem 1.5rem 3rem; background: radial-gradient(ellipse 80% 60% at 50% -10%, var(--accent-soft), transparent);} .hero .hanko{ font-size: 4.5rem; line-height: 1; margin-bottom: 1rem;} .hero h1{ font-size: clamp(2rem, 6vw, 3.4rem); font-weight: 800; letter-spacing: .02em;} .hero .tagline{ font-size: clamp(1.05rem, 2.5vw, 1.4rem); color: var(--text-sub); margin: 1rem auto 0; max-width: 34em;} .hero .tagline strong{ color: var(--accent);} .cta-row{ display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2.5rem;} .btn{ display: inline-block; padding: .9rem 2.2rem; border-radius: 999px; font-weight: 700; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease;} .btn:hover{ transform: translateY(-2px); box-shadow: var(--shadow);} .btn-primary{ background: var(--accent); color: #fff;} .btn-ghost{ border: 2px solid var(--border); color: var(--text);} .hero .no-signup{ margin-top: 1.2rem; font-size: .85rem; color: var(--text-sub);} section{ max-width: 68rem; margin: 0 auto; padding: 4.5rem 1.5rem;} section>h2{ font-size: clamp(1.5rem, 4vw, 2.1rem); text-align: center; margin-bottom: .6rem;} section>.lead{ text-align: center; color: var(--text-sub); max-width: 40em; margin: 0 auto 3rem;} h2 .accent{ color: var(--accent);} .vs-grid{ display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1.2rem;} .vs-card{ background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.6rem; box-shadow: var(--shadow);} .vs-card .problem{ color: var(--text-sub); font-size: .92rem; text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 2px;} .vs-card .solution{ font-weight: 700; margin-top: .5rem;} .vs-card .icon{ font-size: 1.8rem; margin-bottom: .5rem; display: block;} .steps{ display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; counter-reset: step;} .step{ position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 2.4rem 1.6rem 1.6rem; box-shadow: var(--shadow);} .step::before{ counter-increment: step; content: counter(step); position: absolute; top: -1rem; left: 1.4rem; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 800; display: grid; place-content: center;} .step h3{ margin-bottom: .4rem;} .step p{ color: var(--text-sub); font-size: .95rem;} .shots{ display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1.5rem;} .shots figure{ background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1rem; box-shadow: var(--shadow);} .shots img{ border-radius: .5rem; width: 100%;} .shots figcaption{ text-align: center; font-size: .9rem; color: var(--text-sub); margin-top: .6rem;} .tech-list{ display: flex; flex-wrap: wrap; gap: .6rem; justify-content: center; list-style: none;} .tech-list li{ background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: .4rem 1.1rem; font-size: .9rem;} footer{ text-align: center; padding: 3rem 1.5rem 4rem; color: var(--text-sub); font-size: .9rem; border-top: 1px solid var(--border);} footer .cta-row{ margin-top: 0; margin-bottom: 2rem;} @media (prefers-reduced-motion: no-preference){ @supports ((animation-timeline: view()) and (animation-range: entry)){ @keyframes rise{ from{ opacity: 0; transform: translateY(2rem);}} .vs-card, .step, .shots figure{ animation: rise auto ease-out backwards; animation-timeline: view(); animation-range: entry 0% entry 60%;}}}
-  </style>
+ :root{ --bg: #faf9f7; --surface: #ffffff; --text: #1c1917; --text-sub: #57534e; --accent: #b91c1c; --accent-soft: #fef2f2; --border: #e7e5e4; --shadow: 0 1px 3px rgb(0 0 0 / .06), 0 8px 24px rgb(0 0 0 / .07); color-scheme: light dark;} @media (prefers-color-scheme: dark){ :root{ --bg: #171412; --surface: #221f1c; --text: #f5f5f4; --text-sub: #a8a29e; --accent: #f87171; --accent-soft: #3b1a1a; --border: #3a3532; --shadow: 0 1px 3px rgb(0 0 0 / .4), 0 8px 24px rgb(0 0 0 / .35);}} *{ margin: 0; padding: 0; box-sizing: border-box;} body{ font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "BIZ UDPGothic", Meiryo, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.8;} img{ max-width: 100%; height: auto;} a{ color: var(--accent);} .navbar{ position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: .8rem 1.5rem; background: var(--surface); border-bottom: 1px solid var(--border);} .navbar .brand{ font-weight: 800;} .lang-switcher select{ background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: .5rem; padding: .4rem .6rem; font-size: .85rem;} .hero{ min-height: 80svh; display: grid; place-content: center; text-align: center; padding: 4rem 1.5rem 3rem; background: radial-gradient(ellipse 80% 60% at 50% -10%, var(--accent-soft), transparent);} .hero .hanko{ font-size: 4.5rem; line-height: 1; margin-bottom: 1rem;} .hero h1{ font-size: clamp(2rem, 6vw, 3.4rem); font-weight: 800; letter-spacing: .02em;} .hero .tagline{ font-size: clamp(1.05rem, 2.5vw, 1.4rem); color: var(--text-sub); margin: 1rem auto 0; max-width: 34em;} .hero .tagline strong{ color: var(--accent);} .cta-row{ display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2.5rem;} .btn{ display: inline-block; padding: .9rem 2.2rem; border-radius: 999px; font-weight: 700; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease;} .btn:hover{ transform: translateY(-2px); box-shadow: var(--shadow);} .btn-primary{ background: var(--accent); color: #fff;} .btn-ghost{ border: 2px solid var(--border); color: var(--text);} .hero .no-signup{ margin-top: 1.2rem; font-size: .85rem; color: var(--text-sub);} section{ max-width: 800px; margin: 0 auto; padding: 4.5rem 1.5rem;} section>h2{ font-size: clamp(1.5rem, 4vw, 2.1rem); text-align: center; margin-bottom: .6rem;} section>.lead{ text-align: center; color: var(--text-sub); max-width: 40em; margin: 0 auto 3rem;} h2 .accent{ color: var(--accent);} .vs-grid{ display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1.2rem;} .vs-card{ background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.6rem; box-shadow: var(--shadow);} .vs-card .problem{ color: var(--text-sub); font-size: .92rem; text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 2px;} .vs-card .solution{ font-weight: 700; margin-top: .5rem;} .vs-card .icon{ font-size: 1.8rem; margin-bottom: .5rem; display: block;} .steps{ display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; counter-reset: step;} .step{ position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 2.4rem 1.6rem 1.6rem; box-shadow: var(--shadow);} .step::before{ counter-increment: step; content: counter(step); position: absolute; top: -1rem; left: 1.4rem; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 800; display: grid; place-content: center;} .step h3{ margin-bottom: .4rem;} .step p{ color: var(--text-sub); font-size: .95rem;} .shots{ display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1.5rem;} .shots figure{ background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1rem; box-shadow: var(--shadow);} .shots img{ border-radius: .5rem; width: 100%;} .shots figcaption{ text-align: center; font-size: .9rem; color: var(--text-sub); margin-top: .6rem;} .tech-list{ display: flex; flex-wrap: wrap; gap: .6rem; justify-content: center; list-style: none;} .tech-list li{ background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: .4rem 1.1rem; font-size: .9rem;} .code-row{ display: flex; align-items: stretch; gap: .5rem; background: var(--surface); border: 1px solid var(--border); border-radius: .6rem; padding: .3rem .3rem .3rem 1rem; max-width: 40rem; margin: 0 auto 1rem; overflow-x: auto;} .code-row code{ flex: 1; padding: .6rem 0; white-space: pre; font-size: .85rem; color: var(--text);} .copy-btn{ flex-shrink: 0; display: grid; place-content: center; width: 2.4rem; border: none; background: transparent; color: var(--text-sub); border-radius: .4rem; cursor: pointer;} .copy-btn:hover{ background: var(--accent-soft); color: var(--accent);} .copy-btn svg{ width: 1.1rem; height: 1.1rem;} .copy-btn .check{ display: none; color: #16a34a;} .copy-btn.copied .copy{ display: none;} .copy-btn.copied .check{ display: block;} footer{ text-align: center; padding: 3rem 1.5rem 4rem; color: var(--text-sub); font-size: .9rem; border-top: 1px solid var(--border);} footer .cta-row{ margin-top: 0; margin-bottom: 2rem;} @media (prefers-reduced-motion: no-preference){ @supports ((animation-timeline: view()) and (animation-range: entry)){ @keyframes rise{ from{ opacity: 0; transform: translateY(2rem);}} .vs-card, .step, .shots figure{ animation: rise auto ease-out backwards; animation-timeline: view(); animation-range: entry 0% entry 60%;}}}  </style>
 </head>
 
 <body>
+
+  <nav class="navbar">
+    <span class="brand">ShigotoForm</span>
+    <div class="lang-switcher">
+      <select id="lang-select" aria-label="Language">
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+        <option value="es">Español</option>
+        <option value="ru">Русский</option>
+      </select>
+    </div>
+  </nav>
 
   <header class="hero">
     <div class="hanko" aria-hidden="true">📄🖋️</div>
     <h1>ShigotoForm</h1>
     <p class="tagline">
-      あなたの履歴書は、<strong>あなたのデバイスの中に</strong>。<br>
-      サーバー送信ゼロで作れる、日本式履歴書作成PWA。
+      <template type="language-group">
+        <span language="ja">あなたの履歴書は、<strong>あなたのデバイスの中に</strong>。<br>サーバー送信ゼロで作れる、日本式履歴書作成PWA。</span>
+        <span language="en">Your resume stays <strong>on your device</strong>.<br>A Japanese-style resume PWA with zero server transmission.</span>
+        <span language="zh">你的简历，只存在<strong>你的设备中</strong>。<br>零服务器传输的日式简历制作 PWA。</span>
+        <span language="es">Tu currículum permanece <strong>en tu dispositivo</strong>.<br>Una PWA de currículum estilo japonés sin transmisión al servidor.</span>
+        <span language="ru">Ваше резюме остаётся <strong>на вашем устройстве</strong>.<br>PWA для резюме в японском стиле без передачи данных на сервер.</span>
+      </template>
     </p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="https://shigotoform.netlify.app/">🚀 今すぐ使ってみる</a>
-      <a class="btn btn-ghost" href="https://github.com/hidao80/ShigotoForm">GitHub で見る</a>
+      <a class="btn btn-primary" href="https://shigotoform.netlify.app/">🚀
+        <template type="language-group">
+          <span language="ja">今すぐ使ってみる</span>
+          <span language="en">Try it now</span>
+          <span language="zh">立即体验</span>
+          <span language="es">Probar ahora</span>
+          <span language="ru">Попробовать сейчас</span>
+        </template>
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/hidao80/ShigotoForm">
+        <template type="language-group">
+          <span language="ja">GitHub で見る</span>
+          <span language="en">View on GitHub</span>
+          <span language="zh">在 GitHub 查看</span>
+          <span language="es">Ver en GitHub</span>
+          <span language="ru">Смотреть на GitHub</span>
+        </template>
+      </a>
     </div>
-    <p class="no-signup">アカウント登録不要・完全無料・インストール不要（PWA対応）</p>
+    <p class="no-signup">
+      <template type="language-group">
+        <span language="ja">アカウント登録不要・完全無料・インストール不要（PWA対応）</span>
+        <span language="en">No sign-up · Completely free · No install required (PWA-ready)</span>
+        <span language="zh">无需注册·完全免费·无需安装（支持 PWA）</span>
+        <span language="es">Sin registro · Totalmente gratis · Sin instalación (compatible con PWA)</span>
+        <span language="ru">Без регистрации · Полностью бесплатно · Установка не требуется (поддержка PWA)</span>
+      </template>
+    </p>
   </header>
 
   <section>
-    <h2>履歴書ツールの<span class="accent">「不安」</span>を、ぜんぶ解決</h2>
-    <p class="lead">氏名・住所・職歴——履歴書は個人情報のかたまりです。ShigotoForm はデータを一切送信しない設計で、その不安を根本から取り除きます。</p>
+    <h2>
+      <template type="language-group">
+        <span language="ja">履歴書ツールの<span class="accent">「不安」</span>を、ぜんぶ解決</span>
+        <span language="en">Every resume-tool <span class="accent">worry</span>, solved</span>
+        <span language="zh">简历工具的<span class="accent">「顾虑」</span>，全部解决</span>
+        <span language="es">Resolvemos <span class="accent">todas las preocupaciones</span> sobre herramientas de currículum</span>
+        <span language="ru">Решаем <span class="accent">все опасения</span> по поводу инструментов для резюме</span>
+      </template>
+    </h2>
+    <p class="lead">
+      <template type="language-group">
+        <span language="ja">氏名・住所・職歴——履歴書は個人情報のかたまりです。ShigotoForm はデータを一切送信しない設計で、その不安を根本から取り除きます。</span>
+        <span language="en">Name, address, work history — a resume is a bundle of personal data. ShigotoForm removes that worry at the design level by never transmitting anything.</span>
+        <span language="zh">姓名、住址、工作经历——简历是个人信息的集合体。ShigotoForm 从设计上杜绝数据传输，彻底消除这种顾虑。</span>
+        <span language="es">Nombre, dirección, historial laboral: un currículum es un conjunto de datos personales. ShigotoForm elimina esa preocupación de raíz al no transmitir nada.</span>
+        <span language="ru">Имя, адрес, трудовой стаж — резюме это набор персональных данных. ShigotoForm устраняет эту проблему на уровне архитектуры, никогда ничего не передавая.</span>
+      </template>
+    </p>
     <div class="vs-grid">
       <div class="vs-card">
         <span class="icon" aria-hidden="true">🔒</span>
-        <p class="problem">個人情報がクラウドにアップロードされる</p>
-        <p class="solution">完全クライアントサイド。データはブラウザの IndexedDB のみに保存され、外部への通信は一切ありません。</p>
+        <p class="problem">
+          <template type="language-group">
+            <span language="ja">個人情報がクラウドにアップロードされる</span>
+            <span language="en">Personal data uploaded to the cloud</span>
+            <span language="zh">个人信息被上传至云端</span>
+            <span language="es">Los datos personales se suben a la nube</span>
+            <span language="ru">Личные данные загружаются в облако</span>
+          </template>
+        </p>
+        <p class="solution">
+          <template type="language-group">
+            <span language="ja">完全クライアントサイド。データはブラウザの IndexedDB のみに保存され、外部への通信は一切ありません。</span>
+            <span language="en">Fully client-side. Data lives only in your browser's IndexedDB — nothing is ever sent externally.</span>
+            <span language="zh">完全客户端运行。数据仅保存在浏览器的 IndexedDB 中，绝不与外部通信。</span>
+            <span language="es">Totalmente del lado del cliente. Los datos solo se guardan en el IndexedDB del navegador, sin comunicación externa.</span>
+            <span language="ru">Полностью клиентское решение. Данные хранятся только в IndexedDB браузера, без внешней передачи.</span>
+          </template>
+        </p>
       </div>
       <div class="vs-card">
         <span class="icon" aria-hidden="true">🗾</span>
-        <p class="problem">海外製ツールは日本式履歴書に非対応</p>
-        <p class="solution">履歴書レイアウトを、ゴシック体・明朝体の日本語フォントで表現します。顔写真添付には近日対応予定。</p>
+        <p class="problem">
+          <template type="language-group">
+            <span language="ja">海外製ツールは日本式履歴書に非対応</span>
+            <span language="en">Foreign tools don't support Japanese-style resumes</span>
+            <span language="zh">海外工具不支持日式简历格式</span>
+            <span language="es">Las herramientas extranjeras no soportan el currículum japonés</span>
+            <span language="ru">Зарубежные инструменты не поддерживают японский формат резюме</span>
+          </template>
+        </p>
+        <p class="solution">
+          <template type="language-group">
+            <span language="ja">履歴書レイアウトを、ゴシック体・明朝体の日本語フォントで表現します。顔写真添付には近日対応予定。</span>
+            <span language="en">Renders the resume layout in Gothic or Mincho Japanese fonts. Photo attachment support is coming soon.</span>
+            <span language="zh">以哥特体或明朝体等日文字体呈现简历排版，证件照上传功能即将支持。</span>
+            <span language="es">Muestra el diseño del currículum en fuentes japonesas Gothic o Mincho. Pronto soporte para foto de perfil.</span>
+            <span language="ru">Отображает макет резюме шрифтами Gothic или Mincho. Скоро появится поддержка фото.</span>
+          </template>
+        </p>
       </div>
       <div class="vs-card">
         <span class="icon" aria-hidden="true">💸</span>
-        <p class="problem">PDF出力は有料プラン限定</p>
-        <p class="solution">html2pdf.js によるローカル生成で、高解像度の A4 PDF を無料でダウンロードできます。</p>
+        <p class="problem">
+          <template type="language-group">
+            <span language="ja">PDF出力は有料プラン限定</span>
+            <span language="en">PDF export locked behind a paid plan</span>
+            <span language="zh">PDF 导出仅限付费方案</span>
+            <span language="es">La exportación a PDF está limitada a planes de pago</span>
+            <span language="ru">Экспорт в PDF доступен только в платных тарифах</span>
+          </template>
+        </p>
+        <p class="solution">
+          <template type="language-group">
+            <span language="ja">html2pdf.js によるローカル生成で、高解像度の A4 PDF を無料でダウンロードできます。</span>
+            <span language="en">Generates high-resolution A4 PDFs locally with html2pdf.js, completely free.</span>
+            <span language="zh">通过 html2pdf.js 本地生成，免费下载高分辨率 A4 PDF。</span>
+            <span language="es">Genera PDF A4 de alta resolución localmente con html2pdf.js, totalmente gratis.</span>
+            <span language="ru">Локально генерирует PDF формата A4 высокого разрешения с помощью html2pdf.js, совершенно бесплатно.</span>
+          </template>
+        </p>
       </div>
       <div class="vs-card">
         <span class="icon" aria-hidden="true">💾</span>
-        <p class="problem">機種変更でデータが消える</p>
-        <p class="solution">JSON エクスポート／インポートでバックアップと復元が自由自在。デバイスをまたいで引き継げます。</p>
+        <p class="problem">
+          <template type="language-group">
+            <span language="ja">機種変更でデータが消える</span>
+            <span language="en">Data lost when switching devices</span>
+            <span language="zh">更换设备后数据丢失</span>
+            <span language="es">Se pierden los datos al cambiar de dispositivo</span>
+            <span language="ru">Данные теряются при смене устройства</span>
+          </template>
+        </p>
+        <p class="solution">
+          <template type="language-group">
+            <span language="ja">JSON エクスポート／インポートでバックアップと復元が自由自在。デバイスをまたいで引き継げます。</span>
+            <span language="en">Freely back up and restore via JSON export/import — carry your data across devices.</span>
+            <span language="zh">通过 JSON 导出/导入自由备份与恢复，可跨设备继续使用。</span>
+            <span language="es">Haz copia de seguridad y restaura libremente mediante exportación/importación JSON entre dispositivos.</span>
+            <span language="ru">Свободно создавайте резервные копии и восстанавливайте данные через экспорт/импорт JSON между устройствами.</span>
+          </template>
+        </p>
       </div>
       <div class="vs-card">
         <span class="icon" aria-hidden="true">📶</span>
-        <p class="problem">ネット環境がないと使えない</p>
-        <p class="solution">Service Worker によるオフライン対応。PWA としてインストールすれば圏外でも編集できます。</p>
+        <p class="problem">
+          <template type="language-group">
+            <span language="ja">ネット環境がないと使えない</span>
+            <span language="en">Unusable without an internet connection</span>
+            <span language="zh">没有网络就无法使用</span>
+            <span language="es">No se puede usar sin conexión a internet</span>
+            <span language="ru">Невозможно использовать без интернета</span>
+          </template>
+        </p>
+        <p class="solution">
+          <template type="language-group">
+            <span language="ja">Service Worker によるオフライン対応。PWA としてインストールすれば圏外でも編集できます。</span>
+            <span language="en">Offline-ready via Service Worker. Install as a PWA and keep editing offline.</span>
+            <span language="zh">通过 Service Worker 支持离线使用，安装为 PWA 后无网也能编辑。</span>
+            <span language="es">Compatible sin conexión gracias al Service Worker. Instálala como PWA y sigue editando sin conexión.</span>
+            <span language="ru">Поддержка офлайн-режима через Service Worker. Установите как PWA и редактируйте без сети.</span>
+          </template>
+        </p>
       </div>
       <div class="vs-card">
         <span class="icon" aria-hidden="true">♿</span>
-        <p class="problem">アクセシビリティが後回し</p>
-        <p class="solution">Lighthouse アクセシビリティスコア 100、WAVE 検証エラー 0 件。誰にでも使いやすい UI です。</p>
+        <p class="problem">
+          <template type="language-group">
+            <span language="ja">アクセシビリティが後回し</span>
+            <span language="en">Accessibility as an afterthought</span>
+            <span language="zh">无障碍功能常被忽视</span>
+            <span language="es">La accesibilidad queda en segundo plano</span>
+            <span language="ru">Доступность отходит на второй план</span>
+          </template>
+        </p>
+        <p class="solution">
+          <template type="language-group">
+            <span language="ja">Lighthouse アクセシビリティスコア 100、WAVE 検証エラー 0 件。誰にでも使いやすい UI です。</span>
+            <span language="en">Lighthouse accessibility score 100, zero WAVE errors. Built to be usable by everyone.</span>
+            <span language="zh">Lighthouse 无障碍评分 100，WAVE 检测 0 错误，人人可用的界面。</span>
+            <span language="es">Puntuación de accesibilidad Lighthouse de 100, cero errores en WAVE. Diseñada para que todos puedan usarla.</span>
+            <span language="ru">Оценка доступности Lighthouse — 100, ноль ошибок WAVE. Создано для всех пользователей.</span>
+          </template>
+        </p>
       </div>
     </div>
   </section>
 
   <section>
-    <h2>使い方は、たったの <span class="accent">3ステップ</span></h2>
-    <p class="lead">面倒な設定は不要。開いたらすぐ書き始められます。入力内容は自動保存されるので、途中で閉じても大丈夫。</p>
+    <h2>
+      <template type="language-group">
+        <span language="ja">使い方は、たったの <span class="accent">3ステップ</span></span>
+        <span language="en">Just <span class="accent">3 steps</span> to use</span>
+        <span language="zh">只需 <span class="accent">3 步</span> 即可使用</span>
+        <span language="es">Solo <span class="accent">3 pasos</span> para usarlo</span>
+        <span language="ru">Всего <span class="accent">3 шага</span> для использования</span>
+      </template>
+    </h2>
+    <p class="lead">
+      <template type="language-group">
+        <span language="ja">面倒な設定は不要。開いたらすぐ書き始められます。入力内容は自動保存されるので、途中で閉じても大丈夫。</span>
+        <span language="en">No tedious setup — start writing the moment you open it. Your input is auto-saved, so it's safe to close midway.</span>
+        <span language="zh">无需繁琐设置，打开即可开始填写。内容自动保存，中途关闭也不用担心。</span>
+        <span language="es">Sin configuraciones tediosas: empieza a escribir en cuanto lo abras. Tu contenido se guarda automáticamente.</span>
+        <span language="ru">Никакой утомительной настройки — начните писать сразу после открытия. Ввод сохраняется автоматически.</span>
+      </template>
+    </p>
     <div class="steps">
       <div class="step">
-        <h3>✏️ 入力する</h3>
-        <p>氏名・住所・学歴・職歴・資格をフォームに入力。ふりがなの自動補完や行の追加・削除にも対応しています。</p>
+        <h3>✏️
+          <template type="language-group">
+            <span language="ja">入力する</span>
+            <span language="en">Fill in</span>
+            <span language="zh">填写</span>
+            <span language="es">Completa</span>
+            <span language="ru">Заполните</span>
+          </template>
+        </h3>
+        <p>
+          <template type="language-group">
+            <span language="ja">氏名・住所・学歴・職歴・資格をフォームに入力。ふりがなの自動補完や行の追加・削除にも対応しています。</span>
+            <span language="en">Enter name, address, education, work history, and licenses. Furigana auto-fill and row add/remove are supported.</span>
+            <span language="zh">在表单中输入姓名、住址、学历、工作经历和资格证书，支持假名自动补全及行的增删。</span>
+            <span language="es">Introduce nombre, dirección, educación, historial laboral y licencias. Compatible con autocompletado de furigana y filas.</span>
+            <span language="ru">Введите имя, адрес, образование, трудовой стаж и лицензии. Поддерживаются автозаполнение фуриганы и строки.</span>
+          </template>
+        </p>
       </div>
       <div class="step">
-        <h3>👀 プレビューする</h3>
-        <p>A4 用紙サイズで仕上がりを確認。ゴシック体・明朝体をワンクリックで切り替えられます。</p>
+        <h3>👀
+          <template type="language-group">
+            <span language="ja">プレビューする</span>
+            <span language="en">Preview</span>
+            <span language="zh">预览</span>
+            <span language="es">Vista previa</span>
+            <span language="ru">Просмотр</span>
+          </template>
+        </h3>
+        <p>
+          <template type="language-group">
+            <span language="ja">A4 用紙サイズで仕上がりを確認。ゴシック体・明朝体をワンクリックで切り替えられます。</span>
+            <span language="en">Check the finished layout at A4 size. Switch between Gothic and Mincho fonts with one click.</span>
+            <span language="zh">以 A4 纸张尺寸确认排版效果，一键切换哥特体与明朝体。</span>
+            <span language="es">Revisa el resultado final en tamaño A4. Cambia entre fuente Gothic y Mincho con un clic.</span>
+            <span language="ru">Проверьте итоговый макет в размере A4. Переключайтесь между шрифтами Gothic и Mincho одним кликом.</span>
+          </template>
+        </p>
       </div>
       <div class="step">
-        <h3>📥 PDFで保存する</h3>
-        <p>「履歴書PDFダウンロード」を押すだけ。印刷にそのまま使える高解像度 PDF が手に入ります。</p>
+        <h3>📥
+          <template type="language-group">
+            <span language="ja">PDFで保存する</span>
+            <span language="en">Save as PDF</span>
+            <span language="zh">保存为 PDF</span>
+            <span language="es">Guarda como PDF</span>
+            <span language="ru">Сохраните как PDF</span>
+          </template>
+        </h3>
+        <p>
+          <template type="language-group">
+            <span language="ja">「履歴書PDFダウンロード」を押すだけ。印刷にそのまま使える高解像度 PDF が手に入ります。</span>
+            <span language="en">Just click "Download Resume PDF" — get a print-ready, high-resolution PDF.</span>
+            <span language="zh">点击「下载简历 PDF」即可获得可直接打印的高分辨率 PDF。</span>
+            <span language="es">Solo pulsa "Descargar currículum en PDF" para obtener un PDF listo para imprimir.</span>
+            <span language="ru">Просто нажмите «Скачать резюме в PDF» и получите готовый к печати PDF высокого разрешения.</span>
+          </template>
+        </p>
       </div>
     </div>
   </section>
 
   <section>
-    <h2>スクリーンショット</h2>
-    <p class="lead">シンプルな入力画面と、印刷品質のプレビュー。ダークモードにも対応しています。</p>
+    <h2>
+      <template type="language-group">
+        <span language="ja">クイックスタート</span>
+        <span language="en">Quick Start</span>
+        <span language="zh">快速开始</span>
+        <span language="es">Inicio rápido</span>
+        <span language="ru">Быстрый старт</span>
+      </template>
+    </h2>
+    <p class="lead">
+      <template type="language-group">
+        <span language="ja">コマンド一つでローカル起動。アカウント登録は不要です。</span>
+        <span language="en">Get it running locally with one command. No sign-up required.</span>
+        <span language="zh">一条命令即可在本地运行，无需注册。</span>
+        <span language="es">Ponlo en marcha localmente con un solo comando. No requiere registro.</span>
+        <span language="ru">Запустите локально одной командой. Регистрация не требуется.</span>
+      </template>
+    </p>
+    <div class="code-row">
+      <code>docker compose up dev</code>
+      <button class="copy-btn" type="button" data-copy="docker compose up dev" aria-label="Copy">
+        <svg class="copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>
+        <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </button>
+    </div>
+    <div class="code-row">
+      <code>git clone https://github.com/hidao80/ShigotoForm.git
+cd ShigotoForm
+bun install
+bun dev</code>
+      <button class="copy-btn" type="button" data-copy="git clone https://github.com/hidao80/ShigotoForm.git&#10;cd ShigotoForm&#10;bun install&#10;bun dev" aria-label="Copy">
+        <svg class="copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>
+        <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </button>
+    </div>
+  </section>
+
+  <section>
+    <h2>
+      <template type="language-group">
+        <span language="ja">スクリーンショット</span>
+        <span language="en">Screenshots</span>
+        <span language="zh">截图</span>
+        <span language="es">Capturas de pantalla</span>
+        <span language="ru">Скриншоты</span>
+      </template>
+    </h2>
+    <p class="lead">
+      <template type="language-group">
+        <span language="ja">シンプルな入力画面と、印刷品質のプレビュー。ダークモードにも対応しています。</span>
+        <span language="en">A simple input screen and a print-quality preview. Dark mode supported too.</span>
+        <span language="zh">简洁的输入界面与印刷级预览效果，同时支持深色模式。</span>
+        <span language="es">Una pantalla de entrada sencilla y una vista previa con calidad de impresión. También compatible con modo oscuro.</span>
+        <span language="ru">Простой экран ввода и предпросмотр печатного качества. Поддерживается и тёмная тема.</span>
+      </template>
+    </p>
     <div class="shots">
       <figure>
         <img src="https://github.com/user-attachments/assets/01a0c251-604e-4536-8c74-9b74bed8fff6"
           alt="ShigotoForm の入力画面" loading="lazy">
-        <figcaption>入力画面 — 自動保存つきフォーム</figcaption>
+        <figcaption>
+          <template type="language-group">
+            <span language="ja">入力画面 — 自動保存つきフォーム</span>
+            <span language="en">Input screen — auto-saving form</span>
+            <span language="zh">输入界面 — 自动保存表单</span>
+            <span language="es">Pantalla de entrada — formulario con autoguardado</span>
+            <span language="ru">Экран ввода — форма с автосохранением</span>
+          </template>
+        </figcaption>
       </figure>
       <figure>
         <img src="https://github.com/user-attachments/assets/50bf681b-34f1-4d8d-9ddd-0efa1905d911" alt="A4プレビュー（ゴシック体）"
           loading="lazy">
-        <figcaption>A4 プレビュー（ゴシック体）</figcaption>
+        <figcaption>
+          <template type="language-group">
+            <span language="ja">A4 プレビュー（ゴシック体）</span>
+            <span language="en">A4 preview (Gothic font)</span>
+            <span language="zh">A4 预览（哥特体）</span>
+            <span language="es">Vista previa A4 (fuente Gothic)</span>
+            <span language="ru">Предпросмотр A4 (шрифт Gothic)</span>
+          </template>
+        </figcaption>
       </figure>
       <figure>
         <img src="https://github.com/user-attachments/assets/f2ab3688-2c8c-437e-b42c-7424b81b87ee" alt="A4プレビュー（明朝体）"
           loading="lazy">
-        <figcaption>A4 プレビュー（明朝体）</figcaption>
+        <figcaption>
+          <template type="language-group">
+            <span language="ja">A4 プレビュー（明朝体）</span>
+            <span language="en">A4 preview (Mincho font)</span>
+            <span language="zh">A4 预览（明朝体）</span>
+            <span language="es">Vista previa A4 (fuente Mincho)</span>
+            <span language="ru">Предпросмотр A4 (шрифт Mincho)</span>
+          </template>
+        </figcaption>
       </figure>
     </div>
   </section>
 
   <section>
-    <h2>信頼できる技術スタック</h2>
-    <p class="lead">モダンで実績のあるオープンソース技術のみで構成。CI では依存パッケージのマルウェアスキャン（Takumi Guard）も実施しています。</p>
+    <h2>
+      <template type="language-group">
+        <span language="ja">信頼できる技術スタック</span>
+        <span language="en">Built on a trusted stack</span>
+        <span language="zh">值得信赖的技术栈</span>
+        <span language="es">Una pila tecnológica confiable</span>
+        <span language="ru">Надёжный технологический стек</span>
+      </template>
+    </h2>
+    <p class="lead">
+      <template type="language-group">
+        <span language="ja">モダンで実績のあるオープンソース技術のみで構成。CI では依存パッケージのマルウェアスキャン（Takumi Guard）も実施しています。</span>
+        <span language="en">Built entirely with modern, proven open-source technology. CI also scans dependencies for malware via Takumi Guard.</span>
+        <span language="zh">完全基于成熟可靠的开源技术构建。CI 中还通过 Takumi Guard 对依赖包进行恶意软件扫描。</span>
+        <span language="es">Construido enteramente con tecnología de código abierto moderna y probada. El CI también escanea dependencias con Takumi Guard.</span>
+        <span language="ru">Полностью построено на современных и проверенных open-source технологиях. CI также сканирует зависимости с помощью Takumi Guard.</span>
+      </template>
+    </p>
     <ul class="tech-list">
       <li>TypeScript</li>
       <li>Vite</li>
@@ -160,13 +471,38 @@
 
   <footer>
     <div class="cta-row">
-      <a class="btn btn-primary" href="https://shigotoform.netlify.app/">🚀 ライブデモを開く</a>
-      <a class="btn btn-ghost" href="https://github.com/hidao80/ShigotoForm">⭐ GitHub でスターする</a>
+      <a class="btn btn-primary" href="https://shigotoform.netlify.app/">🚀
+        <template type="language-group">
+          <span language="ja">ライブデモを開く</span>
+          <span language="en">Open live demo</span>
+          <span language="zh">打开在线演示</span>
+          <span language="es">Abrir demo en vivo</span>
+          <span language="ru">Открыть демо</span>
+        </template>
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/hidao80/ShigotoForm">⭐
+        <template type="language-group">
+          <span language="ja">GitHub でスターする</span>
+          <span language="en">Star on GitHub</span>
+          <span language="zh">在 GitHub 点星</span>
+          <span language="es">Dar estrella en GitHub</span>
+          <span language="ru">Поставить звезду на GitHub</span>
+        </template>
+      </a>
     </div>
-    <p>ShigotoForm は MIT ライセンスのオープンソースソフトウェアです。<br>
-      バグ報告・プルリクエストを歓迎します。</p>
+    <p>
+      <template type="language-group">
+        <span language="ja">ShigotoForm は MIT ライセンスのオープンソースソフトウェアです。<br>バグ報告・プルリクエストを歓迎します。</span>
+        <span language="en">ShigotoForm is open-source software under the MIT License.<br>Bug reports and pull requests are welcome.</span>
+        <span language="zh">ShigotoForm 是基于 MIT 许可证的开源软件。<br>欢迎提交 Bug 报告与 Pull Request。</span>
+        <span language="es">ShigotoForm es software de código abierto bajo la licencia MIT.<br>Se agradecen los informes de errores y las pull requests.</span>
+        <span language="ru">ShigotoForm — программное обеспечение с открытым исходным кодом под лицензией MIT.<br>Мы приветствуем отчёты об ошибках и pull request'ы.</span>
+      </template>
+    </p>
   </footer>
 
+  <script src="https://unpkg.com/multilanguagejs@2.0.1/dist/multilanguagejs.umd.cjs"></script>
+  <script src="main.min.js"></script>
 </body>
 
 </html>
