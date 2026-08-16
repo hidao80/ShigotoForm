@@ -13,7 +13,12 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "screenshot": "playwright test tests/e2e/screenshot.spec.ts"
+    "screenshot": "playwright test tests/e2e/screenshot.spec.ts",
+    "act": "act -l",
+    "act:build": "act -j build",
+    "act:test": "act -j test",
+    "act:audit": "act -j audit",
+    "act:lint": "act -j lint"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.8",

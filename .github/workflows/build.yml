@@ -11,5 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - name: Install docker CLI (act only)
+        if: ${{ env.ACT }}
+        run: apt-get update && apt-get install -y docker.io
       - run: echo "REPO_NAME_LC=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
       - run: docker build -t ${{ env.REPO_NAME_LC }}:${{ github.sha }} .
