@@ -172,3 +172,66 @@ describe('入力内容の削除', () => {
     expect(await loadResume()).toBeUndefined();
   });
 });
+
+describe('JSON インポートの検証 (zod)', () => {
+  /** インポートボタン → 生成された file input に指定内容のファイルを渡す */
+  const importJson = async (text: string) => {
+    const click = vi.spyOn(HTMLInputElement.prototype, 'click').mockImplementation(function (this: HTMLInputElement) {
+      if (this.type !== 'file') return;
+      const dt = new DataTransfer();
+      dt.items.add(new File([text], 'resume.json', { type: 'application/json' }));
+      Object.defineProperty(this, 'files', { value: dt.files });
+      this.dispatchEvent(new Event('change'));
+    });
+    try {
+      $<HTMLButtonElement>('#upload-button').click();
+    } finally {
+      click.mockRestore();
+    }
+  };
+
+  test('旧形式のJSONは正規化されてフォームと保存データへ反映される', async () => {
+    await importJson(
+      JSON.stringify({
+        fullname: '山田 太郎',
+        createdAt: '2026-10-03',
+        career: [{ startDate: '2010-04', endDate: '2014-03', name: 'ACME' }],
+      }),
+    );
+    await vi.waitFor(() => expect($<HTMLInputElement>('#name-input').value).toBe('山田 太郎'));
+    const { loadResume } = await import('../../src/db.ts');
+    await vi.waitFor(async () => expect((await loadResume())?.resume.career[0]?.start).toBe('2010-04'));
+  });
+
+  test.each([
+    ['JSONとして不正', '{not json', 'JSONとして読み込めませんでした'],
+    ['型が不正', JSON.stringify({ fullname: 123 }), '履歴書データの形式が正しくありません'],
+  ])('%s な場合はエラートーストを出し、既存データを変更しない', async (_label, text, message) => {
+    const { loadResume } = await import('../../src/db.ts');
+    const before = await loadResume();
+    await importJson(text);
+    await vi.waitFor(() =>
+      expect(
+        [...document.querySelectorAll('#sf-toast-container .sf-toast.error')].some((t) =>
+          t.textContent?.includes(message),
+        ),
+      ).toBe(true),
+    );
+    expect($<HTMLInputElement>('#name-input').value).toBe('山田 太郎');
+    expect(await loadResume()).toEqual(before);
+  });
+
+  test('複数の不正は箇条書きで列挙され、5件を超える分は件数にまとめる', async () => {
+    const { loadResume } = await import('../../src/db.ts');
+    const before = await loadResume();
+    const bad = { fullname: 1, tel1: 1, tel2: 1, mail1: 1, mail2: 1, zipCode: 1, address1: 1 };
+    document.querySelector('#sf-toast-container')?.replaceChildren(); // 前のテストのトーストを除去
+    await importJson(JSON.stringify(bad));
+    await vi.waitFor(() => expect(document.querySelector('#sf-toast-container .sf-toast.error')).not.toBeNull());
+    const text = document.querySelector('#sf-toast-container .sf-toast.error')?.textContent ?? '';
+    expect(text.split('\n').filter((l: string) => l.startsWith('・'))).toHaveLength(5);
+    expect(text).toContain('…他2件');
+    expect(text).not.toMatch(/Invalid input|expected/);
+    expect(await loadResume()).toEqual(before);
+  });
+});
