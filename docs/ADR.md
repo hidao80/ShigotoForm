@@ -1,7 +1,7 @@
 # Architecture Decision Records — ShigotoForm
 
-Git のコミット履歴（`git log`、2026-10-03 時点・HEAD `7f576d5`）から抽出したアーキテクチャ上の意思決定を記録する。日付はコミット日（JST）。
-ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミットハッシュを `git cat-file` で実在確認した。ADR-013 以降は本ファイルで追記・更新している。
+Git のコミット履歴（`git log`、2026-10-03 時点・HEAD `952c2ab`）から抽出したアーキテクチャ上の意思決定を記録する。日付はコミット日（JST）。
+ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミットハッシュを `git cat-file` で実在確認した。ADR-013 以降は本ファイルで追記・更新している。`docs/ADR.md` は `afc786a` でコミット済み。
 コミットメッセージに理由が書かれていない箇所は **Speculative** と明記する。
 
 | ADR | 概要 | Status |
@@ -21,6 +21,9 @@ ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミット
 | 013 | E2E を Bun.WebView へ | Superseded by ADR-014 |
 | 014 | テスト基盤を Vitest（unit + Browser Mode）へ | Accepted |
 | 015 | main.ts / resume.ts を features/components に分割 | Accepted |
+| 016 | LP の CSS を外部ファイル（main.css + main.min.css）へ分離 | Accepted |
+| 017 | AI エージェント向けインターフェース（WebMCP 宣言的アノテーション + llms.txt） | Accepted |
+| 018 | Netlify 配信前提の HTTP ヘッダー定義（`public/_headers`、HSTS） | Accepted |
 
 ---
 
@@ -103,6 +106,7 @@ Noto フォント（和文）と FontAwesome をバンドルに含めた結果�
 
 - Lighthouse パフォーマンススコアの改善（README にスコア記載）。
 - CSS 側は `.fonts-loaded` / `.icons-loaded` クラスに依存した切り替えが必須になり、CSS 変更時の制約として `AGENTS.md` に明文化されている。
+- 追補（2026-10-03, `b560cfd`）: Font Awesome の `font-display: block` を Lighthouse の「フォント表示」指摘への対策として `swap` に上書きするため、`src/icons-font.css`（`fa-regular-400.woff2` のみ対象の後勝ち `@font-face`）を新設。`lazyLoadIcons()` は `all.min.css` → `icons-font.css` の順で import し、`document.fonts.load()` 完了後に `icons-loaded` を付与する。`icons-font.css` は `all.min.css` より後に読み込む順序依存があり、使用中の `fa-regular` 以外のウェイトは対象外。コミットメッセージの接頭辞は `docs:` だが実体はコード変更。
 
 ---
 
@@ -289,7 +293,7 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 ### Consequences
 
 - 同日中に `b1a8f18` で当該スクリーンショットテストを削除し、`28a2668` で `@types/bun` と `bun test` 系スクリプトを撤去した。Bun.WebView 方式は定着せず、同日（2026-10-03）中に ADR-014 に置き換わった。
-- 既存 `docs/ADR.md` の ADR-013 は「Bun.WebView 採用（未コミット）」のまま Accepted になっており、現状（HEAD）と乖離している。同ファイルは未コミットで編集中のため、本ファイルでは Superseded として扱う。
+- `afc786a` 以前の `docs/ADR.md` は ADR-013 を「Bun.WebView 採用（未コミット）」の Accepted としており HEAD と乖離していたが、`afc786a` で Superseded に更新済み（現行の `docs/ADR.md` は本ファイルと同じ ADR-014/015 を含む）。
 - Speculative: 撤回の理由（Bun 1.4 必須・experimental API・Windows での起動不具合など、`docs/ADR.md` 記載の懸念）は、コミットからは確認できない。
 
 ---
@@ -344,6 +348,77 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 - ユーザー入力値の HTML 埋め込みは `escapeHtml()` 経由とする規約が `AGENTS.md` に明文化された。
 - 動的行は `MutationObserver` がリスナーを自動付与するため、手動での二重登録を避ける運用制約がある。
 - 構造変更に伴い `AGENTS.md` のアーキテクチャ節の更新が必要になる（`56bd9c1`）。
+
+---
+
+## ADR-016: LP の CSS を `<style>` インラインから外部ファイル（`main.css` + `main.min.css`）へ分離
+
+- **Status**: Accepted
+- **Date**: 2026-10-03（`0ca9944`, `17db077`）
+
+### Context
+
+- `docs/index.html` は `<style>` に約 5 KB の minify 済み CSS を 1 行で埋め込んでおり、保守時に差分が読めない状態だった（`0ca9944` の diff で確認）。
+- Speculative: 可読性・差分管理の改善と、HTML 本体の軽量化が動機と推測される。コミットメッセージに理由の記載はない。
+
+### Decision
+
+- 可読なソース `docs/main.css`（320 行）と、その minify 版 `docs/main.min.css`（1 行）を追加し、`index.html` は `<link rel="stylesheet" href="main.min.css">` で参照（`0ca9944`）。既存の `main.js` / `main.min.js` と同じ「ソース + minify 版を両方コミット」の方式に揃えた。
+- LP はビルド工程を持たない方針を維持（`docs/DESIGN.md` は「CSS ライブラリ・Web フォント不使用、CSS は `main.css` に集約」へ更新、`17db077`）。ADR-011 の LP 仕様はこの構成を前提とする。
+
+### Consequences
+
+- LP のスタイルが別リクエストになるため、初回描画に CSS 取得が加わる（Speculative: 静的ホスティングの小ファイルなので影響は小さいと推測。未計測）。
+- `main.css` 編集後に `main.min.css` を手動で再生成する運用が必要。minify の手順・自動化は本調査では確認できず（未確認）。ソースと minify 版の乖離リスクがある。
+- 同コミットで LP のクイックスタート（`docker compose up prod`）と技術スタック表示（Bun / Vitest + Playwright E2E / Docker・nginx）を現状に合わせて更新。`DESIGN.md` の既知不整合のうち「Playwright E2E 表記が古い」は解消済み。
+
+---
+
+## ADR-017: AI エージェント向けインターフェースとして WebMCP 宣言的アノテーションと `llms.txt` を導入
+
+- **Status**: Accepted
+- **Date**: 2026-10-03（`833664b` アノテーション実装、`3c94c74` / `33e4ee2` `llms.txt`、`952c2ab` README）
+
+### Context
+
+- 履歴書フォームを AI エージェントが確実に識別・入力できるようにする必要があった。コミットメッセージ（`33e4ee2`）は「improve form accessibility for AI agents」と記載。
+- Speculative: Lighthouse の WebMCP 監査（README に `WebMCP 4/4` バッジを掲載、`952c2ab`）の通過が直接の動機と推測される。
+
+### Decision
+
+- `src/components/resume-form.ts` の `<form>` に `toolname="fill-resume-basic-info"` / `tooldescription`、各入力に `toolparamdescription` を付与（WebMCP の宣言的アノテーション）。実装は ADR-015 の分割コミット `833664b` に含まれるが、同コミットのメッセージには記載がなく、文書化は 2026-10-03 の `33e4ee2` / `952c2ab` で行われた。動的に追加される学歴・職歴／資格行にも同アノテーションを付ける（README 記載）。
+- アプリ向けに `public/llms.txt`（`3c94c74` 新設、`33e4ee2` で WebMCP 追記）を追加し、ビルド成果物のルートで配信する。LP 向けには別途 `docs/llms.txt` を更新（`33e4ee2`）。2 ファイルは用途（アプリ／LP）が異なる。
+- LP（`docs/index.html`）に WebMCP 対応の訴求カードと技術スタック項目を追加（`33e4ee2`）。
+
+### Consequences
+
+- 外部ネットワーク通信を追加しない（ADR-001 を維持）。宣言的アノテーションは HTML 属性のみで、README も「データはどこにも送信されない」と明記している。
+- WebMCP は実験的機能（README: Microsoft Edge で `edge://flags` から有効化）であり、仕様・対応ブラウザの変動リスクがある。
+- フォーム項目を追加・変更する際は `toolparamdescription` の更新が必要になる保守負荷が生じる（Speculative: 規約として `AGENTS.md` には未記載。記載の有無は未確認の項目として残る）。
+- `llms.txt` が `docs/ADR.md` 等を参照しているため、文書構成を変えるとリンク切れの恐れがある。
+
+---
+
+## ADR-018: Netlify 配信前提の HTTP ヘッダー定義（`public/_headers`、HSTS）
+
+- **Status**: Accepted
+- **Date**: 2026-10-03（`3c94c74`、`952c2ab` README 反映）
+
+### Context
+
+- アプリ本体の公開先は `https://shigotoform.netlify.app/`（`index.html` の OGP、README の Netlify バッジ）。ADR-005 の Docker/nginx 構成（`nginx.conf`）にはセキュリティ関連ヘッダーの設定がない（HEAD で確認）。
+- Speculative: Lighthouse の Best Practices（README のスコアが 96 → 100 に更新）での HSTS 指摘解消が動機と推測される。コミットメッセージの記載は「improved security」のみ。
+
+### Decision
+
+- `public/_headers` を追加し、全パスに `Strict-Transport-Security: max-age=31536000; includeSubDomains` を付与（`3c94c74`）。`public/` 配下のため Vite ビルドで `dist/` にコピーされる（`public/` が静的資産ディレクトリである点は Vite の既定動作に依拠、`vite.config.js` に `publicDir` 指定なしを確認）。
+- README に「Hosting: Netlify」「HTTPS enforced」を明記（`952c2ab`）。
+
+### Consequences
+
+- `_headers` は Netlify（互換ホスティング）固有の形式であり、Docker/nginx 配信（ADR-005）には適用されない。両経路でヘッダー設定が非対称になる。nginx 側への HSTS 追加は未実施。
+- `includeSubDomains` を含むため、ドメインのサブドメインが HTTP のみで運用される場合に影響する（Speculative: 現行運用でのサブドメイン利用有無は未確認）。
+- CSP などその他のセキュリティヘッダーは未設定（`_headers` は 2 行のみ）。
 
 ---
 

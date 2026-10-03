@@ -4,23 +4,23 @@
   var META = {
     ja: {
       title: "ShigotoForm — あなたの履歴書は、あなたのデバイスの中に",
-      description: "ShigotoForm — 個人情報を一切送信しない、ブラウザ完結型の履歴書作成PWA。JIS規格レイアウトのA4 PDFを無料で出力。"
+      description: "ShigotoForm — 個人情報を一切送信しない、ブラウザ完結型の履歴書作成PWA。A4 PDFを無料で出力。"
     },
     en: {
       title: "ShigotoForm — Your Resume, Your Device",
-      description: "ShigotoForm — A browser-only resume builder that never transmits your data. Free JIS-standard A4 PDF export."
+      description: "ShigotoForm — A browser-only resume builder that never transmits your data. Free A4 PDF export."
     },
     zh: {
       title: "ShigotoForm — 简历只留在你的设备上",
-      description: "ShigotoForm — 完全在浏览器端运行、绝不上传数据的简历制作 PWA。免费导出符合日本 JIS 标准的 A4 PDF。"
+      description: "ShigotoForm — 完全在浏览器端运行、绝不上传数据的简历制作 PWA。免费导出 A4 PDF。"
     },
     es: {
       title: "ShigotoForm — Tu currículum, en tu propio dispositivo",
-      description: "ShigotoForm — Una PWA para crear currículums que funciona solo en el navegador y nunca transmite tus datos. Exporta PDF A4 con formato JIS gratis."
+      description: "ShigotoForm — Una PWA para crear currículums que funciona solo en el navegador y nunca transmite tus datos. Exporta PDF A4 gratis."
     },
     ru: {
       title: "ShigotoForm — Ваше резюме остаётся на вашем устройстве",
-      description: "ShigotoForm — PWA для создания резюме, работающее полностью в браузере и никогда не передающее ваши данные. Бесплатный экспорт PDF формата A4 по стандарту JIS."
+      description: "ShigotoForm — PWA для создания резюме, работающее полностью в браузере и никогда не передающее ваши данные. Бесплатный экспорт PDF формата A4."
     }
   };
 

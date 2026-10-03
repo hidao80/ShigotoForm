@@ -45,7 +45,7 @@ no account, no backend, no privacy risk.
 ## Issues & Reasons
 
 - **Cloud exposure**: Most resume tools upload your data to a server — ShigotoForm runs entirely client-side; nothing is ever transmitted.
-- **No Japanese support**: Western PDF tools lack the JIS-standard resume（履歴書）layout — ShigotoForm renders it with proper Japanese font support.
+- **No Japanese support**: Western PDF tools lack the Japanese resume（履歴書）layout — ShigotoForm renders it with proper Japanese font support.
 - **Paywalled PDF export**: Most tools charge for PDF output — ShigotoForm generates PDFs locally using html2pdf.js, for free.
 - **Data loss on device switch**: Switching devices without a backup means losing your data — use JSON export/import to back up and restore anywhere.
 

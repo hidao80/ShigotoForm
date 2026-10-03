@@ -48,11 +48,11 @@ line-height: 1.8;
 上から順に以下のセクション構成。
 1. **ナビバー**（`.navbar`）— `position: sticky; top: 0`。左にブランド名、右に言語セレクタ
 2. **ヒーロー**（`.hero`）— `min-height: 80svh`、中央配置。`--accent-soft` の楕円ラジアルグラデを上部に敷く。絵文字（📄🖋️）、`h1`、タグライン、CTA 2 つ、注記（登録不要・無料・インストール不要）
-3. **課題と解決**（6 枚の `.vs-card`）— プライバシー / 日本式履歴書 / PDF 無料 / データ移行 / オフライン / アクセシビリティ
+3. **課題と解決**（7 枚の `.vs-card`）— プライバシー / 日本式履歴書 / PDF 無料 / データ移行 / オフライン / アクセシビリティ / AI エージェント（WebMCP）
 4. **使い方**（3 枚の `.step`）— 入力 → プレビュー → PDF 保存
 5. **クイックスタート**（`.code-row` × 3）— `docker compose up dev`、`git clone … && bun dev`、`docker compose up prod`
 6. **スクリーンショット**（3 枚の `figure`）— 入力画面 / A4 ゴシック / A4 明朝
-7. **技術スタック**（`.tech-list`）— ピル型タグ 11 個
+7. **技術スタック**（`.tech-list`）— ピル型タグ 12 個
 8. **フッター**— CTA 2 つ、ライセンス・貢献案内
 
 ### レスポンシブ
@@ -127,7 +127,7 @@ LP 本文は「Lighthouse アクセシビリティ 100、WAVE エラー 0」を�
 ## 10. 既知の不整合・改善候補（調査所見）
 実装との差異。修正未実施。
 1. （解消済）技術スタック表示を「Vitest + Playwright E2E」に更新（ADR-014 でテスト基盤が Vitest Browser Mode + Playwright Chromium へ移行したため）
-2. 「JIS規格レイアウト」（`meta description`）と本文「履歴書レイアウトを…フォントで表現」に温度差
+2. （解消済）`main.js` の `META.*.description` から「JIS 規格」の表現を削除し、静的メタ・本文の表現と揃えた
 3. 「顔写真添付には近日対応予定」は機能現状に合わせた更新が必要
 4. `main.js` の `META` と `index.html` の静的メタ（日本語）で `title` / `description` 文言が相違（例: ja は一致、en は LP 本文と OGP が別表現）
 5. スクリーンショット `alt` が言語切替に非連動
