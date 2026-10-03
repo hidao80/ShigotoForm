@@ -27,6 +27,8 @@ ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミット
 | 019 | インポート JSON の検証に Zod を導入 | Accepted |
 | 020 | フォーム入力の検証に Zod を適用（随時表示 + プレビュー時ブロック） | Accepted |
 | 021 | UI を React + react-bootstrap へ全面移行 | Accepted |
+| 022 | ふりがな自動入力を @j1nn0/vanilla-autokana へ置き換え | Accepted |
+| 023 | プレビューのフォントは swap で先に表示し、PDF 化はフォントの読み込み完了を待つ | Accepted |
 
 ---
 
@@ -517,6 +519,64 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 - 閉じたメニュー内の要素が DOM に残るため、開閉の遷移中は一時的に同じ id の要素が 2 つ存在する（遷移完了後は 1 つ）。
 - `ResumeJson` / `Career` / `License` の手書き型とスキーマの二重管理は ADR-019 のまま。
 - 状態更新は非同期で描画される。DOM を直接参照するコード（フォーカス移動など）は、メニューの `onExited` やアコーディオンの `onEntered` を待つ必要がある（`<App />` の `afterMenuClosed` / `afterContactOpened`）。
+
+---
+
+## ADR-022: ふりがな自動入力を @j1nn0/vanilla-autokana へ置き換え
+
+- **Status**: Accepted（ADR-021 の vanilla-autokana と proxy input に関する記述を置き換える）
+- **Date**: 2026-10-03（`feat/replace-autokana` ブランチ。コミット前でハッシュは未確定）
+
+### Context
+
+- ADR-021 では、vanilla-autokana（1.3.0、2021-05 が最終リリース。リポジトリの master には Element 対応があるが npm の配布物は古い）を使うため、id 文字列でのバインド、DOM に置く非表示の proxy input、30ms ごとのタイマー書き込みの抑止、といった回避策が必要だった。
+- ユーザー要望: React 向けの適切なふりがなライブラリがあれば差し替える。
+
+### 検討した候補（npm / GitHub API で 2026-10-03 に確認）
+
+| 候補 | 評価 |
+|---|---|
+| `vanilla-autokana`（現行） | 週 25,142 DL。2021 以降リリースなし。配布版は id 文字列のみ・タイマー監視・`value` 直接書き込み |
+| `react-use-kana` 2.4.0 | React のフック（週 11,928 DL、npm の最終リリースは 2022-03）。ただし state を内部に持ち、氏名の変更履歴だけから導出する。復元済みのふりがなの続きや手入力を引き継げず、現行の挙動より後退する |
+| `react-auto-kana` | 2015 年のまま。対象外 |
+| `@j1nn0/vanilla-autokana` 3.0.1 | vanilla-autokana のフォーク（2026-08 に v3）。Element を受け付け、タイマーではなく入力・IME（composition）イベントで追跡し、`onChange` と `destroy()` を持ち、型を同梱。React 専用ではない。週 20 DL・スター 0・単独メンテナ |
+
+### Decision
+
+- 挙動を保てる `@j1nn0/vanilla-autokana` を採用し、`vanilla-autokana` を削除した。React 専用ライブラリは、既存のふりがなの続き入力を保てないため採用しなかった。
+- `hooks/use-autokana.ts` は氏名・ふりがなの入力欄にバインドし、`onChange` を `setField('fullnameKana', …)` に渡す（proxy input、id 文字列、タイマー起因の同値書き込み対策は不要になった）。`destroy()` を effect のクリーンアップで呼ぶ。
+- ライブラリは氏名欄への任意の `input` イベント（ブラウザの自動入力、プログラムによる変更）にも反応するため、氏名欄にフォーカスがあるときだけ `onChange` を state へ反映する（ユーザーが入力したふりがなを上書きしないため）。
+
+### Consequences
+
+- 挙動の差: 氏名が空のままフォーカスして入力を始めると、ふりがな欄の既存の内容を起点にせず最初から作り直す（氏名が入っているときは続きから入力する）。従来は常に続きから入力していた。
+- 採用実績が少ない単独メンテナのパッケージを依存に加えた。配布物（9.7 kB、ネットワーク通信なし）は 3.0.1 の時点で確認したが、更新時は差分の確認が必要。`bun audit` は問題なし。Takumi Guard によるマルウェアスキャンは CI で実行される。
+- 追従しづらい場合は、`vanilla-autokana` + proxy 方式（ADR-021）へ戻せる。
+- E2E: IME（composition）で漢字へ変換しても読みが残ること、既存の氏名・ふりがなの続きとして入力できること、自動入力ではふりがなを上書きしないことを追加で検証した。
+
+---
+
+## ADR-023: プレビューのフォントは swap で先に表示し、PDF 化はフォントの読み込み完了を待つ
+
+- **Status**: Accepted（ADR-004 の遅延読み込み・swap 方針を、描画完了まで拡張する）
+- **Date**: 2026-10-03（`feat/replace-autokana` ブランチ。コミット前でハッシュは未確定）
+
+### Context
+
+- ユーザー要望: フォント表示を swap で、描画が完了するまでを最適化する。
+- 現状の確認（ビルド成果物）: Noto Sans/Serif JP（`@fontsource`）は 124 の unicode-range 分割ですべて `font-display: swap`。Font Awesome の `all.min.css` は 10 個の `@font-face` がすべて `block` だが、使っているのは `fa-regular` の 1 面のみで、これは `icons-font.css` が `swap` で上書き済み（ADR-004 / Lighthouse 対策）。つまり表示（swap）自体は既に満たしていた。
+- 残っていた問題: `lazyLoadNotoFonts()` が完了するのは CSS の読み込みであって、フォントファイルではない。swap のためプレビューは代替フォントで先に出て後から差し替わるが、PDF 化（html2canvas）は読み込み完了を待たずに実行され、代替フォントで撮られ得た。
+
+### Decision
+
+- `waitForPreviewFonts(fontType, text)` を追加（`features/lazy-assets.ts`）。`document.fonts.load('400 1em "<family>"', text)` で、実際に表示している文字列に必要な unicode-range の分割だけを読み込み、完了まで待つ。上限 5 秒を超えたら待たずに続行し（オフライン等）、失敗は握りつぶす。`document.fonts` が無い環境では待たない。
+- `<ResumeModal />` は、表示と同時に（表示を待たせず）この読み込みを開始し、PDF ダウンロードの直前にも完了を待つ。表示は従来どおり swap で先に出る。
+
+### Consequences
+
+- PDF が代替フォントで出力されることを防ぐ。通常は表示から操作までの間に読み込みが終わるため、ダウンロードは待たされない。
+- 書体を切り替えると、その書体の読み込みを改めて始める。
+- 未実施: 実ブラウザでのフォント差し替えの見た目と、PDF の出力フォントの目視確認。Font Awesome の未使用の `block` 面（`fa-solid` 等）は使っていないため要求されず、上書きもしていない（使う場合は同様に `swap` で上書きが必要）。
 
 ---
 
