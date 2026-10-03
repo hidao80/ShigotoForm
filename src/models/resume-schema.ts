@@ -34,7 +34,7 @@ const licenseSchema = z.looseObject({
  * 履歴書JSON（インポート / IndexedDB 保存形式）スキーマ。
  * 旧形式（json 直下の career / license、resume 欠落）も受け付け、ResumeJson へ正規化します。
  */
-export const resumeJsonSchema = z
+const resumeJsonSchema = z
   .looseObject({
     fullnameKana: z.string().default(''),
     fullname: z.string().default(''),
