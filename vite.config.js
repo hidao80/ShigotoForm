@@ -49,9 +49,8 @@ export default defineConfig(({ command }) => ({
         clientsClaim: true,
         skipWaiting: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
-        // Android Edge でのオフライン遷移安定化: index.html を確実に precache
+        // index.html は globPatterns で precache 済み（重複登録すると add-to-cache-list-conflicting-entries になる）
         additionalManifestEntries: [
-          { url: '/index.html', revision: null },
           // Font Awesome（CDN）をオフラインでも確実に使えるよう precache
           { url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', revision: '6.4.0' },
           {
