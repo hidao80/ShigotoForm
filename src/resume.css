@@ -194,6 +194,7 @@ html:not(.icons-loaded) i[class*=" fa-"]::before {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   padding: 10px 12px;
   min-width: 280px;
+  white-space: pre-line; /* メッセージ中の改行（複数エラーの一覧）を反映 */
 }
 .sf-toast.success {
   border: 1px solid var(--success-color);
