@@ -24,6 +24,11 @@
     }
   };
 
+  // コピーボタンのアイコン（HTML に 3 回書くと重複するため、ここで 1 回だけ定義して挿入する）
+  var COPY_ICONS =
+    '<svg class="copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>' +
+    '<svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
   var LANGUAGES = ["ja", "en", "zh", "es", "ru"];
   var STORAGE_KEY = "shigotoform-lp-lang";
 
@@ -63,6 +68,7 @@
     }
 
     document.querySelectorAll(".copy-btn").forEach(function (btn) {
+      btn.innerHTML = COPY_ICONS;
       btn.addEventListener("click", function () {
         var text = btn.getAttribute("data-copy") || "";
         navigator.clipboard.writeText(text).then(function () {
