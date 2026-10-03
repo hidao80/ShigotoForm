@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance to AI coding agents (Claude Code, Codex, etc.) when working with code in this repository.
 
 ## Project Overview
 
@@ -13,9 +13,9 @@ bun install           # Install dependencies
 bun dev               # HTTPS dev server (https://localhost:5173)
 bun run build         # tsc type-check → Vite build → dist/
 bun run preview       # Serve built dist/ locally
-bun run lint          # Biome check
+bun run lint          # Biome check + tsc --noEmit (src/)
 bun run format        # Biome auto-format
-bun test              # Playwright E2E tests
+bun test              # E2E tests (bun:test + Bun.WebView; requires Bun >=1.4 and Chrome/Edge)
 bun run screenshot    # Capture screenshots across all viewports
 ```
 
@@ -59,7 +59,7 @@ Backwards-compatible: `jsonToFormResume()` also accepts the legacy flat format (
 ### Font Lazy-Loading
 
 - Noto fonts: `requestIdleCallback` after `DOMContentLoaded`
-- Font Awesome: on help button hover / offcanvas menu open
+- Font Awesome: also in the idle callback, and earlier on help button `pointerover`/`focusin` or offcanvas open
 - After loading, `fonts-loaded` / `icons-loaded` classes are added to `<html>`
 
 ## Coding Conventions
@@ -75,7 +75,7 @@ Backwards-compatible: `jsonToFormResume()` also accepts the legacy flat format (
 
 - Any changes to A4 layout values (210mm × 297mm) must be visually verified via PDF output
 - Theme is controlled via Bootstrap 5 `data-bs-theme` — do not write `color`/`background` directly
-- Font families are conditionally applied via `.fonts-loaded` class (matches lazy-load timing)
+- Résumé font family is chosen by `.font-gothic` / `.font-mincho` on `.resume-preview`; `html.icons-loaded` gates the icon fallback styles
 
 ### DOM Manipulation
 
@@ -89,6 +89,6 @@ Backwards-compatible: `jsonToFormResume()` also accepts the legacy flat format (
 - Do not import modules directly in `index.html`; only `src/main.ts` is bootstrapped there
 - Linter is **Biome** — ESLint/Prettier are not used
 - `noUnusedLocals` / `noUnusedParameters` are enforced in strict mode
-- The `@ts-ignore` on `html2pdf.js` is intentional (no `@types` package exists)
+- `html2pdf.js` has no `@types` package; its types come from the local stub `src/types/html2pdf.d.ts`
 - Docker production target serves on port 80 via nginx:alpine
 - Ensure `bun run lint` passes before committing
