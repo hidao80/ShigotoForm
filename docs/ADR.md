@@ -30,6 +30,7 @@ ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミット
 | 022 | ふりがな自動入力を @j1nn0/vanilla-autokana へ置き換え | Accepted |
 | 023 | プレビューのフォントは swap で先に表示し、PDF 化はフォントの読み込み完了を待つ | Accepted |
 | 024 | 学歴・職歴／免許・資格の行を、ドラッグ＆ドロップで並べ替え可能にする（@dnd-kit） | Accepted |
+| 025 | Font Awesome の font-display を、後勝ちの @font-face ではなくビルド時の PostCSS で swap にする | Accepted |
 
 ---
 
@@ -112,7 +113,7 @@ Noto フォント（和文）と FontAwesome をバンドルに含めた結果�
 
 - Lighthouse パフォーマンススコアの改善（README にスコア記載）。
 - CSS 側は `.fonts-loaded` / `.icons-loaded` クラスに依存した切り替えが必須になり、CSS 変更時の制約として `AGENTS.md` に明文化されている。
-- 追補（2026-10-03, `b560cfd`）: Font Awesome の `font-display: block` を Lighthouse の「フォント表示」指摘への対策として `swap` に上書きするため、`src/icons-font.css`（`fa-regular-400.woff2` のみ対象の後勝ち `@font-face`）を新設。`lazyLoadIcons()` は `all.min.css` → `icons-font.css` の順で import し、`document.fonts.load()` 完了後に `icons-loaded` を付与する。`icons-font.css` は `all.min.css` より後に読み込む順序依存があり、使用中の `fa-regular` 以外のウェイトは対象外。コミットメッセージの接頭辞は `docs:` だが実体はコード変更。
+- 追補（2026-10-03, `b560cfd`）: Font Awesome の `font-display: block` を Lighthouse の「フォント表示」指摘への対策として `swap` に上書きするため、`src/icons-font.css`（`fa-regular-400.woff2` のみ対象の後勝ち `@font-face`）を新設。`lazyLoadIcons()` は `all.min.css` → `icons-font.css` の順で import し、`document.fonts.load()` 完了後に `icons-loaded` を付与する。`icons-font.css` は `all.min.css` より後に読み込む順序依存があり、使用中の `fa-regular` 以外のウェイトは対象外。コミットメッセージの接頭辞は `docs:` だが実体はコード変更。→ この方式（`icons-font.css`）は ADR-025 で PostCSS による書き換えへ置き換えた。
 
 ---
 
@@ -565,7 +566,7 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 ### Context
 
 - ユーザー要望: フォント表示を swap で、描画が完了するまでを最適化する。
-- 現状の確認（ビルド成果物）: Noto Sans/Serif JP（`@fontsource`）は 124 の unicode-range 分割ですべて `font-display: swap`。Font Awesome の `all.min.css` は 10 個の `@font-face` がすべて `block` だが、使っているのは `fa-regular` の 1 面のみで、これは `icons-font.css` が `swap` で上書き済み（ADR-004 / Lighthouse 対策）。つまり表示（swap）自体は既に満たしていた。
+- 現状の確認（ビルド成果物）: Noto Sans/Serif JP（`@fontsource`）は 124 の unicode-range 分割ですべて `font-display: swap`。Font Awesome の `all.min.css` は 10 個の `@font-face` がすべて `block` だが、使っているのは `fa-regular` の 1 面のみで、これは `icons-font.css` が `swap` で上書き済み（ADR-004 / Lighthouse 対策。この上書きは `block` の規則が残る問題があり、後に ADR-025 でビルド時の書き換えへ置き換えた）。つまり表示（swap）自体は既に満たしていた。
 - 残っていた問題: `lazyLoadNotoFonts()` が完了するのは CSS の読み込みであって、フォントファイルではない。swap のためプレビューは代替フォントで先に出て後から差し替わるが、PDF 化（html2canvas）は読み込み完了を待たずに実行され、代替フォントで撮られ得た。
 
 ### Decision
@@ -607,6 +608,32 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 - 一覧のコンテキストごとに読み上げ用の隠し要素（説明文・ライブリージョン）が DOM に追加される。
 - E2E は実ブラウザで、キーボード（確定・Esc 取り消し）とポインタ操作（ドラッグ）を検証している。ポインタ操作は、実際のマウスではなく `PointerEvent` を段階的に送って再現している。
 - 未実施: 実機のタッチ操作・スクリーンリーダー（NVDA / VoiceOver）での読み上げの確認。狭い画面でのスクロール中のドラッグの感触。
+
+---
+
+## ADR-025: Font Awesome の font-display を、ビルド時の PostCSS で swap にする
+
+- **Status**: Accepted（ADR-004 追補と ADR-023 の、`icons-font.css` による上書きを置き換える）
+- **Date**: 2026-10-03（`fix/font-display-swap` ブランチ。コミット前でハッシュは未確定）
+
+### Context
+
+- 症状: ビルド後に、Font Awesome のフォントが font-display: swap にならない（再発）。
+- 原因: `icons-font.css` は、`all.min.css`（`@font-face` 10 個がすべて `block`）の後に、同じ family / weight の `@font-face` を `swap` で足していた。ブラウザは後勝ちの規則で描画するが、**両方の規則が `document.fonts` に残る**。ビルド成果物を実ブラウザで確認したところ、`Font Awesome 7 Free` の 400 は `block` と `swap` の 2 つが両方 `loaded` で、`lazyLoadIcons()` の `document.fonts.load()` が `block` 側も読み込み、フォントファイルが 2 回要求されていた。CSS 上にも `block` の規則が残るため、Lighthouse の「フォント表示」では `block` として指摘され得る。
+- つまり、後から上書きする方法では、`block` の規則を無くせない。
+
+### Decision
+
+- `scripts/postcss-font-display-swap.ts` の PostCSS プラグインで、`@fortawesome` 配下の CSS の `@font-face` を、すべて `font-display: swap` に書き換える（指定が無い場合は追加）。`vite.config.js` の `css.postcss.plugins` に登録し、開発サーバーとビルドの両方に効かせる。
+- `src/icons-font.css` と、その import を削除する。`lazyLoadIcons()` は `all.min.css` の import → `document.fonts.load()` → `icons-loaded`（従来どおり）。
+- 使っていない書体面（`fa-solid` など）も swap になる。以後、書体面を追加しても個別の上書きは要らない。
+- 単体テストで、`block` / `auto` / 指定なしの書き換え、重複追加の防止、対象外の CSS を変えないこと、Windows のパス区切りを確認する（`postcss` を devDependency に明示した）。
+
+### Consequences
+
+- ビルド成果物（`dist/assets/*.css`）に `font-display: block` と `auto` が無く、実ブラウザの `document.fonts` の全 `FontFace` が `swap`。`fa-regular-400.woff2` は 1 回だけ要求される。
+- `@fortawesome` 以外の CSS は書き換えない。Noto（`@fontsource`）は元から `swap`。
+- 未実施: Lighthouse での再計測（スコアは README のものから未更新）。
 
 ---
 

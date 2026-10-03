@@ -2,8 +2,11 @@ import { defineConfig } from 'vite';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { fontDisplaySwap } from './scripts/postcss-font-display-swap.ts';
 
 export default defineConfig(({ command }) => ({
+  // Font Awesome の @font-face は block のため、ビルド時に swap へ書き換える（src/features/lazy-assets.ts の lazyLoadIcons）
+  css: { postcss: { plugins: [fontDisplaySwap()] } },
   plugins: [
     react(),
     ...(command === 'serve' ? [basicSsl()] : []),
