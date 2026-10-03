@@ -1,3 +1,5 @@
+import { createCareerRow } from './components/career-row.ts';
+import { createLicenseRow } from './components/license-row.ts';
 import type { Career, License, Resume } from './models/Resume.ts';
 
 /**
@@ -57,72 +59,6 @@ export function addLicenseEventListener() {
 }
 
 /**
- * 学歴・職歴の1行生成
- * @param {Career} [item] - 初期値として設定するCareerオブジェクト
- * @returns {HTMLDivElement} - 生成された行のHTML要素
- * @throws なし
- * @example
- * const row = createCareerRow({ ... });
- */
-function createCareerRow(item?: Career): HTMLDivElement {
-  const div = document.createElement('div');
-  div.className = 'card mb-2';
-  div.innerHTML = `
-    <div class="card-body row align-items-center flex-nowrap">
-      <div class="col-auto d-flex align-items-center gap-1" style="min-width:264px;">
-        <input type="month" class="form-control" name="start" placeholder="開始年月" value="${item?.start || ''}" style="width:120px;" />
-        <span>～</span>
-        <input type="month" class="form-control" name="end" placeholder="終了年月" value="${item?.end || ''}" style="width:120px;" />
-      </div>
-      <div class="col px-0">
-        <input type="text" class="form-control" name="name" placeholder="会社・学校名" value="${item?.name || ''}" />
-      </div>
-      <div class="col px-0">
-        <input type="text" class="form-control" name="position" placeholder="役職・学科" value="${item?.position || ''}" />
-      </div>
-      <div class="col px-0">
-        <input type="text" class="form-control" name="description" placeholder="説明" value="${item?.description || ''}" />
-      </div>
-      <div class="col-auto ps-1">
-        <button type="button" class="btn btn-danger btn-sm remove-row">削除</button>
-      </div>
-    </div>
-  `;
-  return div;
-}
-
-/**
- * 免許・資格の1行生成
- * @param {License} [item] - 初期値として設定するLicenseオブジェクト
- * @returns {HTMLDivElement} - 生成された行のHTML要素
- * @throws なし
- * @example
- * const row = createLicenseRow({ ... });
- */
-function createLicenseRow(item?: License): HTMLDivElement {
-  const div = document.createElement('div');
-  div.className = 'card mb-2';
-  div.innerHTML = `
-    <div class="card-body row align-items-center">
-      <div class="col-auto" style="min-width:120px;">
-        <input type="month" class="form-control" name="endDate" placeholder="年月" value="${item?.date || ''}" />
-      </div>
-      <div class="col px-0">
-        <input type="text" class="form-control" name="name" placeholder="内容" value="${item?.name || ''}" />
-      </div>
-      <div class="col-auto ps-1 d-flex gap-1 align-items-center">
-        <select class="form-select form-select-sm status-select" style="width:auto;min-width:70px;">
-          <option value="合格"${item?.pass === '合格' || !item?.pass ? ' selected' : ''}>合格</option>
-          <option value="取得"${item?.pass === '取得' ? ' selected' : ''}>取得</option>
-        </select>
-        <button type="button" class="btn btn-danger btn-sm remove-row">削除</button>
-      </div>
-    </div>
-  `;
-  return div;
-}
-
-/**
  * 学歴・職歴の行にイベントリスナーを追加します。
  * @param {HTMLElement} div - 学歴・職歴の行のHTML要素
  * @returns {void}
@@ -162,111 +98,6 @@ function attachLicenseRowListeners(div: HTMLElement) {
   }
   const removeBtn = div.querySelector('.remove-row');
   if (removeBtn) removeBtn.addEventListener('click', () => div.remove());
-}
-
-/**
- * 履歴書データをHTML形式で生成します。
- * @param {Resume} data - 履歴書のデータ
- * @param {'gothic' | 'mincho'} [fontType='gothic'] - 使用するフォントの種類
- * @returns {string} - 生成されたHTML文字列
- * @throws なし
- * @example
- * const html = generateResumeHtml(data, 'mincho');
- */
-export function generateResumeHtml(data: Resume, fontType: 'gothic' | 'mincho' = 'gothic'): string {
-  const fontClass = fontType === 'mincho' ? 'font-mincho' : 'font-gothic';
-  /**
-   * 日付を「YYYY年MM月DD日」形式に変換します。
-   * @param {string} dateStr - 日付文字列
-   * @returns {string} - フォーマット済み日付
-   * @throws なし
-   */
-  function formatDate(dateStr: string): string {
-    if (!dateStr) return '';
-    // YYYY-MM-DD or YYYY-MM
-    const [y, m = '', d = ''] = dateStr.split(/-|\//);
-    if (!y) return '';
-    if (m && d) return `${y}年${m}月${d}日`;
-    if (m) return `${y}年${m}月`;
-    return `${y}年`;
-  }
-
-  /**
-   * 郵便番号をハイフン付きの形式にフォーマットします。
-   * @param {string} zip - フォーマットする郵便番号
-   * @returns {string} - フォーマットされた郵便番号
-   * @throws なし
-   */
-  function formatZipCode(zip: string): string {
-    if (!zip) return '';
-    // すでにハイフンが含まれていればそのまま
-    if (zip.includes('-')) return zip;
-    // 7桁以上の場合のみ4文字目にハイフンを挿入
-    if (zip.length >= 7) return `${zip.slice(0, 3)}-${zip.slice(3)}`;
-    return zip;
-  }
-
-  return `
-    <div class="resume-preview p-4 rounded shadow ${fontClass}" style="width:210mm; height:297mm; margin:auto; box-sizing:border-box; position:relative;">
-      <h1 class="mb-3">履歴書</h1>
-      <table class="table table-bordered mb-4">
-        <tbody>
-          <tr>
-            <th style="width:140px;">ふりがな</th>
-            <td>
-              <ruby>
-                ${data.fullname || ''}
-                ${data.fullnameKana ? `<rt>${data.fullnameKana}</rt>` : ''}
-              </ruby>
-            </td>
-            <th style="width:140px;">生年月日</th>
-            <td>${formatDate(data.birthday || '')}</td>
-          </tr>
-          <tr>
-            <th>性別</th>
-            <td>${data.sex || ''}</td>
-            <th>作成日</th>
-            <td>${formatDate(data.createdAt || '')}</td>
-          </tr>
-          <tr>
-            <th>郵便番号</th>
-            <td>${formatZipCode(data.zipCode || '')}</td>
-            <th>住所</th>
-            <td>${data.address1 || ''}</td>
-          </tr>
-          <tr>
-            <th>電話番号</th>
-            <td>${data.tel1 || ''}</td>
-            <th>メールアドレス</th>
-            <td>${data.mail1 || ''}</td>
-          </tr>
-          <tr>
-            <th>連絡先住所</th>
-            <td>${data.address2 || ''}</td>
-            <th>連絡先電話番号</th>
-            <td>${data.tel2 || ''}</td>
-          </tr>
-        </tbody>
-      </table>
-      <h2 class="mt-4">学歴・職歴</h2>
-      <ul>
-        ${(data.career || [])
-          .map(
-            (c) =>
-              `<li>
-            ${formatDate(c.start)} ～ ${c.end && c.end.trim() !== '' ? formatDate(c.end) : '現在'} ${c.name} 
-            ${c.position ? ` / ${c.position}` : ''} 
-            ${c.description ? `<span style="margin-left:2em;">${c.description}</span>` : ''}
-          </li>`,
-          )
-          .join('')}
-      </ul>
-      <h2 class="mt-4">免許・資格</h2>
-      <ul>
-        ${(data.license || []).map((l) => `<li>${formatDate(l.date)} ${l.name}${l.pass ? `　${l.pass}` : ''}</li>`).join('')}
-      </ul>
-    </div>
-  `;
 }
 
 /**
