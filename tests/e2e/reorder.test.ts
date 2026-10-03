@@ -18,6 +18,15 @@ const moved = (list: string) =>
   [...document.querySelectorAll<HTMLElement>(`#${list} .card`)].some((card) =>
     /translate3d\(0px, -[1-9]/.test(card.style.transform),
   );
+/** 一覧の先頭のハンドルをキーボードでつかんで 1 つ下へ動かし、移動先が決まるところまで進める（確定・取り消しは呼び出し側） */
+async function liftAndMoveDown(list: string) {
+  const [first] = handles(list);
+  first?.focus();
+  await userEvent.keyboard('{ }'); // つかむ
+  await vi.waitFor(() => expect(first?.getAttribute('aria-pressed')).toBe('true'));
+  await userEvent.keyboard('{ArrowDown}');
+  await vi.waitFor(() => expect(moved(list)).toBe(true)); // 移動先が決まるまで待つ
+}
 const frame = () => new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
 const center = (el: Element) => {
   const r = el.getBoundingClientRect();
@@ -62,12 +71,7 @@ describe('学歴・職歴 / 免許・資格の並べ替え', () => {
   test('キーボードで並べ替えると、画面の順序と保存データの順序が変わり、ハンドルにフォーカスが残る', async () => {
     const before = names('career-history');
     expect(before).toHaveLength(2);
-    const [first] = handles('career-history');
-    first?.focus();
-    await userEvent.keyboard('{ }'); // つかむ
-    await vi.waitFor(() => expect(first?.getAttribute('aria-pressed')).toBe('true'));
-    await userEvent.keyboard('{ArrowDown}');
-    await vi.waitFor(() => expect(moved('career-history')).toBe(true)); // 移動先が決まるまで待つ
+    await liftAndMoveDown('career-history');
     await userEvent.keyboard('{ }'); // 確定
     await vi.waitFor(() => expect(names('career-history')).toEqual([...before].reverse()));
     expect(names('license-history')).toEqual(sample().license.map((l) => l.name));
@@ -80,12 +84,7 @@ describe('学歴・職歴 / 免許・資格の並べ替え', () => {
 
   test('Esc で取り消すと順序は変わらない', async () => {
     const before = names('career-history');
-    const [first] = handles('career-history');
-    first?.focus();
-    await userEvent.keyboard('{ }');
-    await vi.waitFor(() => expect(first?.getAttribute('aria-pressed')).toBe('true'));
-    await userEvent.keyboard('{ArrowDown}');
-    await vi.waitFor(() => expect(moved('career-history')).toBe(true));
+    await liftAndMoveDown('career-history');
     await userEvent.keyboard('{Escape}');
     await new Promise((resolve) => setTimeout(resolve, 300));
     expect(names('career-history')).toEqual(before);
