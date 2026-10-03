@@ -78,7 +78,7 @@ CSS カウンター（`counter-reset: step`）で `::before` に番号を自動�
 カード内に画像（角丸 `.5rem`、`loading="lazy"`）と `figcaption`。画像は GitHub の user-attachments 参照。
 
 ### コードブロック（`.code-row`）
-`--surface` 背景の横スクロール可能な行（`max-width: 40rem`）。右端にコピーボタン（`.copy-btn`）。クリックで `data-copy` の内容をクリップボードへ書込、コピーアイコンを緑のチェックに `1.5s` 切替（`.copied` クラス）。複数行コマンドは `data-copy` 内で `&#10;` により改行表現。
+`--surface` 背景の横スクロール可能な行（`max-width: 40rem`）。右端にコピーボタン（`.copy-btn`）。アイコン（コピー / チェックの SVG 2 つ）は HTML には書かず、`main.js` が `.copy-btn` へ挿入する（同じ SVG を 3 回書くと重複するため。`main.min.js` も再生成すること）。クリックで `data-copy` の内容をクリップボードへ書込、コピーアイコンを緑のチェックに `1.5s` 切替（`.copied` クラス）。複数行コマンドは `data-copy` 内で `&#10;` により改行表現。
 
 ### 技術タグ（`.tech-list li`）
 `--surface` 背景 + `--border` 枠のピル型。中央寄せ、折り返し。
