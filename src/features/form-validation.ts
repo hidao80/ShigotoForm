@@ -25,6 +25,61 @@ const FIELD_BY_ID = new Map(RESUME_FORM_FIELDS.map((field) => [FIELD_IDS[field],
 const getInput = (field: ResumeFormField) => document.getElementById(FIELD_IDS[field]) as HTMLInputElement | null;
 
 /**
+ * 入力欄からエラー表示（is-invalid / aria-invalid / aria-describedby）を取り除きます。表示中でなければ何もしません。
+ * @param {HTMLInputElement} input - 対象の入力欄
+ * @returns {void}
+ * @throws なし
+ */
+function clearFieldError(input: HTMLInputElement) {
+  if (!input.classList.contains('is-invalid')) return;
+  input.classList.remove('is-invalid');
+  input.removeAttribute('aria-invalid');
+  const rest = (input.getAttribute('aria-describedby') ?? '').replace(`${input.id}-error`, '').trim();
+  if (rest) input.setAttribute('aria-describedby', rest);
+  else input.removeAttribute('aria-describedby');
+}
+
+/**
+ * 入力欄用のフィードバック要素（invalid-feedback）を取得し、なければ作成して配置します。
+ * @param {HTMLInputElement} input - 対象の入力欄
+ * @returns {HTMLElement} フィードバック要素
+ * @throws なし
+ */
+function ensureFeedback(input: HTMLInputElement): HTMLElement {
+  const errorId = `${input.id}-error`;
+  const existing = document.getElementById(errorId);
+  if (existing) return existing;
+  const feedback = document.createElement('div');
+  feedback.id = errorId;
+  feedback.className = 'invalid-feedback';
+  const group = input.parentElement?.classList.contains('input-group') ? input.parentElement : null;
+  if (group) {
+    // input-group 内ではフィードバックを同じグループの末尾に置く
+    group.classList.add('has-validation');
+    group.append(feedback);
+  } else {
+    input.after(feedback);
+  }
+  return feedback;
+}
+
+/**
+ * 入力欄にエラー表示（is-invalid / aria-invalid / aria-describedby とメッセージ）を付けます。
+ * @param {HTMLInputElement} input - 対象の入力欄
+ * @param {string} message - エラーメッセージ
+ * @returns {void}
+ * @throws なし
+ */
+function showFieldError(input: HTMLInputElement, message: string) {
+  const feedback = ensureFeedback(input);
+  if (feedback.textContent !== message) feedback.textContent = message;
+  if (input.classList.contains('is-invalid')) return;
+  input.classList.add('is-invalid');
+  input.setAttribute('aria-invalid', 'true');
+  input.setAttribute('aria-describedby', `${input.getAttribute('aria-describedby') ?? ''} ${feedback.id}`.trim());
+}
+
+/**
  * 入力欄にエラー表示（Bootstrap の is-invalid / invalid-feedback、aria-invalid / aria-describedby）を反映します。
  * 表示が変わらない場合は DOM を書き換えません。
  * @param {HTMLInputElement} input - 対象の入力欄
@@ -33,37 +88,8 @@ const getInput = (field: ResumeFormField) => document.getElementById(FIELD_IDS[f
  * @throws なし
  */
 function setFieldError(input: HTMLInputElement, message: string | null) {
-  const errorId = `${input.id}-error`;
-  const wasInvalid = input.classList.contains('is-invalid');
-  if (message === null) {
-    if (!wasInvalid) return;
-    input.classList.remove('is-invalid');
-    input.removeAttribute('aria-invalid');
-    const rest = (input.getAttribute('aria-describedby') ?? '').replace(errorId, '').trim();
-    if (rest) input.setAttribute('aria-describedby', rest);
-    else input.removeAttribute('aria-describedby');
-    return;
-  }
-  let feedback = document.getElementById(errorId);
-  if (!feedback) {
-    feedback = document.createElement('div');
-    feedback.id = errorId;
-    feedback.className = 'invalid-feedback';
-    const group = input.parentElement?.classList.contains('input-group') ? input.parentElement : null;
-    if (group) {
-      // input-group 内ではフィードバックを同じグループの末尾に置く
-      group.classList.add('has-validation');
-      group.append(feedback);
-    } else {
-      input.after(feedback);
-    }
-  }
-  if (feedback.textContent !== message) feedback.textContent = message;
-  if (wasInvalid) return;
-  input.classList.add('is-invalid');
-  input.setAttribute('aria-invalid', 'true');
-  const describedBy = input.getAttribute('aria-describedby') ?? '';
-  input.setAttribute('aria-describedby', `${describedBy} ${errorId}`.trim());
+  if (message === null) clearFieldError(input);
+  else showFieldError(input, message);
 }
 
 /**
