@@ -6,6 +6,7 @@ import { ResumeForm } from '../../../src/components/resume-form.tsx';
 import { clearResume } from '../../../src/db.ts';
 import { useResumeForm } from '../../../src/hooks/use-resume-form.ts';
 import { createEmptyResume } from '../../../src/models/Resume.ts';
+import { controlsMissingToolParam } from '../../webmcp.ts';
 import { sample } from '../fixtures.ts';
 
 type Form = ReturnType<typeof useResumeForm>;
@@ -234,11 +235,7 @@ describe('WebMCP（宣言的アノテーション）', () => {
     const form = document.querySelector('form') as HTMLFormElement;
     expect(form.getAttribute('toolname')).toBe('fill-resume-basic-info');
     expect(form.getAttribute('tooldescription')).toBeTruthy();
-    const missing = [...form.elements]
-      .filter((el) => (el as HTMLInputElement).name)
-      .filter((el) => !el.getAttribute('toolparamdescription'))
-      .map((el) => (el as HTMLInputElement).name);
-    expect(missing).toEqual([]);
+    expect(controlsMissingToolParam(form)).toEqual([]);
   });
 
   test('Enter などによる submit でページ遷移しない', async () => {

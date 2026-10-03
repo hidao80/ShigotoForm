@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 import { PATTERN_CASES } from '../field-cases.ts';
+import { controlsMissingToolParam } from '../webmcp.ts';
 import { mountApp, setNativeValue, sleep } from './mount-app.ts';
 
 const $ = <T extends Element = HTMLElement>(selector: string) => document.querySelector(selector) as T;
@@ -71,11 +72,7 @@ describe('宣言型 WebMCP', () => {
   });
 
   test('name を持つ全コントロールが toolparamdescription を持つ', () => {
-    const missing = [...$<HTMLFormElement>('form').elements]
-      .filter((el) => (el as HTMLInputElement).name)
-      .filter((el) => !el.getAttribute('toolparamdescription'))
-      .map((el) => (el as HTMLInputElement).name);
-    expect(missing).toEqual([]);
+    expect(controlsMissingToolParam($<HTMLFormElement>('form'))).toEqual([]);
   });
 
   test('静的入力欄の name がスキーマのプロパティ名として揃っている', () => {
