@@ -4,11 +4,11 @@ import { mountApp, sleep } from './mount-app.ts';
 beforeAll(mountApp);
 
 test('氏名欄にフォーカスしているだけ（編集なし）では何も保存しない', async () => {
-  // vanilla-autokana は氏名が空でも 30ms ごとにふりがなへ空文字を書き込む。編集とみなして保存してはいけない
+  // フォーカスだけではふりがなの自動入力が何も書き込まず、編集とみなされて保存されてはいけない
   const name = document.getElementById('name-input') as HTMLInputElement;
-  name.dispatchEvent(new FocusEvent('focus'));
+  name.focus();
   await sleep(400);
-  name.dispatchEvent(new FocusEvent('blur'));
+  name.blur();
   const { loadResume } = await import('../../src/db.ts');
   expect(await loadResume()).toBeUndefined();
 });
