@@ -7,6 +7,7 @@ import { FIELD_PATTERNS, type ResumeFormField } from '../models/resume-form-sche
 import { CareerRow } from './career-row.tsx';
 import { FIELD_IDS } from './field-ids.ts';
 import { LicenseRow } from './license-row.tsx';
+import { SortableList } from './sortable-list.tsx';
 import { ValidatedInput } from './validated-input.tsx';
 
 const FIELD_BY_ID = new Map(Object.entries(FIELD_IDS).map(([field, id]) => [id, field as ResumeFormField]));
@@ -281,14 +282,20 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
                   学歴・職歴
                 </h2>
               </legend>
-              {state.career.map((row) => (
-                <CareerRow
-                  key={row.id}
-                  row={row}
-                  onChange={(patch) => edit({ type: 'update-career', id: row.id, patch })}
-                  onRemove={() => edit({ type: 'remove-career', id: row.id })}
-                />
-              ))}
+              <SortableList
+                ids={state.career.map((row) => row.id)}
+                label="学歴・職歴"
+                onMove={(activeId, overId) => edit({ type: 'move-career', activeId, overId })}
+              >
+                {state.career.map((row) => (
+                  <CareerRow
+                    key={row.id}
+                    row={row}
+                    onChange={(patch) => edit({ type: 'update-career', id: row.id, patch })}
+                    onRemove={() => edit({ type: 'remove-career', id: row.id })}
+                  />
+                ))}
+              </SortableList>
             </fieldset>
             <Button
               id="add-career-history"
@@ -311,14 +318,20 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
                   免許・資格
                 </h2>
               </legend>
-              {state.license.map((row) => (
-                <LicenseRow
-                  key={row.id}
-                  row={row}
-                  onChange={(patch) => edit({ type: 'update-license', id: row.id, patch })}
-                  onRemove={() => edit({ type: 'remove-license', id: row.id })}
-                />
-              ))}
+              <SortableList
+                ids={state.license.map((row) => row.id)}
+                label="免許・資格"
+                onMove={(activeId, overId) => edit({ type: 'move-license', activeId, overId })}
+              >
+                {state.license.map((row) => (
+                  <LicenseRow
+                    key={row.id}
+                    row={row}
+                    onChange={(patch) => edit({ type: 'update-license', id: row.id, patch })}
+                    onRemove={() => edit({ type: 'remove-license', id: row.id })}
+                  />
+                ))}
+              </SortableList>
             </fieldset>
             <Button
               id="add-license-history"

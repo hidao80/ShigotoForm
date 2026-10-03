@@ -34,6 +34,7 @@ src/
 │   ├── help-modal.tsx, delete-modal.tsx, resume-modal.tsx   # Modals (shown only while open)
 │   ├── resume-form.tsx, validated-input.tsx     # The form, and a controlled input with validation display
 │   ├── career-row.tsx, license-row.tsx          # One dynamic row each
+│   ├── sortable-list.tsx                        # <SortableList /> (dnd-kit context) and <SortableRow /> (Card + drag handle) — drag-and-drop reordering
 │   ├── resume-preview.tsx                       # <ResumePreview /> (A4 résumé), formatDate() / formatZipCode()
 │   ├── field-ids.ts                             # Validated field → input id mapping
 │   ├── toast.ts, toast-container.tsx            # showToast() / formatToastList() (imperative store) and <ToastContainer />
@@ -138,7 +139,7 @@ The offcanvas menu restores focus to its toggler when it closes. When it is clos
 ### React
 
 - UI is React 19 + react-bootstrap. Use react-bootstrap components for Modal / Offcanvas / Accordion / Navbar / Button / Form controls; **do not** import Bootstrap's JS or use `data-bs-*` toggles (the Bootstrap CSS is still imported in `main.tsx`)
-- Form values are controlled and live in `useResumeForm()` state (reducer in `models/resume-state.ts`); change them via `edit()` / `setField()` / `replace()`, never by writing to the DOM. Dynamic rows are state arrays with stable `id` keys
+- Form values are controlled and live in `useResumeForm()` state (reducer in `models/resume-state.ts`); change them via `edit()` / `setField()` / `replace()`, never by writing to the DOM. Dynamic rows are state arrays with stable `id` keys; reordering is `move-career` / `move-license` (the saved / exported order follows the state, nothing is sorted elsewhere). Rows render through `<SortableRow />`, and only its handle starts a drag (mouse / touch / keyboard) so inputs are not affected. The handle icon is inline SVG, not Font Awesome (no extra font face)
 - User values are rendered as JSX text, so they cannot be interpreted as HTML — **never** use `dangerouslySetInnerHTML` (the résumé preview is built in JSX for this reason)
 - react-bootstrap puts `id` on `.modal-dialog` (not on the outer `.modal`, which carries `show` / `role` / `aria-labelledby`); modal contents are unmounted while closed, so triggers do not use `aria-controls` for them. The menu is rendered statically so its buttons always exist
 - WebMCP attributes (`toolname` / `tooldescription` / `toolparamdescription`) are plain lowercase props, typed in `types/webmcp.d.ts`; keep them when editing inputs, including dynamic rows

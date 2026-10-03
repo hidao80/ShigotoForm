@@ -58,6 +58,23 @@ describe('復元と自動保存', () => {
     expect(saved?.age).toBe(Number(calculateAge('1990-04-01')));
   });
 
+  test('行の並べ替えは編集として保存され、保存データの順序も入れ替わる', async () => {
+    await saveResume(formResumeToJson(sample()));
+    const { result } = await mount();
+    const [first, second] = result.current.resume.career;
+    const [a, b] = result.current.state.career.map((row) => row.id) as [string, string];
+    const [lic1, lic2] = result.current.resume.license;
+    const [l1, l2] = result.current.state.license.map((row) => row.id) as [string, string];
+    act(() => {
+      result.current.edit({ type: 'move-career', activeId: a, overId: b });
+      result.current.edit({ type: 'move-license', activeId: l1, overId: l2 });
+    });
+    await waitFor(async () => expect((await loadResume())?.resume.career[0]?.name).toBe(second?.name));
+    const saved = await loadResume();
+    expect(saved?.resume.career.map((r) => r.name)).toEqual([second?.name, first?.name]);
+    expect(saved?.resume.license.map((r) => r.name)).toEqual([lic2?.name, lic1?.name]);
+  });
+
   test('値が変わらない書き込み（ふりがなの自動入力の再通知など）は編集とみなさず、保存しない', async () => {
     const { result } = await mount();
     const before = result.current.state;

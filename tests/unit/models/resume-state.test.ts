@@ -81,6 +81,39 @@ describe('resumeReducer', () => {
     expect(resumeReducer(state, { type: 'remove-license', id: lic.id }).license).toHaveLength(1);
   });
 
+  test('move は行を移動先の位置へ移し、間の行は 1 つずつずれて id は変わらない', () => {
+    const row = (name: string) => ({ start: '', end: '', name, position: '', description: '' });
+    const state = fromResume({ ...createEmptyResume(), career: [row('A'), row('B'), row('C')] });
+    const [a, b, c] = state.career as [
+      (typeof state.career)[number],
+      (typeof state.career)[number],
+      (typeof state.career)[number],
+    ];
+    const down = resumeReducer(state, { type: 'move-career', activeId: a.id, overId: c.id });
+    expect(down.career.map((r) => r.id)).toEqual([b.id, c.id, a.id]);
+    const up = resumeReducer(state, { type: 'move-career', activeId: c.id, overId: a.id });
+    expect(up.career.map((r) => r.id)).toEqual([c.id, a.id, b.id]);
+    expect(down.license).toBe(state.license);
+    // 並べ替えた順序が保存・エクスポート用のデータにそのまま出る
+    expect(toResume(down).career.map((r) => r.name)).toEqual([b.name, c.name, a.name]);
+  });
+
+  test('move-license は資格の行だけを入れ替える', () => {
+    const state = initial();
+    const [a, b] = state.license as [(typeof state.license)[number], (typeof state.license)[number]];
+    const next = resumeReducer(state, { type: 'move-license', activeId: a.id, overId: b.id });
+    expect(next.license.map((r) => r.name)).toEqual([b.name, a.name]);
+    expect(next.career).toBe(state.career);
+  });
+
+  test('move は同じ行・存在しない id なら同じ状態を返す（再描画・保存を起こさない）', () => {
+    const state = initial();
+    const [a] = state.career as [(typeof state.career)[number]];
+    expect(resumeReducer(state, { type: 'move-career', activeId: a.id, overId: a.id })).toBe(state);
+    expect(resumeReducer(state, { type: 'move-career', activeId: a.id, overId: 'none' })).toBe(state);
+    expect(resumeReducer(state, { type: 'move-license', activeId: 'none', overId: a.id })).toBe(state);
+  });
+
   test('replace は全体を差し替える', () => {
     const next = resumeReducer(initial(), { type: 'replace', resume: createEmptyResume() });
     expect(toResume(next)).toEqual(createEmptyResume());
