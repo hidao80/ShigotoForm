@@ -273,11 +273,14 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
           </Accordion.Item>
         </Accordion>
         <div className="row">
-          <h2 className="mt-5" id="career-history-title">
-            学歴・職歴
-          </h2>
           <div className="col-md">
-            <fieldset id="career-history" aria-labelledby="career-history-title">
+            <fieldset id="career-history">
+              {/* legend が fieldset の名前になる。見出し（h2）は legend の中に置いて見出しナビゲーションも保つ */}
+              <legend className="float-none w-auto p-0 mb-0">
+                <h2 className="mt-5" id="career-history-title">
+                  学歴・職歴
+                </h2>
+              </legend>
               {state.career.map((row) => (
                 <CareerRow
                   key={row.id}
@@ -301,11 +304,13 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
           </div>
         </div>
         <div className="row">
-          <h2 className="mt-5" id="license-history-title">
-            免許・資格
-          </h2>
           <div className="col-md">
-            <fieldset id="license-history" aria-labelledby="license-history-title">
+            <fieldset id="license-history">
+              <legend className="float-none w-auto p-0 mb-0">
+                <h2 className="mt-5" id="license-history-title">
+                  免許・資格
+                </h2>
+              </legend>
               {state.license.map((row) => (
                 <LicenseRow
                   key={row.id}
