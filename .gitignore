@@ -21,6 +21,8 @@ graphify-out/
 test-results/
 playwright/.cache/
 screenshots/
+# jscpd (HTML report output)
+report/
 
 # Editor directories and files
 .vscode/*
