@@ -27,7 +27,7 @@ export default defineConfig({
             'react-bootstrap',
             '@vite-pwa/workbox-window',
             'html2pdf.js',
-            'vanilla-autokana',
+            '@j1nn0/vanilla-autokana',
             'dexie',
             'zod',
             'zod/locales',
