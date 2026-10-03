@@ -83,3 +83,26 @@ export function validateResumeForm(resume: Resume): FieldError[] {
   }
   return errors;
 }
+
+/** 欄ごとのエラーメッセージ（エラーのない欄はキーなし） */
+export type FieldErrors = Partial<Record<ResumeFormField, string>>;
+
+/**
+ * FieldError の配列を欄ごとのメッセージの対応表に変換します。
+ * @param {FieldError[]} errors - validateResumeForm の結果
+ * @returns {FieldErrors} 欄ごとのメッセージ
+ * @throws なし
+ */
+export function toFieldErrors(errors: FieldError[]): FieldErrors {
+  return Object.fromEntries(errors.map((e) => [e.field, e.message]));
+}
+
+/**
+ * 入力済みの欄だけを検証します（復元・インポート直後の表示用。空欄は未入力として必須エラーを出さない）。
+ * @param {Resume} resume - 履歴書データ
+ * @returns {FieldErrors} 入力済みで不正な欄のメッセージ
+ * @throws なし
+ */
+export function validateFilledFields(resume: Resume): FieldErrors {
+  return toFieldErrors(validateResumeForm(resume).filter((e) => resume[e.field] !== ''));
+}
