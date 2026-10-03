@@ -90,15 +90,23 @@ bun run screenshot    # Capture screenshots across all viewports
 
 ### Input Instructions
 
-1. **Full Name**: Enter your full name in the text box. Furigana will be auto-filled to some extent.
-2. **Date of Birth**: Select a date from the calendar or enter it in YYYY/MM/DD format.
-3. **Address**: Enter your postal code and full address.
-4. **Phone Number**: Enter numbers in half-width digits without hyphens.
-5. **Email Address**: Enter a valid email address format.
-6. **Education/Work History**: Enter your educational and work history in a list format. You can add or remove rows using the "Add" or "Delete" buttons. Drag the handle (⋮⋮) at the right end of a row to change the order (touch and keyboard also work: focus the handle, press Space, move with the arrow keys, press Space again). The saved and exported data follow the same order.
-7. **Qualifications/Licenses**: Enter your qualifications and licenses in a list format. You can add or remove rows using the "Add" or "Delete" buttons. Drag the handle (⋮⋮) at the right end of a row to change the order (touch and keyboard also work: focus the handle, press Space, move with the arrow keys, press Space again). The saved and exported data follow the same order.
+1. **Date**: Select the date the résumé is written from the calendar. (required)
+2. **Furigana and Full Name**: Enter your full name and the furigana (in hiragana) is auto-filled to some extent. You can edit it afterwards. (required)
+3. **Date of Birth**: Select a date from the calendar or type it in directly. Your age is shown automatically. (required)
+4. **Sex**: Free text. You can leave it blank.
+5. **Postal Code and Address**: The postal code is 7 digits (a hyphen is allowed). (both required)
+6. **Phone Number and Email Address**: Enter the phone number in half-width digits (e.g. 03-1234-5678) and the email address in a valid format. Both can be left blank.
+7. **Other contact address**: Only if you want to be contacted somewhere other than your current address, open the contact section and enter the address and phone number.
+8. **Education/Work History**: Enter the start and end month (leave the end month blank if you are still there), the company or school, the position or department, and a description, in a list format. Add a row with "+" and remove it with "Delete".
+9. **Qualifications/Licenses**: Enter the month and the name in a list format, and choose whether it was "acquired" or "passed". You can add or remove rows.
 
 ## :sparkles: Features
+
+### Reorder rows
+
+Drag the handle (⋮⋮) at the right end of a row in "Education/Work History" or "Qualifications/Licenses" to move it up or down (mouse and touch).  
+With the keyboard, focus the handle, press Space to pick the row up, move it with the up/down arrow keys and press Space to drop it. Esc cancels.  
+The new order is what gets saved, exported, previewed and written to the PDF.
 
 ### Import/Export
 
@@ -106,7 +114,7 @@ You can export the entered resume information to a JSON file or import a previou
 Open the menu from the hamburger button at the top right and click the "Export" or "Import" button.
 
 When exporting, a JSON file will be downloaded.  
-When importing, select a JSON file from your device and the input screen will be updated immediately.  
+When importing, select a JSON file from your device and the input screen will be updated immediately. Your current input is replaced by the imported content.  
 The imported file is validated first. If it is not valid JSON or its contents have the wrong format, an error message listing the problem fields (up to 5, in Japanese) is shown and your current data is left unchanged.
 
 ### Input Validation
@@ -120,14 +128,14 @@ Required fields (date, furigana, name, birth date, postal code, address) and the
 ### Preview
 
 The content entered on the input screen can be previewed in A4 paper size.  
-Click "Show resume" in the menu to open the preview (enabled once there is input).  
+Click "Show resume" in the menu to open the preview (available once your saved data has been restored, and blocked while the form has errors).  
 You can select either Gothic or Mincho font.
 
 Click "Download Resume PDF" at the bottom of the preview to save as PDF.
 
 ### Auto-save
 
-Everything you type is saved to IndexedDB automatically, including added or removed education/work and license rows.
+Everything you type is saved to IndexedDB in your browser automatically, including added, removed or reordered education/work and license rows. Nothing is sent to a server.
 Reopening the app restores your last input.
 
 ### Dark mode
@@ -136,7 +144,7 @@ Switch between light and dark themes with the "Dark mode" toggle in the menu. Yo
 
 ### Delete input
 
-Click "Delete input" in the menu to clear all saved data (a confirmation dialog is shown first).
+Click "Delete input" in the menu to clear the form and all saved data (a confirmation dialog is shown first). This cannot be undone, so export first if you may need it.
 
 ### WebMCP
 
