@@ -42,7 +42,7 @@ no account, no backend, no privacy risk.
 ## :lock: Security & Privacy
 
 - **Client-side only**: No data transmission to external servers
-- **Local storage**: All data remains in your browser
+- **IndexedDB storage**: All resume data is stored in your browser's IndexedDB (via Dexie) and stays on your device
 - **Privacy-first**: Designed with personal data protection in mind
 - **HTTPS enforced**: The Netlify deployment sends a `Strict-Transport-Security` header (see [public/_headers](public/_headers))
 - **Future enhancement**: Local encryption planned for additional security
@@ -123,7 +123,7 @@ Reopening the app restores your last input.
 
 ### Dark mode
 
-Switch between light and dark themes with the "Dark mode" toggle in the menu. Your choice is remembered on your device.
+Switch between light and dark themes with the "Dark mode" toggle in the menu. Your choice is remembered on your device (in `localStorage`, as it is a single small setting rather than resume data).
 
 ### Delete input
 
@@ -166,10 +166,14 @@ When a new version is available, click "App update" in the menu to apply it.
 
 ## :hammer_and_wrench: Technology Choices
 
-### Why Dexie over localStorage?
-- Larger storage capacity for resume data
-- Better async handling with Promise-based API
-- TypeScript integration for type safety
+### Why IndexedDB (Dexie)?
+Resume data is deliberately stored in IndexedDB, not in `localStorage`, via the [Dexie](https://dexie.org/) wrapper.
+- **Structured data**: The whole resume (including the education/work and license lists) is stored as a JavaScript object, with no manual `JSON.stringify` / `JSON.parse` round trip.
+- **Promise-based API**: Dexie replaces the verbose event-based IndexedDB API with `async` / `await`.
+- **Versioned schema**: Dexie's `version().stores()` declares the schema, so future data-model changes can be migrated safely.
+- **TypeScript integration**: Typed tables (`Table<ResumeRecord, number>`) keep the save/load path type-safe.
+
+The only thing kept in `localStorage` is the light/dark theme preference — a single tiny string that is read synchronously at startup. Resume data never goes there.
 
 ### Why html2pdf.js?
 - Client-side processing (no server required)
