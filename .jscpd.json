@@ -1,0 +1,19 @@
+{
+  "threshold": 0,
+  "reporters": ["html", "console"],
+  "ignore": [
+    "**/__snapshots__/**",
+    "**/node_modules/**",
+    "**/coverage/**",
+    "**/dist/**",
+    "**/graphify-out/**",
+    "**/playwright-report/**",
+    "**/report/**",
+    "**/screenshots/**",
+    "**/test-results/**",
+    "**/z-ai/**"
+  ],
+  "absolute": true,
+  "minLines": 5,
+  "cross-formats": "js-ts"
+}
