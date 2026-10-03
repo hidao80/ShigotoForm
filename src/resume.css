@@ -9,7 +9,6 @@
   --light-border: #dee2e6;
   --light-hover: #f8f9fa;
   --light-required: #dc3545;
-  --light-version: rgba(0, 0, 0, 0.7);
 
   --dark-bg: #1a1a1a;
   --dark-text: #ffffff;
@@ -19,20 +18,18 @@
   --dark-border: #444444;
   --dark-hover: #2d2d2d;
   --dark-required: #ff4444;
-  --dark-version: rgba(255, 255, 255, 0.7);
 }
 
 /* Mix colors based on light/dark mode */
 :root {
   --bg-color: color-mix(in srgb, var(--light-bg) 70%, var(--dark-bg) 30%);
-  --text-color: color-mix(in srgb, var(--light-text) 70%, var(--dark-text) 30%);
+  --text-color: color-mix(in srgb, var(--light-text) 90%, var(--dark-text) 10%);
   --primary-color: color-mix(in srgb, var(--light-primary) 70%, var(--dark-primary) 30%);
   --secondary-color: color-mix(in srgb, var(--light-secondary) 70%, var(--dark-secondary) 30%);
   --accent-color: color-mix(in srgb, var(--light-accent) 70%, var(--dark-accent) 30%);
   --border-color: color-mix(in srgb, var(--light-border) 70%, var(--dark-border) 30%);
   --hover-bg: color-mix(in srgb, var(--light-hover) 70%, var(--dark-hover) 30%);
   --required-color: color-mix(in srgb, var(--light-required) 70%, var(--dark-required) 30%);
-  --version-color: color-mix(in srgb, var(--light-version) 70%, var(--dark-version) 30%);
   --success-color: #28a745;
   --info-color: #0d6efd;
   --warn-color: #ffc107;
@@ -90,8 +87,9 @@ rt {
 }
 
 #version-no {
-  color: var(--version-color);
-  font-weight: 300;
+  /* navbar背景(--bg-color ≒ #bababa)に対し約9:1のコントラストを確保 */
+  color: var(--light-text);
+  font-weight: 400;
 }
 
 .resume-preview.font-gothic {
