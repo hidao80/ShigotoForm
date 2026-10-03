@@ -8,7 +8,7 @@ export function resumeModalHtml(): string {
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="resumeModalLabel">履歴書プレビュー</h5>
+        <h2 class="modal-title fs-5" id="resumeModalLabel">履歴書プレビュー</h2>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
       </div>
       <div class="modal-body d-flex justify-content-center align-items-center">

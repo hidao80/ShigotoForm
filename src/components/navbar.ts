@@ -7,7 +7,7 @@ export function navbarHtml(): string {
 <nav class="navbar navbar-expand-lg px-3 py-2 fixed-top" role="navigation" aria-label="主要ナビゲーション">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">
-      <img src="./img/favicon32.webp" alt="ShigotoForm" width="30" height="30" class="d-inline-block align-text-top me-2">
+      <img src="./img/favicon32.webp" alt="" width="30" height="30" class="d-inline-block align-text-top me-2">
       <ruby>ShigotoForm<rt>シゴトフォーム</rt></ruby><span class="fs-6 d-none d-md-block">&emsp;履歴書メーカー&emsp;</span><span id="version-no" class="fs-6 d-none d-md-block"></span>
     </a>
     <button type="button" class="btn p-0 border-0 bg-transparent shadow-none ms-auto me-3" id="help-modal-btn" aria-label="ヘルプ" aria-haspopup="dialog" aria-controls="helpModal">

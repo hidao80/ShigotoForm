@@ -6,7 +6,7 @@ export function offcanvasMenuHtml(): string {
   return `
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel" role="navigation" aria-label="アプリメニュー">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">メニュー</h5>
+    <h2 class="offcanvas-title fs-5" id="offcanvasNavbarLabel">メニュー</h2>
     <button type="button" class="btn p-0 border-0 bg-transparent shadow-none ms-auto me-3" id="help-modal-in-menu-btn" aria-label="ヘルプ" aria-haspopup="dialog" aria-controls="helpModal">
       <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
     </button>
