@@ -2,20 +2,24 @@
 
 > クライアントサイド完結のPWA。日本形式の履歴書をブラウザ内で作成する。バックエンド・ネットワーク通信は一切なし。入力データはIndexedDB（Dexie）にのみ保存され、外部へ送信されない。
 
-ShigotoFormはフォーム入力・A4レイアウトプレビュー・高解像度PDF出力を提供する。アカウント登録不要、サーバー不要。JSONエクスポート/インポートによるバックアップ・復元にも対応する。技術スタックはVite + TypeScript + Bootstrap 5、PWA対応（Service Worker）、html2pdf.jsによるPDF生成。
+ShigotoFormはフォーム入力・A4レイアウトプレビュー・高解像度PDF出力を提供する。アカウント登録不要、サーバー不要。入力内容の自動保存、JSONエクスポート/インポートによるバックアップ・復元、ダークモード、ゴシック体/明朝体の選択にも対応する。技術スタックはVite + TypeScript + Bootstrap 5、PWA対応（Service Worker）、html2pdf.jsによるPDF生成。テストはVitest（unit: jsdom / E2E: Browser Mode + Playwright Chromium）、パッケージ管理はBun、Lint/FormatはBiome。
 
 ## Docs
 
 - [README](https://github.com/hidao80/ShigotoForm/blob/main/README.md): プロジェクト概要、セットアップ手順、機能一覧、技術選定理由
 - [AGENTS](https://github.com/hidao80/ShigotoForm/blob/main/AGENTS.md): アーキテクチャ、コーディング規約、開発コマンド一覧
 - [ADR](https://github.com/hidao80/ShigotoForm/blob/main/docs/ADR.md): アーキテクチャ決定記録
+- [DESIGN](https://github.com/hidao80/ShigotoForm/blob/main/docs/DESIGN.md): ランディングページ（docs/index.html）のデザイン仕様
 
 ## Source
 
-- [main.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/main.ts): エントリーポイント。HTML注入・イベント配線・PWA Service Worker登録
-- [resume.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/resume.ts): フォームDOM読み書き、履歴書HTML生成、動的行追加・削除
-- [db.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/db.ts): Dexie（IndexedDB）ラッパー
+- [main.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/main.ts): エントリーポイント。アプリシェルをHTML注入し、各featureのsetup*()を順に呼ぶ
+- [resume.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/resume.ts): フォームDOM読み書き（saveFromForm / loadToForm）、動的行の追加・削除リスナー
+- [db.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/db.ts): Dexie（IndexedDB）ラッパー、保存用型ResumeJson
 - [models/Resume.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/models/Resume.ts): 内部データ型定義（Career / License / Resume）
+- [theme.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/theme.ts): ダーク/ライトテーマ切替（localStorageに保持）
+- [features/](https://github.com/hidao80/ShigotoForm/tree/main/src/features): 振る舞いモジュール群。resume-json（Resume↔ResumeJson変換）、auto-save、backup（JSON入出力）、preview-modal、pdf-download、delete-content、age-display、help、accordion、pwa-update、lazy-assets
+- [components/](https://github.com/hidao80/ShigotoForm/tree/main/src/components): ビューコンポーネント群。app-shell、resume-form、resume-preview（A4履歴書HTML生成）、career-row、license-row、各種モーダル、escape-html、toast
 
 ## Optional
 
