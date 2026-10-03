@@ -24,6 +24,8 @@ ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミット
 | 016 | LP の CSS を外部ファイル（main.css + main.min.css）へ分離 | Accepted |
 | 017 | AI エージェント向けインターフェース（WebMCP 宣言的アノテーション + llms.txt） | Accepted |
 | 018 | Netlify 配信前提の HTTP ヘッダー定義（`public/_headers`、HSTS） | Accepted |
+| 019 | インポート JSON の検証に Zod を導入 | Accepted |
+| 020 | フォーム入力の検証に Zod を適用（随時表示 + プレビュー時ブロック） | Accepted |
 
 ---
 
@@ -419,6 +421,65 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 - `_headers` は Netlify（互換ホスティング）固有の形式であり、Docker/nginx 配信（ADR-005）には適用されない。両経路でヘッダー設定が非対称になる。nginx 側への HSTS 追加は未実施。
 - `includeSubDomains` を含むため、ドメインのサブドメインが HTTP のみで運用される場合に影響する（Speculative: 現行運用でのサブドメイン利用有無は未確認）。
 - CSP などその他のセキュリティヘッダーは未設定（`_headers` は 2 行のみ）。
+
+---
+
+## ADR-019: インポート JSON の検証に Zod を導入
+
+- **Status**: Accepted
+- **Date**: 2026-10-03（`20531e2` 依存追加、`09896e0` 実装、`ed615b5` テスト）
+
+### Context
+
+- インポート処理（`features/backup.ts`）は `JSON.parse` の結果を検証なしで `jsonToFormResume()` に渡し、そのまま `saveResume()` で IndexedDB に保存していた。JSON 構文エラーは未捕捉で、型が壊れたデータも保存され得た。
+- 受け入れる入力は現行エクスポート形式に加え、旧フラット形式（`career` / `license` が直下、`startDate` / `endDate`、`resume` 欠落）や他ツール出力（`ResumeJson` のコメント記載）。
+- Speculative: 動機はユーザー要望（Zod によるバリデーション対応）。破損ファイルによる保存データ汚染の防止が狙いと推測される。
+
+### Decision
+
+- 依存に `zod`（4.x）を追加し、`src/models/resume-schema.ts` にスキーマと `parseResumeJson()` を配置。
+- スキーマは型の検証に限定し（日付・郵便番号等の書式は検証しない）、旧形式を受理して `ResumeJson` へ正規化する（欠落文字列は `''`、`pass` は `'合格'`、`startDate` / `endDate` は `start` / `end` へ、直下の `career` / `license` は `resume` 配下へ）。未知のキーは `z.looseObject` で保持。
+- 失敗時は全問題を `errors: string[]`（`パス: 理由`）で返す。日本語化は `safeParse` ごとに `zod/locales` の `ja` を渡す方式とし、グローバルな `z.config()` は使わない（モジュール先頭の副作用を避ける規約に合わせる）。
+- `backup.ts` は JSON 構文エラーと検証エラーをトースト（`error`）で通知し、フォームと IndexedDB を変更せず中断する。検証エラーは最大 5 件を箇条書きし、超過分は「…他N件」に集約。複数行表示のため `.sf-toast` に `white-space: pre-line` を追加。
+- テスト: unit（`tests/unit/models/resume-schema.test.ts`）と E2E（`tests/e2e/app.test.ts` のインポート検証）を追加。
+
+### Consequences
+
+- 外部通信は追加せず、ADR-001 を維持。ランタイム依存が 1 つ増え、バンドルサイズが増加する（未計測）。
+- 型は `db.ts` / `models/Resume.ts` の手書き interface のままで、スキーマから導出していない。`ResumeJson` / `Career` / `License` の変更時はスキーマも更新が必要（二重管理）。
+- 検証対象はインポート経路のみ。IndexedDB 読み出し（`loadResume`）には適用していない。フォーム入力の検証は別スキーマで ADR-020 が扱う。
+- 書式（日付・郵便番号等）は未検証のため、型が正しければ内容が不正でも受理される。
+- 旧形式を保存前に正規化するため、インポート後の保存形式は旧形式のままではなく `resume` 配下の形になる。
+
+---
+
+## ADR-020: フォーム入力の検証に Zod を適用（随時表示 + プレビュー時ブロック）
+
+- **Status**: Accepted
+- **Date**: 2026-10-03（コミット前。ハッシュは未確定）
+
+### Context
+
+- 入力欄には HTML の `required` / `pattern` が付いているが、`<form>` に submit 処理がなく `checkValidity()` も呼ばれないため強制されない。必須項目が空でもプレビュー・エクスポート・PDF が通り、`pattern` 違反の見た目のフィードバックもなかった（コードと既存 E2E で確認）。
+- Speculative: 動機はユーザー要望（Zod の採用、随時表示、プレビュー時の警告とブロック）。
+
+### Decision
+
+- `src/models/resume-form-schema.ts` に欄ごとの Zod 規則を定義（必須: 年月日・ふりがな・氏名・生年月日・郵便番号・住所。書式のみ: 電話番号 1・2、メール 1。それ以外と職歴・資格行は検証しない）。インポート用の寛容なスキーマ（ADR-019）とは別にした。メッセージは欄ごとの日本語（`ja` ロケールは正規表現を表示するため使わない）。
+- 正規表現のソースは `FIELD_PATTERNS` に一本化し、`components/resume-form.ts` の `pattern` 属性が同じ定数を埋め込む。Zod 側は `^(?:…)$` で全体一致にする。E2E の `patternMismatch` と unit の Zod 検証が同じ表（`tests/field-cases.ts`）を使い、乖離を CI で検出する。
+- `features/form-validation.ts` で表示を担当。
+  - `<form>` への委譲リスナー 1 つで、離脱・確定時に検証する。エラー表示中の欄だけ入力ごとに再検証する（IME 変換中を除く）。
+  - 表示が変わるときだけ DOM を更新する（Bootstrap の `is-invalid` / `.invalid-feedback`、`aria-invalid`、`aria-describedby`）。
+  - 復元・インポート・削除後は `refreshFormValidation()` で追従する。
+- 「履歴書を表示」は `validateFormWithWarning()` でエラーがあれば警告トースト（`warn`）を出してブロックし、最初の不正欄へフォーカスする（メニュー offcanvas を閉じ、折りたたみ内なら展開してから）。PDF 出力はこのモーダルからのみ到達できる。エクスポートは警告のみで続行する（入力途中のバックアップを可能にするため。ユーザー判断）。自動保存は検証でブロックしない。
+- `formatToastList()` を `toast.ts` に追加し、インポートエラーと共用。
+
+### Consequences
+
+- HTML 属性（`required` / `pattern`）と Zod の `required` 規則が二重管理になる。`pattern` は定数共有で乖離を防ぐが、`required` の対応は欄の追加時に手動で揃える（検証欄は `resumeFormFieldSchemas` と `FIELD_IDS` の 2 箇所）。
+- 日付の妥当性（未来日・生年月日と作成日の前後など）、職歴・資格行の必須項目（日付だけ入力で名称が空など）は検証していない。未決定。
+- バックアップ（エクスポート）はエラー付きのまま出力され得る。不正データは後でインポート時にも ADR-019 の寛容なスキーマで通る。
+- ランタイムのバンドルサイズ・描画への影響は未計測。リスナーは 1 つで、検証は 1 欄分の短い文字列への正規表現のみ。
 
 ---
 

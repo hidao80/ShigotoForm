@@ -32,6 +32,7 @@ src/
 │   ├── resume-json.ts                           # jsonToFormResume() / formResumeToJson()
 │   ├── auto-save.ts, age-display.ts             # Auto-save (change/input + MutationObserver), age calculation
 │   ├── backup.ts, delete-content.ts             # JSON export/import, delete-with-confirm
+│   ├── form-validation.ts                       # Live field validation display + validateFormWithWarning() gate (Zod)
 │   ├── preview-modal.ts, pdf-download.ts        # Résumé preview modal, PDF output (html2pdf)
 │   ├── help.ts, accordion.ts                    # Help modal buttons, accordion initial state
 │   ├── pwa-update.ts                            # Service Worker registration / manual update link
@@ -44,10 +45,12 @@ src/
 │   ├── career-row.ts, license-row.ts            # createCareerRow() / createLicenseRow()
 │   ├── resume-preview.ts                        # generateResumeHtml() (A4 résumé preview)
 │   ├── escape-html.ts                           # escapeHtml() — use for any value interpolated into HTML
-│   └── toast.ts                                 # showToast()
+│   └── toast.ts                                 # showToast() / formatToastList()
 ├── db.ts            # Dexie IndexedDB wrapper (saveResume / loadResume / clearResume)
 ├── theme.ts         # Dark/light theme toggle (persisted in localStorage)
 ├── models/Resume.ts # Internal types: Career / License / Resume / createEmptyResume()
+├── models/resume-schema.ts # Zod schema + parseResumeJson() — validates/normalizes imported JSON (Japanese error messages)
+├── models/resume-form-schema.ts # Zod per-field rules for the form (required / pattern), FIELD_PATTERNS shared with the HTML `pattern` attrs
 └── types/           # Type stubs: html2pdf.d.ts, bootstrap-events.d.ts, etc.
 ```
 
@@ -64,6 +67,26 @@ src/
 - `formResumeToJson(form)` → `ResumeJson` (save/export path)
 
 Backwards-compatible: `jsonToFormResume()` also accepts the legacy flat format (`json.career`).
+
+### Import Validation (Zod)
+
+Untrusted JSON (the import button in `features/backup.ts`) must go through `parseResumeJson()` in `models/resume-schema.ts` **before** `jsonToFormResume()` / `saveResume()`:
+- Returns `{ success: true, data: ResumeJson }` (normalized) or `{ success: false, errors: string[] }` (every issue as `path: message`, in Japanese via `zod/locales` `ja` passed per `safeParse` call — no global `z.config()`)
+- Normalizes legacy input: flat `career` / `license`, missing `resume`, `startDate` / `endDate` → `start` / `end`, missing strings → `''`, missing `pass` → `'合格'`
+- Validates types only (no date/zip format checks) and keeps unknown keys (`z.looseObject`)
+- On failure `backup.ts` shows up to 5 issues in an error toast and leaves the form and IndexedDB untouched
+- When `ResumeJson` / `Career` / `License` change, update the schema too (types in `db.ts` / `models/Resume.ts` are not derived from it)
+
+### Form Validation (Zod)
+
+Input fields are validated by `models/resume-form-schema.ts` (`validateField()` / `validateResumeForm()`), displayed by `features/form-validation.ts`. This is separate from (and stricter than) the lenient import schema above:
+- Rules mirror the HTML attributes: required = `createdAt` / `fullnameKana` / `fullname` / `birthday` / `zipCode` / `address1`; pattern-only (empty allowed) = `tel1` / `tel2` / `mail1`. Optional fields (sex, address2, career/license rows) are not validated
+- Regex sources live in `FIELD_PATTERNS` and are interpolated into the `pattern` attributes in `components/resume-form.ts` — change them there only. Zod wraps them as `^(?:…)$` to match the browser's implicit full match. Messages are custom Japanese (not the `ja` locale, which would print the regex)
+- To add a validated field: add it to `resumeFormFieldSchemas` (key order = on-screen order) **and** `FIELD_IDS` in `form-validation.ts`; add cases to `tests/field-cases.ts` (shared by the E2E `pattern` test and the unit schema test so HTML and Zod rules cannot drift)
+- Live display: a single delegated listener on `<form>` (no per-field / per-row registration). Validate on `focusout` / `change`; a field already showing an error is re-checked on every `input` (skipped during IME composition) so it clears immediately. Valid fields are not flagged mid-typing. Untouched empty required fields show nothing on load
+- DOM writes happen only when the display state changes (`is-invalid`, `aria-invalid`, `aria-describedby`, Bootstrap `.invalid-feedback`; no custom colors)
+- Programmatic writes fire no events: call `refreshFormValidation()` after `loadToForm()` (init, import, delete). vanilla-autokana's furigana fill is handled by re-checking furigana on name input
+- Gate: `validateFormWithWarning({ header, focus })` validates the current DOM form (`saveFromForm()`), marks every field, shows a `warn` toast. `#show-resume` blocks on errors (focus moves to the first invalid field after closing the offcanvas menu / expanding the accordion; PDF output is only reachable through that modal). Export only warns and still proceeds so half-filled résumés can be backed up. Auto-save is never gated (it keeps saving invalid drafts)
 
 ### Auto-save
 

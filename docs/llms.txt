@@ -17,8 +17,10 @@ ShigotoFormはフォーム入力・A4レイアウトプレビュー・高解像�
 - [resume.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/resume.ts): フォームDOM読み書き（saveFromForm / loadToForm）、動的行の追加・削除リスナー
 - [db.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/db.ts): Dexie（IndexedDB）ラッパー、保存用型ResumeJson
 - [models/Resume.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/models/Resume.ts): 内部データ型定義（Career / License / Resume）
+- [models/resume-schema.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/models/resume-schema.ts): Zodスキーマとparse関数。インポートJSONの検証・旧形式の正規化（日本語エラーメッセージ）
+- [models/resume-form-schema.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/models/resume-form-schema.ts): 入力欄ごとのZod検証規則（必須・書式）。HTMLのpattern属性と正規表現を共有
 - [theme.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/theme.ts): ダーク/ライトテーマ切替（localStorageに保持）
-- [features/](https://github.com/hidao80/ShigotoForm/tree/main/src/features): 振る舞いモジュール群。resume-json（Resume↔ResumeJson変換）、auto-save、backup（JSON入出力）、preview-modal、pdf-download、delete-content、age-display、help、accordion、pwa-update、lazy-assets
+- [features/](https://github.com/hidao80/ShigotoForm/tree/main/src/features): 振る舞いモジュール群。resume-json（Resume↔ResumeJson変換）、auto-save、backup（JSON入出力。インポート時はZodで検証）、form-validation（入力中の検証表示と、プレビュー表示前の警告・ブロック）、preview-modal、pdf-download、delete-content、age-display、help、accordion、pwa-update、lazy-assets
 - [components/](https://github.com/hidao80/ShigotoForm/tree/main/src/components): ビューコンポーネント群。app-shell、resume-form、resume-preview（A4履歴書HTML生成）、career-row、license-row、各種モーダル、escape-html、toast
 
 ## Optional
