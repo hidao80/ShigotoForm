@@ -176,24 +176,6 @@ describe('モーダル', () => {
     );
   });
 
-  test('PDF ダウンロードは Web フォントの読み込み完了を待ってから始める（代替フォントで撮らない）', async () => {
-    let finish: () => void = () => {};
-    const load = vi.fn(() => new Promise<void>((resolve) => (finish = resolve)));
-    Object.defineProperty(document, 'fonts', { configurable: true, value: { load } });
-    try {
-      render(<ResumeModal show onHide={vi.fn()} data={fromResume(sample())} />);
-      // 表示と同時に、表示する文字列でフォントの読み込みを始める
-      await waitFor(() => expect(load).toHaveBeenCalledWith('400 1em "Noto Sans JP"', expect.stringContaining('山田')));
-      fireEvent.click(document.getElementById('download-resume-html') as HTMLElement);
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      expect(downloadResumePdf).not.toHaveBeenCalled();
-      finish();
-      await waitFor(() => expect(downloadResumePdf).toHaveBeenCalledOnce());
-    } finally {
-      Reflect.deleteProperty(document, 'fonts');
-    }
-  });
-
   test('開いているモーダル・メニューの id は重複しない', () => {
     render(
       <>

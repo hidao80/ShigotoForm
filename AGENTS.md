@@ -117,8 +117,6 @@ The offcanvas menu restores focus to its toggler when it closes. When it is clos
 - Noto fonts: `requestIdleCallback` after the first render (`scheduleLazyAssets()` in `<App />`)
 - Font Awesome: also in the idle callback, and earlier on help button `onPointerOver` / `onFocus` or offcanvas `onShow`
 - After loading, `fonts-loaded` / `icons-loaded` classes are added to `<html>`
-- Every web font that is actually requested uses `font-display: swap`: `@fontsource/noto-*` already do (124 unicode-range subsets each), and Font Awesome's `block` rule for the one face in use (`fa-regular`) is overridden in `icons-font.css`. Do not add another face (e.g. `fa-solid`) without overriding it the same way
-- Swap means the preview shows immediately in a fallback font and is replaced when the font file arrives. The PDF must not be captured in the fallback: `waitForPreviewFonts()` (`features/lazy-assets.ts`) waits (up to 5 s, then continues) for `document.fonts.load()` with the text actually shown, so only the needed subsets are fetched. `<ResumeModal />` starts it when it opens and awaits it before `downloadResumePdf()`
 
 ## Coding Conventions
 

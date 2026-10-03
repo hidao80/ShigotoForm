@@ -13,32 +13,6 @@ export const lazyLoadNotoFonts = (() => {
   };
 })();
 
-/**
- * 履歴書プレビューが使う Web フォントの実ファイルが読み込まれるまで待ちます。
- * フォントは font-display: swap のため、プレビューは待たずに代替フォントで先に表示され、読み込みが終わると差し替わる。
- * PDF 化（canvas への描画）は差し替わる前の代替フォントで撮らないよう、この関数で完了を待つ。
- * Noto は unicode-range で分割されているため、実際に表示する文字列を渡して必要な分だけ読み込む。
- * @param {'gothic' | 'mincho'} fontType - プレビューの書体
- * @param {string} text - プレビューに表示している文字列
- * @param {number} [timeoutMs=5000] - 待つ上限。超えたら待たずに続行する（オフライン等で永久に待たないため）
- * @returns {Promise<void>}
- * @throws なし
- * @example
- * await waitForPreviewFonts('mincho', previewEl.textContent ?? '');
- */
-export async function waitForPreviewFonts(fontType: 'gothic' | 'mincho', text: string, timeoutMs = 5000) {
-  await lazyLoadNotoFonts();
-  const family = fontType === 'mincho' ? 'Noto Serif JP' : 'Noto Sans JP';
-  const loading = document.fonts?.load(`400 1em "${family}"`, text).catch(() => {});
-  if (!loading) return;
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  const timeout = new Promise<void>((resolve) => {
-    timer = setTimeout(resolve, timeoutMs);
-  });
-  await Promise.race([loading, timeout]);
-  clearTimeout(timer);
-}
-
 // Font Awesome（アイコン）の遅延読み込み
 export const lazyLoadIcons = (() => {
   let loaded = false;

@@ -1,17 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { waitForPreviewFonts } from '../features/lazy-assets.ts';
 import { downloadResumePdf } from '../features/pdf-download.ts';
 import type { FormState } from '../models/resume-state.ts';
 import { type ResumeFontType, ResumePreview } from './resume-preview.tsx';
-
-/** プレビューに表示する文字列（フォントの必要な文字を先読みするため） */
-const previewText = (data: FormState) =>
-  [
-    ...Object.values(data).filter((v): v is string => typeof v === 'string'),
-    ...data.career.flatMap((c) => [c.start, c.end, c.name, c.position, c.description]),
-    ...data.license.flatMap((l) => [l.date, l.name, l.pass]),
-  ].join('');
 
 interface ResumeModalProps {
   show: boolean;
@@ -26,17 +17,9 @@ export function ResumeModal({ show, onHide, data }: ResumeModalProps) {
   const [fontType, setFontType] = useState<ResumeFontType>('gothic');
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // 表示と同時に Web フォントの読み込みを始める（表示は swap で先に出るので待たせない）。ダウンロード時には通常すでに完了している
-  useEffect(() => {
-    if (show) waitForPreviewFonts(fontType, previewText(data));
-  }, [show, fontType, data]);
-
   const onDownload = async () => {
     const preview = contentRef.current?.querySelector<HTMLElement>('.resume-preview');
-    if (!preview) return;
-    // 表示は swap で先に出ているが、PDF は代替フォントで撮らないよう、Web フォントの読み込み完了を待つ
-    await waitForPreviewFonts(fontType, preview.textContent ?? '');
-    await downloadResumePdf(preview, data);
+    if (preview) await downloadResumePdf(preview, data);
   };
 
   return (
