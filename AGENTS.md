@@ -13,9 +13,11 @@ bun install           # Install dependencies
 bun dev               # HTTPS dev server (https://localhost:5173)
 bun run build         # tsc type-check → Vite build → dist/
 bun run preview       # Serve built dist/ locally
-bun run lint          # Biome check + tsc --noEmit (src/)
+bun run lint          # Biome check + tsc --noEmit (src/, tests/)
 bun run format        # Biome auto-format
-bun test              # E2E tests (bun:test + Bun.WebView; requires Bun >=1.4 and Chrome/Edge)
+bun run test          # Vitest: unit (jsdom) + E2E (Browser Mode, Chromium via Playwright)
+bun run test:unit     # tests/unit only
+bun run test:e2e      # tests/e2e only (first run: bunx playwright install chromium)
 bun run screenshot    # Capture screenshots across all viewports
 ```
 
@@ -25,8 +27,24 @@ Type-check only: `bunx tsc --noEmit`
 
 ```
 src/
-├── main.ts          # Entry point. Injects full HTML into #app, wires events, registers PWA SW
-├── resume.ts        # DOM form read/write, résumé HTML generation, dynamic row add/delete
+├── main.ts          # Entry point. Renders the app shell into #app and calls each feature's setup*() in order
+├── features/        # Behavior modules (event wiring / logic), one per concern; each exposes setup*()
+│   ├── resume-json.ts                           # jsonToFormResume() / formResumeToJson()
+│   ├── auto-save.ts, age-display.ts             # Auto-save (change/input + MutationObserver), age calculation
+│   ├── backup.ts, delete-content.ts             # JSON export/import, delete-with-confirm
+│   ├── preview-modal.ts, pdf-download.ts        # Résumé preview modal, PDF output (html2pdf)
+│   ├── help.ts, accordion.ts                    # Help modal buttons, accordion initial state
+│   ├── pwa-update.ts                            # Service Worker registration / manual update link
+│   └── lazy-assets.ts                           # Noto fonts / Font Awesome lazy loading
+├── resume.ts        # DOM form read/write (saveFromForm / loadToForm), dynamic row add/delete listeners
+├── components/      # View components (HTML-returning functions / DOM factories), one per file
+│   ├── app-shell.ts                             # appShellHtml() — composes the static components below
+│   ├── help-modal.ts, navbar.ts, offcanvas-menu.ts, resume-form.ts,
+│   │   confirm-delete-modal.ts, resume-modal.ts   # Static markup (`*Html()`)
+│   ├── career-row.ts, license-row.ts            # createCareerRow() / createLicenseRow()
+│   ├── resume-preview.ts                        # generateResumeHtml() (A4 résumé preview)
+│   ├── escape-html.ts                           # escapeHtml() — use for any value interpolated into HTML
+│   └── toast.ts                                 # showToast()
 ├── db.ts            # Dexie IndexedDB wrapper (saveResume / loadResume / clearResume)
 ├── theme.ts         # Dark/light theme toggle (persisted in localStorage)
 ├── models/Resume.ts # Internal types: Career / License / Resume / createEmptyResume()
@@ -41,7 +59,7 @@ src/
 | Used for | DOM binding | IndexedDB storage / JSON export |
 | career location | `resume.career[]` (flat) | `resume.resume.career[]` (nested) |
 
-**Conversion is handled exclusively in `main.ts`:**
+**Conversion is handled exclusively in `features/resume-json.ts`:**
 - `jsonToFormResume(json)` → `Resume` (load/import path)
 - `formResumeToJson(form)` → `ResumeJson` (save/export path)
 
@@ -79,7 +97,8 @@ Backwards-compatible: `jsonToFormResume()` also accepts the legacy flat format (
 
 ### DOM Manipulation
 
-- Dynamic rows (career/license) must be created via `createCareerRow()` / `createLicenseRow()`
+- Dynamic rows (career/license) must be created via `createCareerRow()` / `createLicenseRow()` (`components/`)
+- Escape every user value interpolated into HTML strings with `escapeHtml()`
 - After adding a row, always call `attachCareerRowListeners()` / `attachLicenseRowListeners()`
 - `MutationObserver` auto-attaches listeners — avoid duplicate manual registration
 
