@@ -48,7 +48,7 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
   const initialAccordion = useRef(true);
   if (contactOpen) initialAccordion.current = false;
 
-  useAutoKana(FIELD_IDS.fullname, state.fullnameKana, (value) => setField('fullnameKana', value));
+  useAutoKana(FIELD_IDS.fullname, FIELD_IDS.fullnameKana, (value) => setField('fullnameKana', value));
 
   // React の onChange は input イベントに対応するため、値の確定（change）は form への委譲リスナーで検証する
   useEffect(() => {

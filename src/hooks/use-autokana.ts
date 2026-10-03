@@ -1,48 +1,36 @@
+import { bind } from '@j1nn0/vanilla-autokana';
 import { useEffect, useRef } from 'react';
-import * as AutoKana from 'vanilla-autokana';
-
-const PROXY_ID = 'sf-autokana-proxy';
 
 /**
- * 氏名入力欄から、ふりがなを自動入力します（vanilla-autokana）。
- * vanilla-autokana はタイマーで氏名を監視し、ふりがな欄の `value` へ直接書き込む（イベントを発火しない）。
- * 制御コンポーネントの入力欄は DOM への直接書き込みを state に反映できないため、`value` を横取りする
- * 非表示の input をふりがな欄の代わりに渡し、書き込みを state の更新（onChange）へ変換する。
- * （配布版の vanilla-autokana は要素ではなく id 文字列でしか受け付けないため、proxy も DOM に置く）
+ * 氏名入力欄から、ふりがなを自動入力します（@j1nn0/vanilla-autokana）。
+ * ライブラリは氏名欄の入力・IME（composition）イベントを購読し、ふりがなが変わるたびに `onChange` を呼ぶ
+ * （タイマーによる監視はしない）。フォーカス時には、ふりがな欄の現在値を起点にして続きから入力する。
+ * 制御コンポーネントのふりがな欄へはライブラリが `value` を直接書き込むが、React は `onChange` の
+ * コールバック経由の state 更新で値を持つため、書き込みの結果は state と一致する。
  * @param {string} nameId - 氏名の入力欄の id
- * @param {string} kana - 現在のふりがな（state）
+ * @param {string} kanaId - ふりがなの入力欄の id
  * @param {(value: string) => void} onChange - ふりがなの更新
  * @returns {void}
  * @throws なし
  */
-export function useAutoKana(nameId: string, kana: string, onChange: (value: string) => void) {
-  const kanaRef = useRef(kana);
+export function useAutoKana(nameId: string, kanaId: string, onChange: (value: string) => void) {
   const onChangeRef = useRef(onChange);
   useEffect(() => {
-    kanaRef.current = kana;
     onChangeRef.current = onChange;
   });
 
   useEffect(() => {
-    const proxy = document.createElement('input');
-    proxy.id = PROXY_ID;
-    proxy.type = 'hidden';
-    Object.defineProperty(proxy, 'value', {
-      configurable: true,
-      get: () => kanaRef.current,
-      set: (value: string) => {
-        // 氏名が空のときも 30ms ごとに同じ値が書き込まれるため、変化したときだけ state を更新する
-        if (value === kanaRef.current) return;
-        kanaRef.current = value;
-        onChangeRef.current(value);
+    const nameEl = document.getElementById(nameId);
+    const kanaEl = document.getElementById(kanaId);
+    if (!(nameEl instanceof HTMLInputElement) || !(kanaEl instanceof HTMLInputElement)) return;
+    const autoKana = bind(nameEl, kanaEl, {
+      onChange: (value) => {
+        // ブラウザの自動入力やプログラムによる氏名の書き換え（フォーカスのない input イベント）では、
+        // ユーザーが入力したふりがなを上書きしない。氏名欄を編集している間だけ反映する
+        if (document.activeElement === nameEl) onChangeRef.current(value);
       },
     });
-    document.body.append(proxy);
-    const autoKana = AutoKana.bind(`#${nameId}`, `#${PROXY_ID}`);
-    return () => {
-      // バインド解除の API は無いため、停止して書き込みを無効化する（StrictMode の再実行でも二重に書き込まない）
-      autoKana.stop();
-      proxy.remove();
-    };
-  }, [nameId]);
+    // StrictMode の再実行でもリスナーが二重にならないよう、必ず解除する
+    return () => autoKana.destroy();
+  }, [nameId, kanaId]);
 }
