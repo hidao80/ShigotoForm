@@ -91,6 +91,19 @@ describe('ふりがなの自動入力（@j1nn0/vanilla-autokana）', () => {
     blurName();
   });
 
+  test('漢字の氏名がまとめて入力されても（貼り付け・キーボードの候補）、入力済みのふりがなを上書きしない', async () => {
+    fill('name-input', '');
+    fill('furigana-input', 'やまだ たろう');
+    focusName();
+    setNativeValue(name(), '山田 太郎');
+    await sleep(100);
+    expect(kana().value).toBe('やまだ たろう');
+    // ライブラリは再同期され、その後のキー入力は続きから反映される
+    setNativeValue(name(), '山田 太郎う');
+    await vi.waitFor(() => expect(kana().value).toBe('やまだ たろうう'));
+    blurName();
+  });
+
   test('すでにある氏名・ふりがなの続きとして入力する', async () => {
     fill('name-input', '佐藤');
     fill('furigana-input', 'さとう');
