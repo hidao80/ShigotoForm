@@ -1,9 +1,11 @@
 import { defineConfig } from 'vite';
 import basicSsl from '@vitejs/plugin-basic-ssl';
+import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ command }) => ({
   plugins: [
+    react(),
     ...(command === 'serve' ? [basicSsl()] : []),
     VitePWA({
       // workbox-window を使うため自動登録は行わない
