@@ -4,6 +4,15 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    // `bun run coverage` で出力する。unit（jsdom）と E2E（Chromium）の両方の実行結果を合算する
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{ts,tsx}'],
+      // 型定義のみ（実行されない）は対象外
+      exclude: ['src/**/*.d.ts'],
+      reporter: ['text', 'html', 'lcov'],
+      reportsDirectory: 'coverage',
+    },
     projects: [
       {
         // インライン project はルートの plugins を継承しないため、各 project に React plugin を指定する

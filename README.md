@@ -83,6 +83,7 @@ bun run format        # Biome auto-format
 bun run test          # Vitest: unit (jsdom) + E2E (Chromium via Playwright)
 bun run test:unit     # Unit tests only
 bun run test:e2e      # E2E tests only (first run: bunx playwright install chromium)
+bun run coverage      # All tests with a V8 coverage report (text, coverage/index.html, coverage/lcov.info)
 bun run screenshot    # Capture screenshots across all viewports
 ```
 
