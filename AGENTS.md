@@ -13,7 +13,7 @@ bun install           # Install dependencies
 bun dev               # HTTPS dev server (https://localhost:5173)
 bun run build         # tsc type-check → Vite build → dist/
 bun run preview       # Serve built dist/ locally
-bun run lint          # Biome check + tsc --noEmit (src/, tests/)
+bun run lint          # Biome check (src/, tests/, vitest.config.ts) + tsc --noEmit
 bun run format        # Biome auto-format
 bun run test          # Vitest: unit (jsdom) + E2E (Browser Mode, Chromium via Playwright)
 bun run test:unit     # tests/unit only
@@ -95,11 +95,11 @@ Input fields are validated by `models/resume-form-schema.ts` (`validateField()` 
 
 ### Furigana auto-fill (@j1nn0/vanilla-autokana)
 
-`hooks/use-autokana.ts` binds [@j1nn0/vanilla-autokana](https://github.com/j1nn0/vanilla-autokana) (the maintained fork of the unmaintained `vanilla-autokana`, last release 2021) to the name and furigana inputs. It is event-driven (input / IME `compositionstart` / `compositionend`, no timers), reports changes through `onChange` (→ `setField('fullnameKana', …)`), supports `destroy()` (called in the effect cleanup, so StrictMode re-runs do not double-bind), and has its own types. Notes:
+`hooks/use-autokana.ts` binds [@j1nn0/vanilla-autokana](https://github.com/j1nn0/vanilla-autokana) (the maintained fork of `vanilla-autokana`) to the name and furigana inputs. It is event-driven (input / IME `compositionstart` / `compositionend`, no timers), reports changes through `onChange` (→ `setField('fullnameKana', …)`), supports `destroy()` (called in the effect cleanup, so StrictMode re-runs do not double-bind), and has its own types. Notes:
 - The library also writes `furigana.value` directly; this is consistent with React because the same value arrives through `onChange`. Never read the furigana from the library — the form state is the source of truth
 - It reacts to *any* `input` event on the name field, including browser autofill and programmatic changes, so the hook only forwards changes while the name field is focused (otherwise it would overwrite furigana the user typed)
 - At focus it continues from the existing furigana only when the name field is **not empty**; with an empty name, typing starts the furigana over
-- Single-maintainer package with very low adoption (about 20 weekly downloads when adopted): review its changelog / diff before bumping the version
+- Single-maintainer package with very low adoption: review its changelog / diff before bumping the version
 
 ### Menu focus
 
