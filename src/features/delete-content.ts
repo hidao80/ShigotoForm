@@ -4,6 +4,7 @@ import { showToast } from '../components/toast.ts';
 import { clearResume } from '../db.ts';
 import { createEmptyResume } from '../models/Resume';
 import { loadToForm } from '../resume.ts';
+import { refreshFormValidation } from './form-validation.ts';
 
 /**
  * 入力内容の削除（確認モーダル経由）のイベントリスナーを追加します。
@@ -22,6 +23,7 @@ export function setupDeleteContent() {
   document.querySelector('#confirm-delete')?.addEventListener('click', async () => {
     await clearResume();
     loadToForm(createEmptyResume());
+    refreshFormValidation();
     const ageDisplay = document.querySelector('#age-display');
     if (ageDisplay) ageDisplay.textContent = ' ';
     const modalEl = document.getElementById('confirmDeleteModal');

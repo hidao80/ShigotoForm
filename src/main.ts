@@ -19,6 +19,7 @@ import { setupAgeDisplay } from './features/age-display.ts';
 import { setupAutoSave } from './features/auto-save.ts';
 import { setupBackup } from './features/backup.ts';
 import { setupDeleteContent } from './features/delete-content.ts';
+import { setupFormValidation } from './features/form-validation.ts';
 import { setupHelpButtons } from './features/help.ts';
 import { preloadIconsOnFirstInteraction, scheduleLazyAssets } from './features/lazy-assets.ts';
 import { setupPdfDownload } from './features/pdf-download.ts';
@@ -67,6 +68,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (showResumeBtn) showResumeBtn.disabled = false;
 
   setupAutoSave();
+  setupFormValidation();
   setupAgeDisplay();
   setupBackup();
   setupDeleteContent();

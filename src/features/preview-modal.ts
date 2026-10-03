@@ -2,6 +2,7 @@ import Modal from 'bootstrap/js/dist/modal';
 import { resumeModalHtml } from '../components/resume-modal.ts';
 import { generateResumeHtml } from '../components/resume-preview.ts';
 import { loadResume } from '../db.ts';
+import { validateFormWithWarning } from './form-validation.ts';
 import { lazyLoadNotoFonts } from './lazy-assets.ts';
 import { jsonToFormResume } from './resume-json.ts';
 
@@ -16,6 +17,15 @@ export function setupPreviewModal() {
 
   // 「履歴書を表示」ボタンイベント
   document.querySelector('#show-resume')?.addEventListener('click', async () => {
+    // 入力エラーがあれば警告して表示をブロック（PDF出力はこのモーダルからのみ到達できる）
+    if (
+      !validateFormWithWarning({
+        header: '入力内容に誤りがあります。修正してから履歴書を表示してください。',
+        focus: true,
+      })
+    ) {
+      return;
+    }
     // プレビュー使用前にフォントを確実に読み込み
     await lazyLoadNotoFonts();
     const resumeJson = await loadResume();

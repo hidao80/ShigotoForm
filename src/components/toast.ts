@@ -12,6 +12,22 @@ function ensureToastContainer() {
   }
   return el;
 }
+/**
+ * 見出しと箇条書きを 1 つのトースト用メッセージにまとめます（`.sf-toast` は改行を反映）。
+ * @param {string} title - 見出し
+ * @param {string[]} items - 箇条書きの項目
+ * @param {number} [max=5] - 列挙する最大件数。超過分は「…他N件」に集約
+ * @returns {string} 改行区切りのメッセージ
+ * @throws なし
+ * @example
+ * showToast(formatToastList('入力内容に誤りがあります。', ['氏名: 必須']), 'warn');
+ */
+export function formatToastList(title: string, items: string[], max = 5) {
+  const lines = items.slice(0, max).map((item) => `・${item}`);
+  if (items.length > max) lines.push(`…他${items.length - max}件`);
+  return [title, ...lines].join('\n');
+}
+
 export function showToast(message: string, kind: ToastKind = 'info', ttl = 3000) {
   const container = ensureToastContainer();
   const div = document.createElement('div');

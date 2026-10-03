@@ -1,3 +1,5 @@
+import { FIELD_PATTERNS } from '../models/resume-form-schema.ts';
+
 /**
  * 履歴書入力フォーム（main領域）のHTMLを生成します。
  * @returns {string} HTML文字列
@@ -21,13 +23,13 @@ export function resumeFormHtml(): string {
       <div class="row mb-3">
         <label for="furigana-input" class="col-md-3 col-form-label-sm text-right required">ふりがな</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="furigana-input" name="fullname-kana" pattern="(?=.*?[\u3041-\u309F])[\u3041-\u309F\u30FC\\s]*" placeholder="ふりがなを入力してください" required autocomplete="off" toolparamdescription="氏名のふりがな。ひらがなで入力する（例: やまだ たろう）">
+          <input type="text" class="form-control" id="furigana-input" name="fullname-kana" pattern="${FIELD_PATTERNS.furigana}" placeholder="ふりがなを入力してください" required autocomplete="off" toolparamdescription="氏名のふりがな。ひらがなで入力する（例: やまだ たろう）">
         </div>
       </div>
       <div class="row mb-3">
         <label for="name-input" class="col-md-3 col-form-label-sm text-right required">氏名</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="name-input" name="fullname" pattern=".*\\S+.*" placeholder="氏名を入力してください" required autocomplete="name" toolparamdescription="氏名（例: 山田 太郎）">
+          <input type="text" class="form-control" id="name-input" name="fullname" pattern="${FIELD_PATTERNS.notBlank}" placeholder="氏名を入力してください" required autocomplete="name" toolparamdescription="氏名（例: 山田 太郎）">
         </div>
       </div>
       <div class="row mb-3">
@@ -48,26 +50,26 @@ export function resumeFormHtml(): string {
       <div class="row mb-3">
         <label for="zip-code-input" class="col-md-3 col-form-label-sm text-right required">郵便番号</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="zip-code-input" name="zip-code" pattern="\\d{3}-?\\d{4}" placeholder="郵便番号を入力してください" required title="7桁の数字を入力してください（ハイフン可）" autocomplete="postal-code" toolparamdescription="郵便番号。半角数字7桁（ハイフンの有無は問わない。例: 1000001）">
+          <input type="text" class="form-control" id="zip-code-input" name="zip-code" pattern="${FIELD_PATTERNS.zipCode}" placeholder="郵便番号を入力してください" required title="7桁の数字を入力してください（ハイフン可）" autocomplete="postal-code" toolparamdescription="郵便番号。半角数字7桁（ハイフンの有無は問わない。例: 1000001）">
         </div>
       </div>
       <div class="row mb-3">
         <label for="address1-input" class="col-md-3 col-form-label-sm text-right required">住所</label>
         <div class="col-md-9">
-          <input type="text" class="form-control" id="address1-input" name="address1" pattern=".*\\S+.*" placeholder="住所を入力してください" required autocomplete="street-address" toolparamdescription="現住所（都道府県から番地・建物名まで）">
+          <input type="text" class="form-control" id="address1-input" name="address1" pattern="${FIELD_PATTERNS.notBlank}" placeholder="住所を入力してください" required autocomplete="street-address" toolparamdescription="現住所（都道府県から番地・建物名まで）">
         </div>
       </div>
       <div class="row mb-3">
         <label for="tel1-input" class="col-md-3 col-form-label-sm text-right">電話番号</label>
         <div class="col-md-9">
-          <input type="tel" class="form-control" id="tel1-input" name="tel1" pattern="\\d{2,4}-?\\d{2,4}-?\\d{3,4}" placeholder="電話番号を入力してください" autocomplete="tel" toolparamdescription="電話番号。半角数字（例: 03-1234-5678）">
+          <input type="tel" class="form-control" id="tel1-input" name="tel1" pattern="${FIELD_PATTERNS.tel}" placeholder="電話番号を入力してください" autocomplete="tel" toolparamdescription="電話番号。半角数字（例: 03-1234-5678）">
         </div>
       </div>
       <div class="row mb-3">
         <label for="mail1-input" class="col-md-3 col-form-label-sm text-right">メールアドレス</label>
         <div class="col-md-9">
           <input type="email" class="form-control" id="mail1-input" name="mail1" placeholder="メールアドレスを入力してください"
-            pattern="^[a-zA-Z0-9._+\\-]+@[a-zA-Z0-9.\\-]+(\\.[a-zA-Z]{2,})+$" title="有効なメールアドレスを入力してください" autocomplete="email" toolparamdescription="メールアドレス（例: taro@example.com）">
+            pattern="${FIELD_PATTERNS.mail}" title="有効なメールアドレスを入力してください" autocomplete="email" toolparamdescription="メールアドレス（例: taro@example.com）">
         </div>
       </div>
       <div class="accordion mb-3" id="accordionExample">
@@ -88,7 +90,7 @@ export function resumeFormHtml(): string {
               <div class="row mb-3">
                 <label for="tel2-input" class="col-md-3 col-form-label-sm text-right">電話番号</label>
                 <div class="col-md-9">
-                  <input type="tel" class="form-control" id="tel2-input" name="tel2" pattern="\\d{2,4}-?\\d{2,4}-?\\d{3,4}" placeholder="電話番号を入力してください" autocomplete="tel" toolparamdescription="現住所以外に連絡を希望する場合のみ、その連絡先電話番号。不要なら空欄">
+                  <input type="tel" class="form-control" id="tel2-input" name="tel2" pattern="${FIELD_PATTERNS.tel}" placeholder="電話番号を入力してください" autocomplete="tel" toolparamdescription="現住所以外に連絡を希望する場合のみ、その連絡先電話番号。不要なら空欄">
                 </div>
               </div>
             </div>

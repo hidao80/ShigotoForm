@@ -1,11 +1,9 @@
-import { showToast } from '../components/toast.ts';
+import { formatToastList, showToast } from '../components/toast.ts';
 import { saveResume } from '../db.ts';
 import { parseResumeJson } from '../models/resume-schema.ts';
 import { loadToForm, saveFromForm } from '../resume.ts';
+import { refreshFormValidation, validateFormWithWarning } from './form-validation.ts';
 import { formResumeToJson, jsonToFormResume } from './resume-json.ts';
-
-// インポート検証エラーをトーストに列挙する最大件数
-const MAX_SHOWN_ERRORS = 5;
 
 /**
  * エクスポート / インポートボタンにイベントリスナーを追加します。
@@ -17,6 +15,8 @@ export function setupBackup() {
    * エクスポートボタン
    */
   document.querySelector('#backup-button')?.addEventListener('click', async () => {
+    // 入力途中でもバックアップできるよう、エラーは警告のみでエクスポートは続行する
+    validateFormWithWarning({ header: '入力内容に誤りがあります（エクスポートは続行しました）。', focus: false });
     const data = saveFromForm();
     // 入力年月日取得
     const date = (data.createdAt || '').replace(/-/g, '');
@@ -48,13 +48,11 @@ export function setupBackup() {
       }
       const result = parseResumeJson(raw);
       if (!result.success) {
-        const shown = result.errors.slice(0, MAX_SHOWN_ERRORS).map((e) => `・${e}`);
-        const rest = result.errors.length - shown.length;
-        if (rest > 0) shown.push(`…他${rest}件`);
-        showToast(['履歴書データの形式が正しくありません。', ...shown].join('\n'), 'error', 8000);
+        showToast(formatToastList('履歴書データの形式が正しくありません。', result.errors), 'error', 8000);
         return;
       }
       loadToForm(jsonToFormResume(result.data));
+      refreshFormValidation();
       await saveResume(result.data);
     };
     input.click();
