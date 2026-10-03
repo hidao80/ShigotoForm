@@ -5,8 +5,9 @@
 ![Audit](https://github.com/hidao80/ShigotoForm/actions/workflows/audit.yml/badge.svg)
 ![Lint](https://github.com/hidao80/ShigotoForm/actions/workflows/lint.yml/badge.svg)
 ![Build](https://github.com/hidao80/ShigotoForm/actions/workflows/build.yml/badge.svg)
+![Test](https://github.com/hidao80/ShigotoForm/actions/workflows/test.yml/badge.svg)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/d7518453-f8ce-435d-a995-aecb75f57f44/deploy-status)](https://app.netlify.com/projects/shigotoform/deploys)
-[![Security: Takumi Guard](https://img.shields.io/badge/Security-Takumi%20Guard-blue)](https://github.com/hidao80/shigotoform/actions/workflows/npm-scan.yml)
+[![Security: Takumi Guard](https://img.shields.io/badge/Security-Takumi%20Guard-blue)](https://github.com/flatt-security/setup-takumi-guard-npm)
 [![Ask DeepWiki](https://img.shields.io/badge/Ask_DeepWiki-007ec6?logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAPoAAAD6AG1e1JrAAACIUlEQVRYw%2B2XP2gUQRTGv7d3JhYWQawkIBaCVWzETos0gmAnVoKNTSoLK0E7EQQrC20sBVFBtLPQRgTBtBaKjYgIQUSxiJq7fT%2BLvCGPJZdNLt4dQj5Y3u7sznzfzLw%2Fs9IO%2FicANiniCujEfWdsQgBLxAbsbraPZcmBfcAt4DNwKQsZNfEUsAB8YRV12LfA6ZHuedg7AO7ed%2Fc%2BUBcbQhbiu%2B6wXIM6EnZWkszMJe2Ke0n6I2la0v51hFeSMLN6OwIK6jJwEBdUYb2MAxRSz6sY4geiahFgLe1Hwq6YWe3us8AN4FQQU4QM64SPY69Xyr43fADgNjAPXHb3peSsD4FDQ0VLEjAHvIhBPS6AHvA1bBO9JPAXcHFbIRtJ5yzwIQZ9CZwAusDJENIkLqsG8DpNyIZJwSUk9wLHgakcesC1JCCjiHm1kYDNOEjptCxpSVK%2F8f73OFLxPLAYM3oCzEX7MXf%2FlJbc%2F8kWpA4HgQdpYI9IWAbeh83whi84cHXL%2B58EPBoQhnmm94EzwE3gZ2p%2FDhzdbhg%2BTaRr01x7ftb4%2FjBwFzjXrCvDpmLW9crVLNeR9CaapoGemb2TdCERW1tNaBNQ8jktwmozqwtpqRNtdWAjARYk39IS12ZWRX7vmJmA71nQZgi36gN7gCvAj5xc3P0jcH7kx7Ik5IC73wsh14GZsZySow5002l4Jr0b6%2Bm4eSyvpAn8lEzsx2QHo8RfUrlN%2BuPq4ksAAAAASUVORK5CYII%3D&labelColor=010101)](https://deepwiki.com/hidao80/ShigotoForm)
 
 ![Accessibility](https://img.shields.io/badge/Accessibility-100-brightgreen?style=flat-square)
@@ -52,7 +53,9 @@ no account, no backend, no privacy risk.
 # Development with hot reload
 docker compose up dev
 
-# Production build
+# Production build (nginx, http://localhost)
+docker compose up prod
+# or
 docker build -t shigotoform .
 docker run -p 80:80 shigotoform
 ```
@@ -67,6 +70,19 @@ bun dev
 ```
 
 This will start the development server on `https://localhost:5173`.
+
+### Development commands
+
+```bash
+bun run build         # Type-check (tsc) → Vite build → dist/
+bun run preview       # Serve the built dist/ locally
+bun run lint          # Biome check + tsc --noEmit
+bun run format        # Biome auto-format
+bun run test          # Vitest: unit (jsdom) + E2E (Chromium via Playwright)
+bun run test:unit     # Unit tests only
+bun run test:e2e      # E2E tests only (first run: bunx playwright install chromium)
+bun run screenshot    # Capture screenshots across all viewports
+```
 
 ## :open_book: Usage
 
@@ -93,9 +109,28 @@ When importing, select a JSON file from your device and the input screen will be
 ### Preview
 
 The content entered on the input screen can be previewed in A4 paper size.  
+Click "Show resume" in the menu to open the preview (enabled once there is input).  
 You can select either Gothic or Mincho font.
 
 Click "Download Resume PDF" at the bottom of the preview to save as PDF.
+
+### Auto-save
+
+Everything you type is saved to IndexedDB automatically, including added or removed education/work and license rows.
+Reopening the app restores your last input.
+
+### Dark mode
+
+Switch between light and dark themes with the "Dark mode" toggle in the menu. Your choice is remembered on your device.
+
+### Delete input
+
+Click "Delete input" in the menu to clear all saved data (a confirmation dialog is shown first).
+
+### Help & app updates
+
+The help button (?) in the header opens a usage guide.
+When a new version is available, click "App update" in the menu to apply it.
 
 ## :camera_flash: Screenshots
 
@@ -133,6 +168,11 @@ Click "Download Resume PDF" at the bottom of the preview to save as PDF.
 - Client-side processing (no server required)
 - High-quality Japanese font rendering
 - Customizable PDF layout control
+
+### Other stack
+- **Build / PWA**: Vite + vite-plugin-pwa (Workbox Service Worker), TypeScript (strict)
+- **UI**: Bootstrap 5, Font Awesome, Noto Sans/Serif JP (lazy-loaded), vanilla-autokana (furigana)
+- **Quality**: Biome (lint/format), Vitest (unit: jsdom / E2E: Browser Mode + Playwright Chromium)
 
 ## :wheelchair: Accessibility Compliance
 
