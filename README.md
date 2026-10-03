@@ -10,17 +10,30 @@
 [![Security: Takumi Guard](https://img.shields.io/badge/Security-Takumi%20Guard-blue)](https://github.com/flatt-security/setup-takumi-guard-npm)
 [![Ask DeepWiki](https://img.shields.io/badge/Ask_DeepWiki-007ec6?logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAPoAAAD6AG1e1JrAAACIUlEQVRYw%2B2XP2gUQRTGv7d3JhYWQawkIBaCVWzETos0gmAnVoKNTSoLK0E7EQQrC20sBVFBtLPQRgTBtBaKjYgIQUSxiJq7fT%2BLvCGPJZdNLt4dQj5Y3u7sznzfzLw%2Fs9IO%2FicANiniCujEfWdsQgBLxAbsbraPZcmBfcAt4DNwKQsZNfEUsAB8YRV12LfA6ZHuedg7AO7ed%2Fc%2BUBcbQhbiu%2B6wXIM6EnZWkszMJe2Ke0n6I2la0v51hFeSMLN6OwIK6jJwEBdUYb2MAxRSz6sY4geiahFgLe1Hwq6YWe3us8AN4FQQU4QM64SPY69Xyr43fADgNjAPXHb3peSsD4FDQ0VLEjAHvIhBPS6AHvA1bBO9JPAXcHFbIRtJ5yzwIQZ9CZwAusDJENIkLqsG8DpNyIZJwSUk9wLHgakcesC1JCCjiHm1kYDNOEjptCxpSVK%2F8f73OFLxPLAYM3oCzEX7MXf%2FlJbc%2F8kWpA4HgQdpYI9IWAbeh83whi84cHXL%2B58EPBoQhnmm94EzwE3gZ2p%2FDhzdbhg%2BTaRr01x7ftb4%2FjBwFzjXrCvDpmLW9crVLNeR9CaapoGemb2TdCERW1tNaBNQ8jktwmozqwtpqRNtdWAjARYk39IS12ZWRX7vmJmA71nQZgi36gN7gCvAj5xc3P0jcH7kx7Ik5IC73wsh14GZsZySow5002l4Jr0b6%2Bm4eSyvpAn8lEzsx2QHo8RfUrlN%2BuPq4ksAAAAASUVORK5CYII%3D&labelColor=010101)](https://deepwiki.com/hidao80/ShigotoForm)
 
+**Desktop**
+
 ![Accessibility](https://img.shields.io/badge/Accessibility-100-brightgreen?style=flat-square)
-![Best_Practices](https://img.shields.io/badge/Best_Practices-96-brightgreen?style=flat-square)
-![Performance](https://img.shields.io/badge/Performance-84-yellow?style=flat-square)
+![Best_Practices](https://img.shields.io/badge/Best_Practices-100-brightgreen?style=flat-square)
+![Performance](https://img.shields.io/badge/Performance-100-brightgreen?style=flat-square)
 ![SEO](https://img.shields.io/badge/SEO-100-brightgreen?style=flat-square)
-*Tested on: 2026-02-19 using [lighthouse-badges](https://github.com/hidao80/lighthouse-badges)*
+![WebMCP](https://img.shields.io/badge/WebMCP-4%2F4-brightgreen?style=flat-square)
+
+**Mobile**
+
+![Accessibility](https://img.shields.io/badge/Accessibility-100-brightgreen?style=flat-square)
+![Best_Practices](https://img.shields.io/badge/Best_Practices-100-brightgreen?style=flat-square)
+![Performance](https://img.shields.io/badge/Performance-96-brightgreen?style=flat-square)
+![SEO](https://img.shields.io/badge/SEO-100-brightgreen?style=flat-square)
+![WebMCP](https://img.shields.io/badge/WebMCP-4%2F4-brightgreen?style=flat-square)
+
+*Tested on 2026-10-03 with Lighthouse in Microsoft Edge 154.0.4258.48*
 
 ***Your resume, your device — private by design.***
 
 - **Private**: Your personal data never leaves your device — no accounts, no uploads.
 - **Offline-ready**: Works without internet once installed as a PWA via Service Worker.
 - **Print-perfect**: Exports A4-accurate PDFs with Gothic or Mincho Japanese font choice.
+- **Agent-ready**: The input form is annotated for WebMCP, so AI agents in WebMCP-capable browsers can fill it in.
 
 ## Overview
 
@@ -43,6 +56,7 @@ no account, no backend, no privacy risk.
 - **Client-side only**: No data transmission to external servers
 - **Local storage**: All data remains in your browser
 - **Privacy-first**: Designed with personal data protection in mind
+- **HTTPS enforced**: The Netlify deployment sends a `Strict-Transport-Security` header (see [public/_headers](public/_headers))
 - **Future enhancement**: Local encryption planned for additional security
 
 ## :rocket: Quick Start
@@ -127,6 +141,11 @@ Switch between light and dark themes with the "Dark mode" toggle in the menu. Yo
 
 Click "Delete input" in the menu to clear all saved data (a confirmation dialog is shown first).
 
+### WebMCP
+
+The input form declares a WebMCP tool (`fill-resume-basic-info`) via declarative annotations (`toolname` / `tooldescription` on the form, `toolparamdescription` on each field, including dynamically added education/work and license rows).
+In a browser with WebMCP enabled (experimental, e.g. Microsoft Edge with the feature turned on from `edge://flags`), an AI agent can discover the form and fill it in. Everything still runs locally; no data is sent anywhere.
+
 ### Help & app updates
 
 The help button (?) in the header opens a usage guide.
@@ -173,16 +192,16 @@ When a new version is available, click "App update" in the menu to apply it.
 - **Build / PWA**: Vite + vite-plugin-pwa (Workbox Service Worker), TypeScript (strict)
 - **UI**: Bootstrap 5, Font Awesome, Noto Sans/Serif JP (lazy-loaded), vanilla-autokana (furigana)
 - **Quality**: Biome (lint/format), Vitest (unit: jsdom / E2E: Browser Mode + Playwright Chromium)
+- **Hosting**: Netlify (HTTP headers via `public/_headers`); `public/llms.txt` describes the site for LLMs / AI agents
 
 ## :wheelchair: Accessibility Compliance
 
 **WAVE Accessibility Evaluation Results:**
 - :white_check_mark: **0 Errors** - No accessibility violations detected
 - :white_check_mark: **0 Contrast Errors** - All text meets WCAG color contrast requirements  
-- :warning: **2 Alerts** - Minor suggestions for enhancement
-- :dart: **1 Feature** - Accessibility features properly implemented
+- :white_check_mark: **0 Alerts** - No items flagged for manual review
 
-*Tested with WAVE Web Accessibility Evaluator on 2025-08-11*
+*Tested on 2026-10-03 with the [WAVE Evaluation Tool](https://chromewebstore.google.com/detail/wave-evaluation-tool/jbbplnpkjmmeebjpijfedlgcdilocofh) Chrome extension (3.3.1.0)*
 
 ## :handshake: Contributing
 
