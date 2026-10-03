@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, test, vi } from 'vitest';
+import { cdp } from 'vitest/browser';
 import { formResumeToJson } from '../../src/features/resume-json.ts';
 import { sample } from '../unit/fixtures.ts';
 import { mountAppWith, setNativeValue, sleep } from './mount-app.ts';
@@ -69,6 +70,25 @@ describe('ふりがなの自動入力（@j1nn0/vanilla-autokana）', () => {
     await vi.waitFor(async () => expect(await savedKana()).toBe('さとう'));
     const { loadResume } = await import('../../src/db.ts');
     expect((await loadResume())?.fullname).toBe('佐藤');
+  });
+
+  test('実際の IME 入力（信頼されたイベント）でも、変換中の氏名欄の値が消えない', async () => {
+    fill('name-input', '');
+    fill('furigana-input', '');
+    focusName();
+    const session = cdp();
+    // 合成イベントと違い、実際の入力ではリスナーの間にマイクロタスクが走る。
+    // ふりがなの state 更新が氏名欄より先に描画されると、氏名欄が空に戻される（スマホ・タブレットで入力できない不具合）
+    for (const text of ['さ', 'さと', 'さとう']) {
+      await session.send('Input.imeSetComposition', { text, selectionStart: text.length, selectionEnd: text.length });
+      await sleep(50);
+      expect(name().value).toBe(text);
+      expect(kana().value).toBe(text);
+    }
+    await session.send('Input.insertText', { text: '佐藤' });
+    await vi.waitFor(() => expect(name().value).toBe('佐藤'));
+    expect(kana().value).toBe('さとう');
+    blurName();
   });
 
   test('すでにある氏名・ふりがなの続きとして入力する', async () => {

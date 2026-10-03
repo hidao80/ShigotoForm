@@ -27,7 +27,10 @@ export function useAutoKana(nameId: string, kanaId: string, onChange: (value: st
       onChange: (value) => {
         // ブラウザの自動入力やプログラムによる氏名の書き換え（フォーカスのない input イベント）では、
         // ユーザーが入力したふりがなを上書きしない。氏名欄を編集している間だけ反映する
-        if (document.activeElement === nameEl) onChangeRef.current(value);
+        // 状態更新は次のタスクへ遅延させる。ライブラリのリスナーは React のリスナー（root）より先に実行され、
+        // 実機の入力ではその間にマイクロタスクが走るため、同期で更新すると氏名欄の state が古いまま再描画され、
+        // IME 変換中の氏名欄の値が空に戻されて入力できなくなる（スマホ・タブレット）
+        if (document.activeElement === nameEl) setTimeout(() => onChangeRef.current(value));
       },
     });
     // StrictMode の再実行でもリスナーが二重にならないよう、必ず解除する
