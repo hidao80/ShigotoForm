@@ -33,3 +33,6 @@ screenshots/
 *.njsproj
 *.sln
 *.sw?
+
+# Vitest
+.vitest/
