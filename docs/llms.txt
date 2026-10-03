@@ -2,7 +2,7 @@
 
 > クライアントサイド完結のPWA。日本形式の履歴書をブラウザ内で作成する。バックエンド・ネットワーク通信は一切なし。入力データはIndexedDB（Dexie）にのみ保存され、外部へ送信されない。
 
-ShigotoFormはフォーム入力・A4レイアウトプレビュー・高解像度PDF出力を提供する。アカウント登録不要、サーバー不要。入力内容の自動保存、JSONエクスポート/インポートによるバックアップ・復元、ダークモード、ゴシック体/明朝体の選択にも対応する。入力フォームはWebMCPの宣言的アノテーション（toolname / tooldescription / toolparamdescription）を持ち、WebMCP対応ブラウザのAIエージェントから入力できる。技術スタックはVite + TypeScript + Bootstrap 5、PWA対応（Service Worker）、html2pdf.jsによるPDF生成。テストはVitest（unit: jsdom / E2E: Browser Mode + Playwright Chromium）、パッケージ管理はBun、Lint/FormatはBiome。
+ShigotoFormはフォーム入力・A4レイアウトプレビュー・高解像度PDF出力を提供する。アカウント登録不要、サーバー不要。入力内容の自動保存、学歴・職歴と免許・資格の行のドラッグ＆ドロップによる並べ替え、JSONエクスポート/インポートによるバックアップ・復元、ダークモード、ゴシック体/明朝体の選択にも対応する。入力フォームはWebMCPの宣言的アノテーション（toolname / tooldescription / toolparamdescription）を持ち、WebMCP対応ブラウザのAIエージェントから入力できる。技術スタックはVite + TypeScript + React 19 + react-bootstrap（Bootstrap 5）、入力検証にZod、行の並べ替えに@dnd-kit、PWA対応（Service Worker）、html2pdf.jsによるPDF生成。テストはVitest（unit: jsdom / E2E: Browser Mode + Playwright Chromium）、パッケージ管理はBun、Lint/FormatはBiome。
 
 ## Docs
 
@@ -18,10 +18,10 @@ ShigotoFormはフォーム入力・A4レイアウトプレビュー・高解像�
 - [models/Resume.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/models/Resume.ts): 内部データ型定義（Career / License / Resume）
 - [models/resume-schema.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/models/resume-schema.ts): Zodスキーマとparse関数。インポートJSONの検証・旧形式の正規化（日本語エラーメッセージ）
 - [models/resume-form-schema.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/models/resume-form-schema.ts): 入力欄ごとのZod検証規則（必須・書式）。HTMLのpattern属性と正規表現を共有
-- [models/resume-state.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/models/resume-state.ts): フォーム状態（行に安定したidを持つFormState）とreducer
+- [models/resume-state.ts](https://github.com/hidao80/ShigotoForm/blob/main/src/models/resume-state.ts): フォーム状態（行に安定したidを持つFormState）とreducer（行の追加・更新・削除・並べ替え）
 - [hooks/](https://github.com/hidao80/ShigotoForm/tree/main/src/hooks): Reactフック。use-resume-form（状態・復元・自動保存・入力検証の表示）、use-autokana（ふりがな自動入力）、use-theme（ダーク/ライトテーマ切替、localStorageに保持）
 - [features/](https://github.com/hidao80/ShigotoForm/tree/main/src/features): UIに依存しないロジック群。resume-json（Resume↔ResumeJson変換）、backup（JSON入出力。インポート時はZodで検証）、pdf-download、age-display、pwa-update、lazy-assets
-- [components/](https://github.com/hidao80/ShigotoForm/tree/main/src/components): Reactコンポーネント群（react-bootstrap）。app、app-navbar、app-menu、resume-form、resume-preview（A4履歴書）、career-row、license-row、各種モーダル、toast。入力エラーがあるとプレビュー表示は警告のうえブロックされる
+- [components/](https://github.com/hidao80/ShigotoForm/tree/main/src/components): Reactコンポーネント群（react-bootstrap）。app、app-navbar、app-menu、resume-form、resume-preview（A4履歴書）、career-row、license-row、sortable-list（ドラッグ＆ドロップで並べ替えられる行。マウス・タッチ・キーボード対応）、各種モーダル、toast。入力エラーがあるとプレビュー表示は警告のうえブロックされる
 
 ## Optional
 
