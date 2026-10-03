@@ -79,7 +79,7 @@ export function useResumeForm() {
   const setField = useCallback(
     (field: ScalarField, value: string, composing = false) => {
       // 値が変わらない書き込みは編集とみなさない（再描画・保存しない）。
-      // vanilla-autokana は氏名が空でも 30ms ごとにふりがなへ空文字を書き込むため、これが無いと保存が走り続ける
+      // （プログラムによる同じ値の書き込みや、値の変わらない再通知で、再描画・保存が起きないようにする）
       if (stateRef.current[field] !== value) edit({ type: 'field', field, value });
       if (composing || !isValidatedField(field)) return;
       setErrors((prev) => (prev[field] ? withFieldError(prev, field, validateField(field, value)) : prev));

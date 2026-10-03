@@ -37,24 +37,54 @@ describe('保存データの復元', () => {
   });
 });
 
-describe('ふりがなの自動入力（vanilla-autokana）', () => {
-  test('氏名の入力が、ふりがなの表示と保存データへ反映される', async () => {
-    const name = input('name-input');
-    const kana = input('furigana-input');
+describe('ふりがなの自動入力（@j1nn0/vanilla-autokana）', () => {
+  const name = () => input('name-input');
+  const kana = () => input('furigana-input');
+  // ふりがなの自動入力は氏名欄を編集している間だけ反映されるため、実際にフォーカスを移す
+  const focusName = () => name().focus();
+  const blurName = () => name().blur();
+  const savedKana = async () => (await (await import('../../src/db.ts')).loadResume())?.fullnameKana;
+
+  test('ひらがなの入力が、ふりがなの表示と保存データへ反映される', async () => {
     fill('name-input', '');
     fill('furigana-input', '');
-    // 氏名欄へのフォーカスで監視（タイマー）が始まる
-    name.dispatchEvent(new FocusEvent('focus'));
-    // 1 文字ずつ入力する（vanilla-autokana は一度に 2 文字以上増えると変換の確定とみなす）
-    for (const value of ['や', 'やま', 'やまだ']) {
-      setNativeValue(name, value);
-      await sleep(100);
-    }
-    await vi.waitFor(() => expect(kana.value).toBe('やまだ'), { timeout: 3000 });
-    name.dispatchEvent(new FocusEvent('blur'));
+    focusName();
+    for (const value of ['や', 'やま', 'やまだ']) setNativeValue(name(), value);
+    await vi.waitFor(() => expect(kana().value).toBe('やまだ'));
+    blurName();
+    await vi.waitFor(async () => expect(await savedKana()).toBe('やまだ'));
+  });
+
+  test('IME で入力して漢字に変換しても、ふりがなが残る（composition イベント）', async () => {
+    fill('name-input', '');
+    fill('furigana-input', '');
+    focusName();
+    name().dispatchEvent(new CompositionEvent('compositionstart'));
+    for (const value of ['さ', 'さと', 'さとう']) setNativeValue(name(), value);
+    // 変換を確定: 氏名は漢字になり、ふりがなは確定前の読みのまま
+    setNativeValue(name(), '佐藤');
+    name().dispatchEvent(new CompositionEvent('compositionend'));
+    await vi.waitFor(() => expect(kana().value).toBe('さとう'));
+    blurName();
+    await vi.waitFor(async () => expect(await savedKana()).toBe('さとう'));
     const { loadResume } = await import('../../src/db.ts');
-    await vi.waitFor(async () => expect((await loadResume())?.fullnameKana).toBe('やまだ'));
-    expect((await loadResume())?.fullname).toBe('やまだ');
+    expect((await loadResume())?.fullname).toBe('佐藤');
+  });
+
+  test('すでにある氏名・ふりがなの続きとして入力する', async () => {
+    fill('name-input', '佐藤');
+    fill('furigana-input', 'さとう');
+    focusName();
+    setNativeValue(name(), 'た');
+    await vi.waitFor(() => expect(kana().value).toBe('さとうた'));
+    blurName();
+  });
+
+  test('氏名欄を編集していないとき（自動入力など）の変更では、ふりがなを上書きしない', async () => {
+    fill('furigana-input', 'ふりがな');
+    fill('name-input', '山田 花子');
+    await sleep(100);
+    expect(kana().value).toBe('ふりがな');
   });
 });
 

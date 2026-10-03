@@ -86,16 +86,20 @@ Input fields are validated by `models/resume-form-schema.ts` (`validateField()` 
 - To add a validated field: add it to `resumeFormFieldSchemas` (key order = on-screen order) **and** `FIELD_IDS` in `components/field-ids.ts`; add cases to `tests/field-cases.ts` (shared by the E2E `pattern` test and the unit schema test so HTML and Zod rules cannot drift)
 - Display state is `errors` in `useResumeForm()`. `commitField()` validates on blur / native `change` (one delegated `change` listener on `<form>`, because React's `onChange` is the `input` event); `setField()` re-checks only a field that already shows an error (not during IME composition) so it clears immediately. Valid fields are not flagged mid-typing. Untouched empty required fields show nothing on load
 - `ValidatedInput` renders `is-invalid` / `aria-invalid` / `aria-describedby` / Bootstrap `.invalid-feedback` only while an error exists (no custom colors)
-- `replace()` (restore, import, delete) shows errors for filled fields only. vanilla-autokana's furigana fill goes through `setField()`, so it re-checks furigana too
+- `replace()` (restore, import, delete) shows errors for filled fields only. The furigana auto-fill goes through `setField()`, so it re-checks furigana too
 - Gate (`validateWithWarning()` in `components/app.tsx`): validates the current form state, marks every field, shows a `warn` toast. "履歴書を表示" blocks on errors (focus moves to the first invalid field after the offcanvas menu has exited / the contact accordion has opened; PDF output is only reachable through that modal). Export only warns and still proceeds so half-filled résumés can be backed up. Auto-save is never gated (it keeps saving invalid drafts)
 
 ### Auto-save
 
 `useResumeForm()` restores from IndexedDB on mount, then saves in an effect **only after a user edit** (`edit()` / `setField()` set a dirty flag): `toResume(state)` → `formResumeToJson()` → `saveResume()` (upsert by `createdAt`; `age` is computed from the birthday). It never saves before the restore resolves (that would overwrite stored data with the empty initial state) and never saves after `replace()` (restore / import / delete — import saves its own validated JSON, delete clears the DB), so data the form does not cover (e.g. `resume.hobby` in an imported file) survives a plain page load.
 
-### vanilla-autokana (furigana)
+### Furigana auto-fill (@j1nn0/vanilla-autokana)
 
-The distributed build of vanilla-autokana only accepts element **ids**, polls the name field on a timer and writes `furigana.value` directly (no events), which a controlled React input would ignore. `hooks/use-autokana.ts` therefore binds it to a hidden `#sf-autokana-proxy` input whose `value` setter is intercepted and turned into a state update. Do not bind it to the real furigana input. While the name field has focus it writes the (possibly unchanged, even empty) value every 30 ms, so the proxy setter and `setField()` ignore writes that do not change the value — otherwise an idle focused name field would re-render and save continuously.
+`hooks/use-autokana.ts` binds [@j1nn0/vanilla-autokana](https://github.com/j1nn0/vanilla-autokana) (the maintained fork of the unmaintained `vanilla-autokana`, last release 2021) to the name and furigana inputs. It is event-driven (input / IME `compositionstart` / `compositionend`, no timers), reports changes through `onChange` (→ `setField('fullnameKana', …)`), supports `destroy()` (called in the effect cleanup, so StrictMode re-runs do not double-bind), and has its own types. Notes:
+- The library also writes `furigana.value` directly; this is consistent with React because the same value arrives through `onChange`. Never read the furigana from the library — the form state is the source of truth
+- It reacts to *any* `input` event on the name field, including browser autofill and programmatic changes, so the hook only forwards changes while the name field is focused (otherwise it would overwrite furigana the user typed)
+- At focus it continues from the existing furigana only when the name field is **not empty**; with an empty name, typing starts the furigana over
+- Single-maintainer package with very low adoption (about 20 weekly downloads when adopted): review its changelog / diff before bumping the version
 
 ### Menu focus
 

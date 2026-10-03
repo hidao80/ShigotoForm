@@ -58,7 +58,7 @@ describe('復元と自動保存', () => {
     expect(saved?.age).toBe(Number(calculateAge('1990-04-01')));
   });
 
-  test('値が変わらない書き込み（vanilla-autokana の空書き込みなど）は編集とみなさず、保存しない', async () => {
+  test('値が変わらない書き込み（ふりがなの自動入力の再通知など）は編集とみなさず、保存しない', async () => {
     const { result } = await mount();
     const before = result.current.state;
     act(() => {
