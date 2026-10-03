@@ -250,6 +250,27 @@
           </template>
         </p>
       </div>
+      <div class="vs-card">
+        <span class="icon" aria-hidden="true">🤖</span>
+        <p class="problem">
+          <template type="language-group">
+            <span language="ja">AI エージェントがフォームを正しく操作できない</span>
+            <span language="en">AI agents can't reliably operate the form</span>
+            <span language="zh">AI 代理无法可靠地操作表单</span>
+            <span language="es">Los agentes de IA no pueden operar el formulario de forma fiable</span>
+            <span language="ru">ИИ-агенты не могут надёжно работать с формой</span>
+          </template>
+        </p>
+        <p class="solution">
+          <template type="language-group">
+            <span language="ja">WebMCP 対応。フォームの各項目に説明を付与しているため、WebMCP 対応ブラウザの AI エージェントが入力項目を確実に識別して入力できます。</span>
+            <span language="en">WebMCP-ready. Every form field is annotated, so AI agents in WebMCP-capable browsers can reliably identify and fill them in.</span>
+            <span language="zh">支持 WebMCP。表单各字段均已添加说明，支持 WebMCP 的浏览器中的 AI 代理可准确识别并填写。</span>
+            <span language="es">Compatible con WebMCP. Cada campo del formulario está anotado, por lo que los agentes de IA en navegadores compatibles pueden identificarlos y rellenarlos con fiabilidad.</span>
+            <span language="ru">Поддержка WebMCP. Все поля формы аннотированы, поэтому ИИ-агенты в браузерах с WebMCP надёжно определяют и заполняют их.</span>
+          </template>
+        </p>
+      </div>
     </div>
   </section>
 
@@ -466,6 +487,7 @@ bun dev</code>
       <li>TypeScript</li>
       <li>Vite</li>
       <li>PWA / Service Worker</li>
+      <li>WebMCP</li>
       <li>Dexie (IndexedDB)</li>
       <li>html2pdf.js</li>
       <li>Bootstrap</li>

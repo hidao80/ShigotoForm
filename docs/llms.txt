@@ -2,7 +2,7 @@
 
 > クライアントサイド完結のPWA。日本形式の履歴書をブラウザ内で作成する。バックエンド・ネットワーク通信は一切なし。入力データはIndexedDB（Dexie）にのみ保存され、外部へ送信されない。
 
-ShigotoFormはフォーム入力・A4レイアウトプレビュー・高解像度PDF出力を提供する。アカウント登録不要、サーバー不要。入力内容の自動保存、JSONエクスポート/インポートによるバックアップ・復元、ダークモード、ゴシック体/明朝体の選択にも対応する。技術スタックはVite + TypeScript + Bootstrap 5、PWA対応（Service Worker）、html2pdf.jsによるPDF生成。テストはVitest（unit: jsdom / E2E: Browser Mode + Playwright Chromium）、パッケージ管理はBun、Lint/FormatはBiome。
+ShigotoFormはフォーム入力・A4レイアウトプレビュー・高解像度PDF出力を提供する。アカウント登録不要、サーバー不要。入力内容の自動保存、JSONエクスポート/インポートによるバックアップ・復元、ダークモード、ゴシック体/明朝体の選択にも対応する。入力フォームはWebMCPの宣言的アノテーション（toolname / tooldescription / toolparamdescription）を持ち、WebMCP対応ブラウザのAIエージェントから入力できる。技術スタックはVite + TypeScript + Bootstrap 5、PWA対応（Service Worker）、html2pdf.jsによるPDF生成。テストはVitest（unit: jsdom / E2E: Browser Mode + Playwright Chromium）、パッケージ管理はBun、Lint/FormatはBiome。
 
 ## Docs
 
