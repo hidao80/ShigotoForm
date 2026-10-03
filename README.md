@@ -95,8 +95,8 @@ bun run screenshot    # Capture screenshots across all viewports
 3. **Address**: Enter your postal code and full address.
 4. **Phone Number**: Enter numbers in half-width digits without hyphens.
 5. **Email Address**: Enter a valid email address format.
-6. **Education/Work History**: Enter your educational and work history in a list format. You can add or remove rows using the "Add" or "Delete" buttons.
-7. **Qualifications/Licenses**: Enter your qualifications and licenses in a list format. You can add or remove rows using the "Add" or "Delete" buttons.
+6. **Education/Work History**: Enter your educational and work history in a list format. You can add or remove rows using the "Add" or "Delete" buttons. Drag the handle (⋮⋮) at the right end of a row to change the order (touch and keyboard also work: focus the handle, press Space, move with the arrow keys, press Space again). The saved and exported data follow the same order.
+7. **Qualifications/Licenses**: Enter your qualifications and licenses in a list format. You can add or remove rows using the "Add" or "Delete" buttons. Drag the handle (⋮⋮) at the right end of a row to change the order (touch and keyboard also work: focus the handle, press Space, move with the arrow keys, press Space again). The saved and exported data follow the same order.
 
 ## :sparkles: Features
 
@@ -192,7 +192,7 @@ The only thing kept in `localStorage` is the light/dark theme preference — a s
 ### Other stack
 - **Build / PWA**: Vite + vite-plugin-pwa (Workbox Service Worker), TypeScript (strict)
 - **Framework**: React 19 with hooks (no backend, no router); form state lives in a reducer, persisted to IndexedDB by an auto-save effect
-- **UI**: react-bootstrap (Bootstrap 5), Font Awesome, Noto Sans/Serif JP (lazy-loaded), @j1nn0/vanilla-autokana (furigana)
+- **UI**: react-bootstrap (Bootstrap 5), Font Awesome, Noto Sans/Serif JP (lazy-loaded), @j1nn0/vanilla-autokana (furigana), @dnd-kit (drag-and-drop reordering of rows)
 - **Validation**: [Zod](https://zod.dev/) validates imported JSON (`src/models/resume-schema.ts`, legacy formats are normalized) and form input (`src/models/resume-form-schema.ts`)
 - **Quality**: Biome (lint/format), Vitest (unit: jsdom + React Testing Library / E2E: Browser Mode + Playwright Chromium)
 - **Hosting**: Netlify (HTTP headers via `public/_headers`); `public/llms.txt` describes the site for LLMs / AI agents
