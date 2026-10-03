@@ -34,13 +34,11 @@
     <meta name="twitter:image" content="https://shigotoform.netlify.app/img/favicon64.webp" />
   </head>
   <body>
-    <a href="#main" class="skip-link">本文へスキップ</a>
-    <noscript>
-      <div class="no-js-banner" role="alert" aria-live="assertive">
+    <div id="app">
+      <!-- JavaScript 有効時は src/main.ts が #app の中身ごと置き換えるため表示されません -->
+      <div class="no-js-banner">
         このアプリは JavaScript を必要とします。ブラウザ設定で JavaScript を有効にしてください。
       </div>
-    </noscript>
-    <div id="app">
       <script type="module" src="/src/main.ts"></script>
     </div>
   </body>

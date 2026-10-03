@@ -10,6 +10,7 @@ import { resumeFormHtml } from './resume-form.ts';
  */
 export function appShellHtml(): string {
   return `
+<a href="#main" class="skip-link">本文へスキップ</a>
 ${helpModalHtml()}
 ${navbarHtml()}
 
