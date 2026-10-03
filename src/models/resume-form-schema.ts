@@ -25,7 +25,7 @@ const optionalPattern = (source: string, message: string) => {
  * 入力欄ごとの検証スキーマ（HTML の required / pattern と同じ規則）。キー順は画面上の並び順。
  * 空でよい欄（性別・連絡先住所・職歴・資格）は検証対象外。
  */
-export const resumeFormFieldSchemas = {
+const resumeFormFieldSchemas = {
   createdAt: required('年月日を入力してください'),
   fullnameKana: required('ふりがなを入力してください').regex(
     fullMatch(FIELD_PATTERNS.furigana),
