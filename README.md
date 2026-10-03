@@ -191,9 +191,10 @@ The only thing kept in `localStorage` is the light/dark theme preference — a s
 
 ### Other stack
 - **Build / PWA**: Vite + vite-plugin-pwa (Workbox Service Worker), TypeScript (strict)
-- **UI**: Bootstrap 5, Font Awesome, Noto Sans/Serif JP (lazy-loaded), vanilla-autokana (furigana)
+- **Framework**: React 19 with hooks (no backend, no router); form state lives in a reducer, persisted to IndexedDB by an auto-save effect
+- **UI**: react-bootstrap (Bootstrap 5), Font Awesome, Noto Sans/Serif JP (lazy-loaded), vanilla-autokana (furigana)
 - **Validation**: [Zod](https://zod.dev/) validates imported JSON (`src/models/resume-schema.ts`, legacy formats are normalized) and form input (`src/models/resume-form-schema.ts`)
-- **Quality**: Biome (lint/format), Vitest (unit: jsdom / E2E: Browser Mode + Playwright Chromium)
+- **Quality**: Biome (lint/format), Vitest (unit: jsdom + React Testing Library / E2E: Browser Mode + Playwright Chromium)
 - **Hosting**: Netlify (HTTP headers via `public/_headers`); `public/llms.txt` describes the site for LLMs / AI agents
 
 ## :wheelchair: Accessibility Compliance
