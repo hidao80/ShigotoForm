@@ -1,6 +1,9 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    directory: "/"
+    # ワークフローと、ローカルの composite action（.github/actions/*）の両方が対象
+    directories:
+      - "/"
+      - "/.github/actions/*"
     schedule:
       interval: "weekly"
