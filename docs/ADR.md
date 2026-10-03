@@ -27,6 +27,7 @@ ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミット
 | 019 | インポート JSON の検証に Zod を導入 | Accepted |
 | 020 | フォーム入力の検証に Zod を適用（随時表示 + プレビュー時ブロック） | Accepted |
 | 021 | UI を React + react-bootstrap へ全面移行 | Accepted |
+| 023 | プレビューのフォントは swap で先に表示し、PDF 化はフォントの読み込み完了を待つ | Accepted |
 
 ---
 
@@ -517,6 +518,30 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 - 閉じたメニュー内の要素が DOM に残るため、開閉の遷移中は一時的に同じ id の要素が 2 つ存在する（遷移完了後は 1 つ）。
 - `ResumeJson` / `Career` / `License` の手書き型とスキーマの二重管理は ADR-019 のまま。
 - 状態更新は非同期で描画される。DOM を直接参照するコード（フォーカス移動など）は、メニューの `onExited` やアコーディオンの `onEntered` を待つ必要がある（`<App />` の `afterMenuClosed` / `afterContactOpened`）。
+
+---
+
+## ADR-023: プレビューのフォントは swap で先に表示し、PDF 化はフォントの読み込み完了を待つ
+
+- **Status**: Accepted（ADR-004 の遅延読み込み・swap 方針を、描画完了まで拡張する）
+- **Date**: 2026-10-03（`feat/pdf-font-wait` ブランチ。コミット前でハッシュは未確定）
+
+### Context
+
+- ユーザー要望: フォント表示を swap で、描画が完了するまでを最適化する。
+- 現状の確認（ビルド成果物）: Noto Sans/Serif JP（`@fontsource`）は 124 の unicode-range 分割ですべて `font-display: swap`。Font Awesome の `all.min.css` は 10 個の `@font-face` がすべて `block` だが、使っているのは `fa-regular` の 1 面のみで、これは `icons-font.css` が `swap` で上書き済み（ADR-004 / Lighthouse 対策）。つまり表示（swap）自体は既に満たしていた。
+- 残っていた問題: `lazyLoadNotoFonts()` が完了するのは CSS の読み込みであって、フォントファイルではない。swap のためプレビューは代替フォントで先に出て後から差し替わるが、PDF 化（html2canvas）は読み込み完了を待たずに実行され、代替フォントで撮られ得た。
+
+### Decision
+
+- `waitForPreviewFonts(fontType, text)` を追加（`features/lazy-assets.ts`）。`document.fonts.load('400 1em "<family>"', text)` で、実際に表示している文字列に必要な unicode-range の分割だけを読み込み、完了まで待つ。上限 5 秒を超えたら待たずに続行し（オフライン等）、失敗は握りつぶす。`document.fonts` が無い環境では待たない。
+- `<ResumeModal />` は、表示と同時に（表示を待たせず）この読み込みを開始し、PDF ダウンロードの直前にも完了を待つ。表示は従来どおり swap で先に出る。
+
+### Consequences
+
+- PDF が代替フォントで出力されることを防ぐ。通常は表示から操作までの間に読み込みが終わるため、ダウンロードは待たされない。
+- 書体を切り替えると、その書体の読み込みを改めて始める。
+- 未実施: 実ブラウザでのフォント差し替えの見た目と、PDF の出力フォントの目視確認。Font Awesome の未使用の `block` 面（`fa-solid` 等）は使っていないため要求されず、上書きもしていない（使う場合は同様に `swap` で上書きが必要）。
 
 ---
 
