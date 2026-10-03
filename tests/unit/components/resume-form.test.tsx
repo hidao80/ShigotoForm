@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { ResumeForm } from '../../../src/components/resume-form.tsx';
@@ -208,6 +208,21 @@ describe('動的行', () => {
     expect(rows().map(nameOf)).toEqual(['○○大学', 'ACME']);
     const selects = [...document.querySelectorAll<HTMLSelectElement>('#license-history .status-select')];
     expect(selects.map((s) => s.value)).toEqual(['取得', '合格']);
+  });
+});
+
+describe('動的行の見出し（fieldset / legend）', () => {
+  test.each([
+    ['career-history', '学歴・職歴'],
+    ['license-history', '免許・資格'],
+  ])('#%s は先頭に legend を持ち、見出し（h2）として名前が付く', async (id, title) => {
+    await mount();
+    const fieldset = document.getElementById(id) as HTMLFieldSetElement;
+    expect(fieldset.tagName).toBe('FIELDSET');
+    const legend = fieldset.firstElementChild;
+    expect(legend?.tagName).toBe('LEGEND');
+    expect(legend?.querySelector('h2')?.textContent).toBe(title);
+    expect(screen.getByRole('group', { name: title })).toBe(fieldset);
   });
 });
 
