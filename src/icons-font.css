@@ -1,0 +1,9 @@
+/* Font Awesome は font-display: block のため、後勝ちの @font-face で swap に上書きする（Lighthouse「フォント表示」対策）。
+   使用中の fa-regular のみ対象。all.min.css の読み込み後に import すること */
+@font-face {
+  font-family: "Font Awesome 7 Free";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2") format("woff2");
+}

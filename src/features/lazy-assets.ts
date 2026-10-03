@@ -20,6 +20,10 @@ export const lazyLoadIcons = (() => {
     if (loaded) return;
     try {
       await import('@fortawesome/fontawesome-free/css/all.min.css');
+      // font-display: block を swap に上書き（all.min.css より後に読み込む）
+      await import('../icons-font.css');
+      // フォント取得完了までは代替表示（"?"）を維持し、アイコンが空白で表示されるのを防ぐ
+      await document.fonts?.load('400 1em "Font Awesome 7 Free"').catch(() => {});
       loaded = true;
       document.documentElement.classList.add('icons-loaded');
     } catch {
