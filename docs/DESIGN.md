@@ -1,13 +1,13 @@
 # DESIGN — ShigotoForm ランディングページ
 
-[docs/index.html](index.html) のデザイン仕様。GitHub Pages 公開の静的 LP（`main.min.js` と multilanguagejs のみ使用、ビルド不要）。アプリ本体（`src/`）は対象外。
+[docs/index.html](index.html) のデザイン仕様。GitHub Pages 公開の静的 LP（`main.css`・`main.min.js` と multilanguagejs のみ使用、ビルド不要）。アプリ本体（`src/`）は対象外。
 
 ## 1. デザイン原則
 
 | 原則 | 具体化 |
 |---|---|
 | 信頼感 | 「個人情報を送信しない」を最初に提示。朱（赤）を単一アクセントとし、日本の書類・判子を連想 |
-| 軽量 | フレームワーク・CSS ライブラリ・Web フォント不使用。CSS は `<style>` にインライン |
+| 軽量 | フレームワーク・CSS ライブラリ・Web フォント不使用。CSS は [main.css](main.css) に集約 |
 | 日本語ファースト | 日本語フォントスタック先頭、`line-height: 1.8` で可読性確保 |
 | 自動テーマ | OS 設定（`prefers-color-scheme`）追従。手動切替 UI なし |
 | 多言語 | ja / en / zh / es / ru の 5 言語をクライアント側で切替 |
@@ -50,9 +50,9 @@ line-height: 1.8;
 2. **ヒーロー**（`.hero`）— `min-height: 80svh`、中央配置。`--accent-soft` の楕円ラジアルグラデを上部に敷く。絵文字（📄🖋️）、`h1`、タグライン、CTA 2 つ、注記（登録不要・無料・インストール不要）
 3. **課題と解決**（6 枚の `.vs-card`）— プライバシー / 日本式履歴書 / PDF 無料 / データ移行 / オフライン / アクセシビリティ
 4. **使い方**（3 枚の `.step`）— 入力 → プレビュー → PDF 保存
-5. **クイックスタート**（`.code-row` × 2）— `docker compose up dev` と `git clone … && bun dev`
+5. **クイックスタート**（`.code-row` × 3）— `docker compose up dev`、`git clone … && bun dev`、`docker compose up prod`
 6. **スクリーンショット**（3 枚の `figure`）— 入力画面 / A4 ゴシック / A4 明朝
-7. **技術スタック**（`.tech-list`）— ピル型タグ 9 個
+7. **技術スタック**（`.tech-list`）— ピル型タグ 11 個
 8. **フッター**— CTA 2 つ、ライセンス・貢献案内
 
 ### レスポンシブ
@@ -126,7 +126,7 @@ LP 本文は「Lighthouse アクセシビリティ 100、WAVE エラー 0」を�
 
 ## 10. 既知の不整合・改善候補（調査所見）
 実装との差異。修正未実施。
-1. 技術スタック表示の「Playwright E2E」は、`AGENTS.md` の E2E が `bun:test + Bun.WebView`、git 状態でも `playwright.config.ts` 削除済のため、LP 記載が古い可能性大
+1. （解消済）技術スタック表示を「Vitest + Playwright E2E」に更新（ADR-014 でテスト基盤が Vitest Browser Mode + Playwright Chromium へ移行したため）
 2. 「JIS規格レイアウト」（`meta description`）と本文「履歴書レイアウトを…フォントで表現」に温度差
 3. 「顔写真添付には近日対応予定」は機能現状に合わせた更新が必要
 4. `main.js` の `META` と `index.html` の静的メタ（日本語）で `title` / `description` 文言が相違（例: ja は一致、en は LP 本文と OGP が別表現）
