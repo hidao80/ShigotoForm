@@ -1,14 +1,14 @@
 import { beforeAll, describe, expect, test, vi } from 'vitest';
-import { mountApp, sleep } from './mount-app.ts';
+import { PATTERN_CASES } from '../field-cases.ts';
+import { mountApp, setNativeValue, sleep } from './mount-app.ts';
 
 const $ = <T extends Element = HTMLElement>(selector: string) => document.querySelector(selector) as T;
 const click = (selector: string) => $(selector).click();
 
 /** 値を設定して input / change を発火する（自動保存の契機） */
 const fill = (selector: string, value: string) => {
-  const el = $<HTMLInputElement>(selector);
-  el.value = value;
-  el.dispatchEvent(new Event('input', { bubbles: true }));
+  const el = $<HTMLInputElement | HTMLSelectElement>(selector);
+  setNativeValue(el, value);
   el.dispatchEvent(new Event('change', { bubbles: true }));
 };
 
@@ -105,24 +105,7 @@ describe('入力検証 (pattern)', () => {
     return el.validity.patternMismatch;
   };
 
-  test.each([
-    ['furigana-input', 'やまだ たろう', false],
-    ['furigana-input', 'ゆーき', false],
-    ['furigana-input', '山田', true],
-    ['name-input', '山田 太郎', false],
-    ['name-input', '  ', true],
-    ['zip-code-input', '1000001', false],
-    ['zip-code-input', '100-0001', false],
-    ['zip-code-input', '12345', true],
-    ['address1-input', '東京都千代田区', false],
-    ['address1-input', ' ', true],
-    ['tel1-input', '03-1234-5678', false],
-    ['tel1-input', '09012345678', false],
-    ['tel1-input', 'abc', true],
-    ['tel2-input', '06-1234-5678', false],
-    ['mail1-input', 'taro@example.com', false],
-    ['mail1-input', 'x@', true],
-  ])('%s に "%s" → patternMismatch=%s', (id, value, expected) => {
+  test.each(PATTERN_CASES)('%s に "%s" → patternMismatch=%s', (id, value, expected) => {
     expect(mismatch(id, value)).toBe(expected);
   });
 });
@@ -142,7 +125,7 @@ describe('動的行と自動保存', () => {
 
   test('各行の「削除」で行が消える', async () => {
     click('#career-history .remove-row');
-    expect(document.querySelectorAll('#career-history .card')).toHaveLength(0);
+    await vi.waitFor(() => expect(document.querySelectorAll('#career-history .card')).toHaveLength(0));
   });
 });
 
@@ -155,12 +138,14 @@ describe('入力内容の削除', () => {
     await sleep(200);
 
     click('#delete-content');
-    await vi.waitFor(() => expect($('#confirmDeleteModal').classList.contains('show')).toBe(true));
-    expect($('#confirmDeleteModal').getAttribute('role')).toBe('dialog'); // Bootstrap が表示時に付与;
+    // react-bootstrap は id を .modal-dialog に付け、表示状態（show / role）は外側の .modal が持つ
+    const deleteModal = () => document.getElementById('confirmDeleteModal')?.closest('.modal');
+    await vi.waitFor(() => expect(deleteModal()?.classList.contains('show')).toBe(true));
+    expect(deleteModal()?.getAttribute('role')).toBe('dialog'); // react-bootstrap が表示時に付与
 
-    await sleep(500); // 表示トランジション完了前の hide() は Bootstrap に無視される
+    await sleep(500); // 表示トランジション完了前の hide は無視されることがある
     click('#confirm-delete');
-    await vi.waitFor(() => expect($('#confirmDeleteModal').classList.contains('show')).toBe(false), { timeout: 5000 });
+    await vi.waitFor(() => expect(deleteModal()?.classList.contains('show') ?? false).toBe(false), { timeout: 5000 });
 
     expect($<HTMLInputElement>('#name-input').value).toBe('');
     expect($<HTMLInputElement>('#birthdate-input').value).toBe('');
@@ -225,13 +210,102 @@ describe('JSON インポートの検証 (zod)', () => {
     const { loadResume } = await import('../../src/db.ts');
     const before = await loadResume();
     const bad = { fullname: 1, tel1: 1, tel2: 1, mail1: 1, mail2: 1, zipCode: 1, address1: 1 };
-    document.querySelector('#sf-toast-container')?.replaceChildren(); // 前のテストのトーストを除去
     await importJson(JSON.stringify(bad));
-    await vi.waitFor(() => expect(document.querySelector('#sf-toast-container .sf-toast.error')).not.toBeNull());
-    const text = document.querySelector('#sf-toast-container .sf-toast.error')?.textContent ?? '';
+    const findToast = () =>
+      [...document.querySelectorAll('#sf-toast-container .sf-toast.error')]
+        .map((t) => t.textContent ?? '')
+        .find((t) => t.includes('…他2件'));
+    await vi.waitFor(() => expect(findToast()).toBeDefined());
+    const text = findToast() ?? '';
     expect(text.split('\n').filter((l: string) => l.startsWith('・'))).toHaveLength(5);
-    expect(text).toContain('…他2件');
     expect(text).not.toMatch(/Invalid input|expected/);
     expect(await loadResume()).toEqual(before);
+  });
+});
+
+describe('入力検証の表示とブロック (zod)', () => {
+  const FIELDS: [selector: string, value: string][] = [
+    ['#created-at', '2026-10-03'],
+    ['#furigana-input', 'やまだ たろう'],
+    ['#name-input', '山田 太郎'],
+    ['#birthdate-input', '1990-04-01'],
+    ['#zip-code-input', '1000001'],
+    ['#address1-input', '東京都千代田区'],
+    ['#tel1-input', ''],
+    ['#mail1-input', ''],
+    ['#tel2-input', ''],
+  ];
+  const fillValid = (override: Record<string, string> = {}) => {
+    for (const [selector, value] of FIELDS) fill(selector, override[selector] ?? value);
+  };
+  // 前のテストのトーストが残っていても区別できるよう、reset 時点の要素を控えて新しく出たものだけを見る
+  // （トーストの DOM は React が管理するため、直接削除はしない）
+  const warnToastNodes = () => [...document.querySelectorAll('#sf-toast-container .sf-toast.warn')];
+  let seen = new Set<Element>();
+  const resetToasts = () => {
+    seen = new Set(warnToastNodes());
+  };
+  const toasts = () =>
+    warnToastNodes()
+      .filter((n) => !seen.has(n))
+      .map((n) => n.textContent ?? '');
+  const modalShown = () =>
+    document.getElementById('resumeModal')?.closest('.modal')?.classList.contains('show') ?? false;
+
+  test('不正な値は確定時に赤枠・メッセージ・aria 属性で表示され、直すと入力中に解除される', () => {
+    fillValid({ '#zip-code-input': '12345' });
+    const zip = $<HTMLInputElement>('#zip-code-input');
+    expect(zip.classList.contains('is-invalid')).toBe(true);
+    expect(zip.getAttribute('aria-invalid')).toBe('true');
+    const feedback = document.getElementById(zip.getAttribute('aria-describedby') ?? '');
+    expect(feedback?.textContent).toContain('7桁');
+    expect(getComputedStyle(feedback as Element).display).toBe('block');
+
+    setNativeValue(zip, '1000001');
+    expect(zip.classList.contains('is-invalid')).toBe(false);
+    expect(zip.hasAttribute('aria-describedby')).toBe(false);
+    expect(feedback?.isConnected).toBe(false);
+  });
+
+  test('入力エラーがあると「履歴書を表示」は警告してブロックし、最初の不正欄にフォーカスする', async () => {
+    fillValid({ '#zip-code-input': '12345', '#tel1-input': 'abc' });
+    await sleep(200);
+    resetToasts();
+    click('#show-resume');
+    await vi.waitFor(() => expect(toasts()).toHaveLength(1));
+    expect(toasts()[0]).toContain('修正してから履歴書を表示してください');
+    expect(toasts()[0]).toContain('郵便番号');
+    expect(toasts()[0]).toContain('電話番号');
+    await vi.waitFor(() => expect(document.activeElement?.id).toBe('zip-code-input'));
+    expect($<HTMLInputElement>('#tel1-input').classList.contains('is-invalid')).toBe(true);
+    await sleep(600);
+    expect(modalShown()).toBe(false);
+  });
+
+  test('エクスポートは警告を出すがブロックしない', async () => {
+    const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    try {
+      fillValid({ '#zip-code-input': '12345' });
+      resetToasts();
+      click('#backup-button');
+      await vi.waitFor(() => expect(toasts()).toHaveLength(1));
+      expect(toasts()[0]).toContain('エクスポートは続行しました');
+      await vi.waitFor(() => expect(anchorClick).toHaveBeenCalledOnce());
+    } finally {
+      anchorClick.mockRestore();
+    }
+  });
+
+  test('すべて正しければ「履歴書を表示」でプレビューが開く', async () => {
+    fillValid();
+    await sleep(200);
+    resetToasts();
+    click('#show-resume');
+    await vi.waitFor(() => expect(modalShown()).toBe(true), { timeout: 10_000 });
+    expect(toasts()).toEqual([]);
+    expect(document.querySelectorAll('form .is-invalid')).toHaveLength(0);
+    await sleep(500); // 表示トランジション完了前の hide() は Bootstrap に無視される
+    click('#resumeModal .modal-footer .btn-secondary');
+    await vi.waitFor(() => expect(modalShown()).toBe(false), { timeout: 5000 });
   });
 });

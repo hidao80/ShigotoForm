@@ -20,10 +20,13 @@ ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミット
 | 012 | pnpm → bun | Accepted |
 | 013 | E2E を Bun.WebView へ | Superseded by ADR-014 |
 | 014 | テスト基盤を Vitest（unit + Browser Mode）へ | Accepted |
-| 015 | main.ts / resume.ts を features/components に分割 | Accepted |
+| 015 | main.ts / resume.ts を features/components に分割 | Superseded by ADR-021 |
 | 016 | LP の CSS を外部ファイル（main.css + main.min.css）へ分離 | Accepted |
 | 017 | AI エージェント向けインターフェース（WebMCP 宣言的アノテーション + llms.txt） | Accepted |
 | 018 | Netlify 配信前提の HTTP ヘッダー定義（`public/_headers`、HSTS） | Accepted |
+| 019 | インポート JSON の検証に Zod を導入 | Accepted |
+| 020 | フォーム入力の検証に Zod を適用（随時表示 + プレビュー時ブロック） | Accepted |
+| 021 | UI を React + react-bootstrap へ全面移行 | Accepted |
 
 ---
 
@@ -328,7 +331,7 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 
 ## ADR-015: `main.ts` / `resume.ts` を `features/` と `components/` に責務分割
 
-- **Status**: Accepted
+- **Status**: Superseded by ADR-021（文字列 HTML・`setup*()`・`escapeHtml()`・`MutationObserver` による構成は React へ置き換え。`features/` は UI に依存しないロジック、`components/` は React コンポーネントに役割を変えた）
 - **Date**: 2026-10-03（`833664b`）
 
 ### Context
@@ -419,6 +422,101 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 - `_headers` は Netlify（互換ホスティング）固有の形式であり、Docker/nginx 配信（ADR-005）には適用されない。両経路でヘッダー設定が非対称になる。nginx 側への HSTS 追加は未実施。
 - `includeSubDomains` を含むため、ドメインのサブドメインが HTTP のみで運用される場合に影響する（Speculative: 現行運用でのサブドメイン利用有無は未確認）。
 - CSP などその他のセキュリティヘッダーは未設定（`_headers` は 2 行のみ）。
+
+---
+
+## ADR-019: インポート JSON の検証に Zod を導入
+
+- **Status**: Accepted
+- **Date**: 2026-10-03（`20531e2` 依存追加、`09896e0` 実装、`ed615b5` テスト）
+
+### Context
+
+- インポート処理（`features/backup.ts`）は `JSON.parse` の結果を検証なしで `jsonToFormResume()` に渡し、そのまま `saveResume()` で IndexedDB に保存していた。JSON 構文エラーは未捕捉で、型が壊れたデータも保存され得た。
+- 受け入れる入力は現行エクスポート形式に加え、旧フラット形式（`career` / `license` が直下、`startDate` / `endDate`、`resume` 欠落）や他ツール出力（`ResumeJson` のコメント記載）。
+- Speculative: 動機はユーザー要望（Zod によるバリデーション対応）。破損ファイルによる保存データ汚染の防止が狙いと推測される。
+
+### Decision
+
+- 依存に `zod`（4.x）を追加し、`src/models/resume-schema.ts` にスキーマと `parseResumeJson()` を配置。
+- スキーマは型の検証に限定し（日付・郵便番号等の書式は検証しない）、旧形式を受理して `ResumeJson` へ正規化する（欠落文字列は `''`、`pass` は `'合格'`、`startDate` / `endDate` は `start` / `end` へ、直下の `career` / `license` は `resume` 配下へ）。未知のキーは `z.looseObject` で保持。
+- 失敗時は全問題を `errors: string[]`（`パス: 理由`）で返す。日本語化は `safeParse` ごとに `zod/locales` の `ja` を渡す方式とし、グローバルな `z.config()` は使わない（モジュール先頭の副作用を避ける規約に合わせる）。
+- `backup.ts` は JSON 構文エラーと検証エラーをトースト（`error`）で通知し、フォームと IndexedDB を変更せず中断する。検証エラーは最大 5 件を箇条書きし、超過分は「…他N件」に集約。複数行表示のため `.sf-toast` に `white-space: pre-line` を追加。
+- テスト: unit（`tests/unit/models/resume-schema.test.ts`）と E2E（`tests/e2e/app.test.ts` のインポート検証）を追加。
+
+### Consequences
+
+- 外部通信は追加せず、ADR-001 を維持。ランタイム依存が 1 つ増え、バンドルサイズが増加する（未計測）。
+- 型は `db.ts` / `models/Resume.ts` の手書き interface のままで、スキーマから導出していない。`ResumeJson` / `Career` / `License` の変更時はスキーマも更新が必要（二重管理）。
+- 検証対象はインポート経路のみ。IndexedDB 読み出し（`loadResume`）には適用していない。フォーム入力の検証は別スキーマで ADR-020 が扱う。
+- 書式（日付・郵便番号等）は未検証のため、型が正しければ内容が不正でも受理される。
+- 旧形式を保存前に正規化するため、インポート後の保存形式は旧形式のままではなく `resume` 配下の形になる。
+
+---
+
+## ADR-020: フォーム入力の検証に Zod を適用（随時表示 + プレビュー時ブロック）
+
+- **Status**: Accepted
+- **Date**: 2026-10-03（コミット前。ハッシュは未確定）
+
+### Context
+
+- 入力欄には HTML の `required` / `pattern` が付いているが、`<form>` に submit 処理がなく `checkValidity()` も呼ばれないため強制されない。必須項目が空でもプレビュー・エクスポート・PDF が通り、`pattern` 違反の見た目のフィードバックもなかった（コードと既存 E2E で確認）。
+- Speculative: 動機はユーザー要望（Zod の採用、随時表示、プレビュー時の警告とブロック）。
+
+### Decision
+
+- `src/models/resume-form-schema.ts` に欄ごとの Zod 規則を定義（必須: 年月日・ふりがな・氏名・生年月日・郵便番号・住所。書式のみ: 電話番号 1・2、メール 1。それ以外と職歴・資格行は検証しない）。インポート用の寛容なスキーマ（ADR-019）とは別にした。メッセージは欄ごとの日本語（`ja` ロケールは正規表現を表示するため使わない）。
+- 正規表現のソースは `FIELD_PATTERNS` に一本化し、`components/resume-form.ts` の `pattern` 属性が同じ定数を埋め込む。Zod 側は `^(?:…)$` で全体一致にする。E2E の `patternMismatch` と unit の Zod 検証が同じ表（`tests/field-cases.ts`）を使い、乖離を CI で検出する。
+- `features/form-validation.ts` で表示を担当。
+  - `<form>` への委譲リスナー 1 つで、離脱・確定時に検証する。エラー表示中の欄だけ入力ごとに再検証する（IME 変換中を除く）。
+  - 表示が変わるときだけ DOM を更新する（Bootstrap の `is-invalid` / `.invalid-feedback`、`aria-invalid`、`aria-describedby`）。
+  - 復元・インポート・削除後は `refreshFormValidation()` で追従する。
+- 「履歴書を表示」は `validateFormWithWarning()` でエラーがあれば警告トースト（`warn`）を出してブロックし、最初の不正欄へフォーカスする（メニュー offcanvas を閉じ、折りたたみ内なら展開してから）。PDF 出力はこのモーダルからのみ到達できる。エクスポートは警告のみで続行する（入力途中のバックアップを可能にするため。ユーザー判断）。自動保存は検証でブロックしない。
+- `formatToastList()` を `toast.ts` に追加し、インポートエラーと共用。
+
+### Consequences
+
+- HTML 属性（`required` / `pattern`）と Zod の `required` 規則が二重管理になる。`pattern` は定数共有で乖離を防ぐが、`required` の対応は欄の追加時に手動で揃える（検証欄は `resumeFormFieldSchemas` と `FIELD_IDS` の 2 箇所）。
+- 日付の妥当性（未来日・生年月日と作成日の前後など）、職歴・資格行の必須項目（日付だけ入力で名称が空など）は検証していない。未決定。
+- バックアップ（エクスポート）はエラー付きのまま出力され得る。不正データは後でインポート時にも ADR-019 の寛容なスキーマで通る。
+- ランタイムのバンドルサイズ・描画への影響は未計測。リスナーは 1 つで、検証は 1 欄分の短い文字列への正規表現のみ。
+- 追記: 表示（`features/form-validation.ts` の DOM 操作）は ADR-021 の React 移行で `hooks/use-resume-form.ts` と `components/validated-input.tsx` に移った。規則・タイミング・ゲートの仕様は変わらない。
+
+---
+
+## ADR-021: UI を React + react-bootstrap へ全面移行
+
+- **Status**: Accepted
+- **Date**: 2026-10-03（`feat/react` ブランチ。コミット前でハッシュは未確定）
+
+### Context
+
+- UI は文字列 HTML（`*Html()`）・DOM 直接操作・`setup*()` によるイベント配線・`MutationObserver` による動的行へのリスナー付与で構成されていた。入力検証（ADR-020）の表示も DOM の `classList` / 属性を直接書き換える実装で、状態が DOM に分散していた。
+- Speculative: 動機はユーザー要望（React の導入と全面移行、Bootstrap は react-bootstrap へ置換）。状態管理と描画の宣言化が狙いと推測される。
+
+### Decision
+
+- React 19 と react-bootstrap を導入し、`main.tsx` から `<App />` を `#app` へ描画する（`DOMContentLoaded` で初期化。Service Worker 登録は描画の外で先に行う）。Bootstrap の CSS は維持し、Bootstrap の JS（`data-bs-*`、`window.bootstrap`）は廃止した。
+- 状態: フォーム値は `useResumeForm()`（reducer + 復元 + 自動保存 + 検証表示）に集約。動的行は安定した `id` を持つ配列で、保存・エクスポートの前に `toResume()` で `id` を除く。
+- 自動保存はユーザー編集の後だけ行う（復元・インポート・削除の `replace()` では保存しない）。復元の完了前は保存しない。
+- vanilla-autokana は制御コンポーネントと相容れない（配布版は id 文字列のみ受け付け、`value` へ直接書き込む）ため、`value` の setter を横取りする非表示の proxy input を介して state 更新に変換する（`hooks/use-autokana.ts`）。
+- トースト・アプリ更新状態は、React の描画前にも通知が届くためモジュール内のストア（`useSyncExternalStore`）で持つ。`showToast()` の呼び出し形は維持。
+- 履歴書プレビューは JSX で構築し、`escapeHtml()` と `dangerouslySetInnerHTML` を使わない。
+- メニューをモーダルを開く・欄へフォーカスを移すために閉じるときは、トグルボタンへのフォーカス復帰を無効にする（`restoreFocus`。有効のままだと復帰が後から走ってフォーカスを奪う）。
+- vanilla-autokana のタイマーによる同値の書き込み（氏名が空でも 30ms ごと）は、値が変わらなければ state 更新・保存をしない（`setField()` と proxy の setter）。
+- メニュー（offcanvas）は `renderStaticNode` で閉じていても DOM に残し、E2E と `aria-controls` の参照先を保つ。モーダルは閉じている間は DOM に無いため、モーダルのトリガーの `aria-controls` は外した（`aria-haspopup="dialog"` は維持。ユーザー判断）。
+- 副次的な変更: モーダルを開く操作（ヘルプ・プレビュー・削除）ではメニューを先に閉じる（react-bootstrap の focus trap の競合を避けるため）。`<div role="main">` / `role="group"` は `<main>` / `<fieldset>` に変更（Biome の a11y ルール）。ナビバーのブランドと更新リンクの `href="#"` は、`#app` へのリンクとボタンに変更。年齢は自動保存時に生年月日から計算して保存する（従来は他の編集で 0 に戻っていた）。
+- ツール: `@vitejs/plugin-react`、`tsconfig` の `jsx: react-jsx`、vitest の各 project に React plugin、E2E project の `optimizeDeps.include`（React の二重読み込み対策）。テストは React Testing Library を追加。
+
+### Consequences
+
+- バンドルが増えた: ビルドの index JS は 1,277.71 kB（gzip 369.50 kB）から 1,433.72 kB（gzip 420.18 kB）になり、gzip で約 +50.7 kB（+13.7%）。React / ReactDOM / react-bootstrap の追加が Bootstrap JS の削除を上回った。Lighthouse などの実測は未実施。コード分割（`React.lazy` でプレビューモーダルと html2pdf を遅延読み込みするなど）は未着手で、初期表示の軽量化の余地がある。
+- ARIA の契約が一部変わった（モーダルのトリガーの `aria-controls` 廃止、メニュー・モーダルの DOM 構造の差）。`id` は react-bootstrap の `Modal` では `.modal-dialog` に付き、`show` は外側の `.modal` が持つ。
+- E2E は DOM の id・クラスを契約として維持できたが、React の値追跡（ネイティブ setter が必要）と非同期の状態更新に合わせてテストのヘルパーと待機を変えた。
+- 閉じたメニュー内の要素が DOM に残るため、開閉の遷移中は一時的に同じ id の要素が 2 つ存在する（遷移完了後は 1 つ）。
+- `ResumeJson` / `Career` / `License` の手書き型とスキーマの二重管理は ADR-019 のまま。
+- 状態更新は非同期で描画される。DOM を直接参照するコード（フォーカス移動など）は、メニューの `onExited` やアコーディオンの `onEntered` を待つ必要がある（`<App />` の `afterMenuClosed` / `afterContactOpened`）。
 
 ---
 

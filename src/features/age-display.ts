@@ -1,7 +1,3 @@
-import { saveResume } from '../db.ts';
-import { saveFromForm } from '../resume.ts';
-import { formResumeToJson } from './resume-json.ts';
-
 /**
  * 生年月日から満年齢を計算します。
  * @param {string} birthday - 生年月日（YYYY-MM-DD）
@@ -20,30 +16,4 @@ export function calculateAge(birthday: string, today: Date = new Date()): string
     age--;
   }
   return Number.isNaN(age) ? '' : String(age);
-}
-
-/**
- * 生年月日入力時に満年齢を計算して表示し、DBへ保存します。初期表示時も反映します。
- * @returns {void}
- * @throws なし
- */
-export function setupAgeDisplay() {
-  const birthInput = document.querySelector('#birthdate-input') as HTMLInputElement | null;
-  const ageDisplay = document.querySelector('#age-display');
-  if (!birthInput || !ageDisplay) return;
-
-  birthInput.addEventListener('change', async () => {
-    const age = calculateAge(birthInput.value);
-    ageDisplay.textContent = age;
-
-    // 年齢再計算時にDBへ保存
-    const data = saveFromForm();
-    const json = formResumeToJson(data);
-    json.age = age ? Number(age) : 0;
-    await saveResume(json);
-  });
-  // 初期表示時も反映
-  if (birthInput.value) {
-    ageDisplay.textContent = calculateAge(birthInput.value);
-  }
 }

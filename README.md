@@ -106,7 +106,16 @@ You can export the entered resume information to a JSON file or import a previou
 Open the menu from the hamburger button at the top right and click the "Export" or "Import" button.
 
 When exporting, a JSON file will be downloaded.  
-When importing, select a JSON file from your device and the input screen will be updated immediately.
+When importing, select a JSON file from your device and the input screen will be updated immediately.  
+The imported file is validated first. If it is not valid JSON or its contents have the wrong format, an error message listing the problem fields (up to 5, in Japanese) is shown and your current data is left unchanged.
+
+### Input Validation
+
+Required fields (date, furigana, name, birth date, postal code, address) and the format of postal code, phone numbers and e-mail address are validated with Zod.
+
+- Fields are checked when you leave them, and an error already on screen disappears as soon as you fix it.
+- If the form has errors, "Show résumé" is blocked: a warning lists the problems and the cursor moves to the first invalid field.
+- Export still works with errors (a warning is shown), so you can back up a half-filled résumé. Auto-save is not affected either.
 
 ### Preview
 
@@ -182,8 +191,10 @@ The only thing kept in `localStorage` is the light/dark theme preference — a s
 
 ### Other stack
 - **Build / PWA**: Vite + vite-plugin-pwa (Workbox Service Worker), TypeScript (strict)
-- **UI**: Bootstrap 5, Font Awesome, Noto Sans/Serif JP (lazy-loaded), vanilla-autokana (furigana)
-- **Quality**: Biome (lint/format), Vitest (unit: jsdom / E2E: Browser Mode + Playwright Chromium)
+- **Framework**: React 19 with hooks (no backend, no router); form state lives in a reducer, persisted to IndexedDB by an auto-save effect
+- **UI**: react-bootstrap (Bootstrap 5), Font Awesome, Noto Sans/Serif JP (lazy-loaded), vanilla-autokana (furigana)
+- **Validation**: [Zod](https://zod.dev/) validates imported JSON (`src/models/resume-schema.ts`, legacy formats are normalized) and form input (`src/models/resume-form-schema.ts`)
+- **Quality**: Biome (lint/format), Vitest (unit: jsdom + React Testing Library / E2E: Browser Mode + Playwright Chromium)
 - **Hosting**: Netlify (HTTP headers via `public/_headers`); `public/llms.txt` describes the site for LLMs / AI agents
 
 ## :wheelchair: Accessibility Compliance

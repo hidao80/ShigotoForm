@@ -50,31 +50,3 @@ export function scheduleLazyAssets() {
     }, 0);
   }
 }
-
-/**
- * 初回のアイコン使用時（ヘルプボタン操作・メニュー表示）に、アイコンを即時ロードします（FOUT軽減）。
- * @returns {void}
- * @throws なし
- */
-export function preloadIconsOnFirstInteraction() {
-  const loadIconsOnFirstInteraction = () => {
-    lazyLoadIcons();
-    detach();
-  };
-  const helpTriggerBtn = document.getElementById('help-modal-btn');
-  const helpTriggerBtnInMenu = document.getElementById('help-modal-in-menu-btn');
-  const offcanvas = document.getElementById('offcanvasNavbar');
-  const detach = () => {
-    helpTriggerBtn?.removeEventListener('pointerover', loadIconsOnFirstInteraction);
-    helpTriggerBtn?.removeEventListener('focusin', loadIconsOnFirstInteraction);
-    helpTriggerBtnInMenu?.removeEventListener('pointerover', loadIconsOnFirstInteraction);
-    helpTriggerBtnInMenu?.removeEventListener('focusin', loadIconsOnFirstInteraction);
-    offcanvas?.removeEventListener('show.bs.offcanvas', loadIconsOnFirstInteraction);
-  };
-  helpTriggerBtn?.addEventListener('pointerover', loadIconsOnFirstInteraction, { once: true });
-  helpTriggerBtn?.addEventListener('focusin', loadIconsOnFirstInteraction, { once: true });
-  helpTriggerBtnInMenu?.addEventListener('pointerover', loadIconsOnFirstInteraction, { once: true });
-  helpTriggerBtnInMenu?.addEventListener('focusin', loadIconsOnFirstInteraction, { once: true });
-  // Offcanvas メニューを開いたら確実に読み込み
-  offcanvas?.addEventListener('show.bs.offcanvas', loadIconsOnFirstInteraction, { once: true });
-}
