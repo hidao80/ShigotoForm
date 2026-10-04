@@ -70,7 +70,10 @@ describe('AppNavbar', () => {
     render(<FreshNavbar menuOpen={false} onHelp={vi.fn()} onMenu={vi.fn()} />);
     expect(document.documentElement.classList.contains('icons-loaded')).toBe(false);
     fireEvent[eventName](document.getElementById('help-modal-btn') as HTMLElement);
-    await waitFor(() => expect(document.documentElement.classList.contains('icons-loaded')).toBe(true));
+    // CSS の動的 import が遅い CI（1 vCPU で全ファイル並列）では既定の 1 秒では足りないことがある。テスト自体の上限（5 秒）未満にする
+    await waitFor(() => expect(document.documentElement.classList.contains('icons-loaded')).toBe(true), {
+      timeout: 4000,
+    });
   });
 });
 
