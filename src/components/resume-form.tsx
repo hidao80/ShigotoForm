@@ -1,9 +1,11 @@
 import { type ReactNode, useEffect, useRef } from 'react';
 import { Accordion, Button } from 'react-bootstrap';
+import { flushSync } from 'react-dom';
 import { calculateAge } from '../features/age-display.ts';
 import { useAutoKana } from '../hooks/use-autokana.ts';
 import type { useResumeForm } from '../hooks/use-resume-form.ts';
 import { FIELD_PATTERNS, type ResumeFormField } from '../models/resume-form-schema.ts';
+import type { ResumeAction } from '../models/resume-state.ts';
 import { CareerRow } from './career-row.tsx';
 import { FIELD_IDS } from './field-ids.ts';
 import { LicenseRow } from './license-row.tsx';
@@ -65,6 +67,17 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
   }, [commitField]);
 
   const common = { onValue: setField, onCommit: commitField };
+
+  /** 行を追加し、追加した行の最初の入力欄へフォーカスを移す（追加を支援技術のユーザーにも伝える） */
+  const addRow = (action: 'add-career' | 'add-license', listId: string) => {
+    flushSync(() => edit({ type: action }));
+    document.querySelector<HTMLElement>(`#${listId} li:last-child input`)?.focus();
+  };
+  /** 行を削除し、フォーカスを追加ボタンへ戻す（削除した行のボタンごとフォーカスが消えるため） */
+  const removeRow = (action: ResumeAction, addButtonId: string) => {
+    edit(action);
+    document.getElementById(addButtonId)?.focus();
+  };
 
   return (
     <main className="main-content" id="main" tabIndex={-1}>
@@ -227,7 +240,7 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
           onSelect={(key) => onContactToggle(key === '0')}
         >
           <Accordion.Item eventKey="0">
-            <h2 className="accordion-header" id="headingOne">
+            <h2 className="accordion-header">
               <Accordion.Button
                 className={initialAccordion.current ? 'sf-accordion-initial' : undefined}
                 aria-controls="collapseOne"
@@ -235,7 +248,7 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
                 現住所以外に連絡を希望する場合のみ記入
               </Accordion.Button>
             </h2>
-            <Accordion.Collapse eventKey="0" id="collapseOne" aria-labelledby="headingOne" onEntered={onContactEntered}>
+            <Accordion.Collapse eventKey="0" id="collapseOne" onEntered={onContactEntered}>
               <div className="accordion-body">
                 <FormRow id="address2-input" label="住所">
                   <ValidatedInput
@@ -288,7 +301,7 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
                     key={row.id}
                     row={row}
                     onChange={(patch) => edit({ type: 'update-career', id: row.id, patch })}
-                    onRemove={() => edit({ type: 'remove-career', id: row.id })}
+                    onRemove={() => removeRow({ type: 'remove-career', id: row.id }, 'add-career-history')}
                   />
                 ))}
               </SortableList>
@@ -300,7 +313,7 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
               className="mt-2"
               aria-label="学歴・職歴を追加"
               aria-controls="career-history"
-              onClick={() => edit({ type: 'add-career' })}
+              onClick={() => addRow('add-career', 'career-history')}
             >
               ＋
             </Button>
@@ -324,7 +337,7 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
                     key={row.id}
                     row={row}
                     onChange={(patch) => edit({ type: 'update-license', id: row.id, patch })}
-                    onRemove={() => edit({ type: 'remove-license', id: row.id })}
+                    onRemove={() => removeRow({ type: 'remove-license', id: row.id }, 'add-license-history')}
                   />
                 ))}
               </SortableList>
@@ -336,7 +349,7 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
               className="mt-2"
               aria-label="免許・資格を追加"
               aria-controls="license-history"
-              onClick={() => edit({ type: 'add-license' })}
+              onClick={() => addRow('add-license', 'license-history')}
             >
               ＋
             </Button>

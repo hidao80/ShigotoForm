@@ -92,9 +92,12 @@ interface SortableRowProps {
  * ドラッグを始められるのはハンドルだけなので、入力欄の操作（文字の選択など）とは干渉しない。
  */
 export function SortableRow({ id, label, bodyClassName, children }: SortableRowProps) {
-  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
-    id,
-  });
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging, index } =
+    useSortable({
+      id,
+      // 既定の aria-roledescription は英語の "sortable"
+      attributes: { roleDescription: '並べ替え可能' },
+    });
 
   return (
     <Card
@@ -103,7 +106,7 @@ export function SortableRow({ id, label, bodyClassName, children }: SortableRowP
       className={`mb-2${isDragging ? ' shadow border-primary' : ''}`}
       style={{ transform: CSS.Translate.toString(transform), transition, zIndex: isDragging ? 1 : undefined }}
     >
-      <Card.Body className={bodyClassName} role="group" aria-label={`${label}の項目`}>
+      <Card.Body className={bodyClassName} role="group" aria-label={`${label}の${index + 1}番目`}>
         {children}
         <div className="col-auto ps-1 ms-auto">
           <button
