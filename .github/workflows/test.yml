@@ -6,11 +6,73 @@ on:
   pull_request:
     branches: [main]
 
+# 同じ PR への新しい push で、古い実行を止める（main は止めない）
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  test:
+  # 変更ファイルから、実行が必要なテストを判定する。main への push は常に全件実行
+  changes:
+    runs-on: ubuntu-slim
+    outputs:
+      unit: ${{ steps.scope.outputs.unit }}
+      e2e: ${{ steps.scope.outputs.e2e }}
+      full: ${{ steps.scope.outputs.full }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: scope
+        env:
+          BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}
+        run: bash .github/scripts/detect-test-scope.sh "${BASE_REF}"
+
+  # unit（jsdom）。ブラウザ不要。PR では変更ファイルに関係するテストだけ実行する
+  unit:
+    needs: changes
+    if: needs.changes.outputs.unit == 'true'
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-bun
+      - if: needs.changes.outputs.full == 'true'
+        run: bun run test:unit
+      - if: needs.changes.outputs.full != 'true'
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+        run: bun run test:unit --changed "${BASE_REF}" --passWithNoTests
+
+  # E2E（Chromium）。アプリ全体をマウントするため、src や共有ヘルパーの変更時は全件実行する
+  e2e:
+    needs: changes
+    if: needs.changes.outputs.e2e == 'true'
     runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-bun
-      - run: bunx playwright install --with-deps chromium
-      - run: bun run test
+      - id: playwright
+        run: echo "version=$(bunx playwright --version | awk '{print $2}')" >> "${GITHUB_OUTPUT}"
+      - id: browsers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      # キャッシュヒット時はブラウザ本体を再取得せず、OS 依存パッケージだけ入れる
+      - if: steps.browsers.outputs.cache-hit != 'true'
+        run: bunx playwright install --with-deps chromium
+      - if: steps.browsers.outputs.cache-hit == 'true'
+        run: bunx playwright install-deps chromium
+      - run: bun run test:e2e
+
+  # ブランチ保護の必須チェック（`test`）用。スキップされたジョブは成功扱い、失敗・キャンセルは失敗にする
+  test:
+    needs: [changes, unit, e2e]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-slim
+    steps:
+      - run: |
+          echo "changes=${{ needs.changes.result }} unit=${{ needs.unit.result }} e2e=${{ needs.e2e.result }}"
+          [ "${{ contains(needs.*.result, 'failure') }}" = "false" ]
