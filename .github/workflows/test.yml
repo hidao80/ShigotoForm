@@ -29,10 +29,11 @@ jobs:
         run: bash .github/scripts/detect-test-scope.sh "${BASE_REF}"
 
   # unit（jsdom）。ブラウザ不要。PR では変更ファイルに関係するテストだけ実行する
+  # 1 vCPU の ubuntu-slim では全ファイルの並列実行が遅く、時間切れで落ちるテストが出たため ubuntu-latest を使う
   unit:
     needs: changes
     if: needs.changes.outputs.unit == 'true'
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -49,22 +50,11 @@ jobs:
   e2e:
     needs: changes
     if: needs.changes.outputs.e2e == 'true'
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-bun
-      - id: playwright
-        run: echo "version=$(bunx playwright --version | awk '{print $2}')" >> "${GITHUB_OUTPUT}"
-      - id: browsers
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
-      # キャッシュヒット時はブラウザ本体を再取得せず、OS 依存パッケージだけ入れる
-      - if: steps.browsers.outputs.cache-hit != 'true'
-        run: bunx playwright install --with-deps chromium
-      - if: steps.browsers.outputs.cache-hit == 'true'
-        run: bunx playwright install-deps chromium
+      - run: bunx playwright install --with-deps chromium
       - run: bun run test:e2e
 
   # ブランチ保護の必須チェック（`test`）用。スキップされたジョブは成功扱い、失敗・キャンセルは失敗にする
