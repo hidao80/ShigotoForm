@@ -8,52 +8,17 @@ This file provides guidance to AI coding agents (Claude Code, Codex, etc.) when 
 
 ## Commands
 
-```bash
-bun install           # Install dependencies
-bun dev               # HTTPS dev server (https://localhost:5173)
-bun run build         # tsc type-check → Vite build → dist/
-bun run preview       # Serve built dist/ locally
-bun run lint          # Biome check (src/, tests/, vitest.config.ts) + tsc --noEmit
-bun run format        # Biome auto-format
-bun run test          # Vitest: unit (jsdom) + E2E (Browser Mode, Chromium via Playwright)
-bun run test:unit     # tests/unit only
-bun run test:e2e      # tests/e2e only (first run: bunx playwright install chromium)
-bun run coverage      # Run all tests with V8 coverage (text + coverage/index.html + coverage/lcov.info)
-bun run screenshot    # Capture screenshots across all viewports
-```
-
-Type-check only: `bunx tsc --noEmit`
+Package manager is `bun` (scripts are in `package.json`). `bun run test` runs unit (jsdom) + E2E (Browser Mode, Chromium via Playwright); the first E2E run needs `bunx playwright install chromium`. Type-check only: `bunx tsc --noEmit`.
 
 ## Architecture
 
-```
-src/
-├── main.tsx         # Entry point. Registers the Service Worker, then renders <App /> into #app on DOMContentLoaded
-├── components/      # React components (react-bootstrap), one per file
-│   ├── app.tsx                                  # <App /> — owns form state (useResumeForm) and menu/modal open state
-│   ├── app-navbar.tsx, app-menu.tsx             # Navbar, offcanvas menu (always in the DOM: renderStaticNode)
-│   ├── help-modal.tsx, delete-modal.tsx, resume-modal.tsx   # Modals (shown only while open)
-│   ├── resume-form.tsx, validated-input.tsx     # The form, and a controlled input with validation display
-│   ├── career-row.tsx, license-row.tsx          # One dynamic row each
-│   ├── sortable-list.tsx                        # <SortableList /> (dnd-kit context) and <SortableRow /> (Card + drag handle) — drag-and-drop reordering
-│   ├── resume-preview.tsx                       # <ResumePreview /> (A4 résumé), formatDate() / formatZipCode()
-│   ├── field-ids.ts                             # Validated field → input id mapping
-│   ├── toast.ts, toast-container.tsx            # showToast() / formatToastList() (imperative store) and <ToastContainer />
-├── hooks/           # use-resume-form (state, restore, auto-save, validation), use-autokana, use-theme
-├── features/        # Non-UI logic
-│   ├── resume-json.ts                           # jsonToFormResume() / formResumeToJson()
-│   ├── backup.ts                                # exportResume() / pickJsonFile() / readResumeFile() (JSON export/import)
-│   ├── age-display.ts                           # calculateAge()
-│   ├── pdf-download.ts                          # downloadResumePdf() (html2pdf)
-│   ├── pwa-update.ts                            # Service Worker registration, requestAppUpdate(), useUpdateStatus()
-│   └── lazy-assets.ts                           # Noto fonts / Font Awesome lazy loading
-├── db.ts            # Dexie IndexedDB wrapper (saveResume / loadResume / clearResume)
-├── models/Resume.ts # Internal types: Career / License / Resume / createEmptyResume()
-├── models/resume-state.ts # FormState (rows with stable ids), resumeReducer(), fromResume() / toResume()
-├── models/resume-schema.ts # Zod schema + parseResumeJson() — validates/normalizes imported JSON (Japanese error messages)
-├── models/resume-form-schema.ts # Zod per-field rules for the form (required / pattern), FIELD_PATTERNS shared with the HTML `pattern` attrs
-└── types/           # Type stubs: html2pdf.d.ts, webmcp.d.ts (WebMCP attributes in JSX), etc.
-```
+### Outside `src/`
+
+- `tests/unit/` mirrors the `src/` (and `scripts/`) paths (`db.test.ts`, `models.test.ts` at the top; `fixtures.ts` holds `sample()`). `tests/e2e/` runs in Vitest Browser Mode, and `mount-app.ts` mounts `main.tsx` with a stubbed Service Worker. `tests/field-cases.ts` and `tests/webmcp.ts` are shared by unit and E2E tests
+- `public/` is copied as-is into `dist/` (`_headers` carries the Netlify HTTP headers). `docs/` is the GitHub Pages landing page (no build step)
+- Docker production target: `nginx.conf` only does gzip, asset caching and the SPA fallback — it sets no security headers
+- `docs/ADR.md` is the tracked, authoritative decision record (see the note at its top: paths in old entries may no longer exist). `z-ai/` is git-ignored scratch output and may be absent or stale — do not rely on it
+- `public/llms.txt` and `docs/llms.txt` are two different files on purpose (deployed-site guide vs. repository guide); update both when the features or the source layout described there change
 
 ### Two Data Models
 
@@ -109,6 +74,16 @@ Input fields are validated by `models/resume-form-schema.ts` (`validateField()` 
 
 The offcanvas menu restores focus to its toggler when it closes. When it is closed *for another action* (opening a modal, moving focus to the first invalid field), `closeMenuForAction()` in `<App />` turns `restoreFocus` off first, otherwise the restore runs after our `focus()` and steals it back (a programmatic `.click()` in tests does not reveal this — focus the toggler first, as `tests/e2e/integration.test.ts` does).
 
+### Accessibility (WAI-ARIA)
+
+Semantic HTML first; add ARIA only where it changes what a screen reader announces or where focus goes. Rationale and open issues: `docs/ADR.md` ADR-028. Already decided, so do not undo without reading it:
+- react-bootstrap supplies `role="dialog"` on the offcanvas menu, so do not add `role="navigation"` or an `aria-label` that loses to `aria-labelledby`; the accordion collapse has no role, so it takes no `aria-labelledby`
+- Age display and update status are `<output>` (implicit `role=status`). The toast region sets `aria-atomic="false"` (the implicit `true` re-reads every toast on each addition); only `error` toasts get `role="alert"`
+- Per-field validation errors deliberately have **no** `role="alert"` (restore / import / validate-all would announce many at once); `ValidatedInput` only sets `aria-invalid` / `aria-describedby`
+- `SortableRow` localizes dnd-kit's English `aria-roledescription` and names each row group with its position, e.g. "学歴・職歴の1番目". After adding a row focus goes to its first input, after removing one to the add button (`flushSync`, then focus)
+- Known inaccuracy kept on purpose: "履歴書を表示" has `aria-haspopup="dialog"` although validation errors keep the dialog closed
+- No NVDA / VoiceOver verification has been done; Biome's a11y rules are the only automated check
+
 ### PWA Update Flow
 
 1. When SW reaches `waiting` state, "新しいバージョンがあります" is shown in the menu (`useUpdateStatus()`)
@@ -154,6 +129,7 @@ The offcanvas menu restores focus to its toggler when it closes. When it is clos
 
 - Follow [Semantic Versioning](https://semver.org/): update `"version"` in `package.json` whenever a PR is committed (breaking change → major, new feature → minor, fix → patch)
 - Keep the major version at `0` until the face photo upload and display feature works. Do not bump it to `1` before then
+- `package.json` `"version"` is the only place to bump: `app-navbar.tsx` imports it for the version shown in the navbar, and `bun.lock` and the README do not carry it. Version strings inside `docs/ADR.md` are history — do not rewrite them
 - Write commit messages in the [Conventional Commits](https://www.conventionalcommits.org/) format: `<type>[optional scope]: <description>` (e.g. `fix: Keep name input and furigana intact with real mobile IME input`)
 
 ## Key Constraints

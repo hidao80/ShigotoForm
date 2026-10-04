@@ -1,10 +1,11 @@
 # Architecture Decision Records — ShigotoForm
 
 Git のコミット履歴（`git log`、2026-10-04 時点・origin/main `9efbb17`）から抽出したアーキテクチャ上の意思決定を記録する。日付はコミット日（JST）。
-ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミットハッシュを `git cat-file` で実在確認した。ADR-013 以降は本ファイルで追記・更新している。`docs/ADR.md` は `afc786a` でコミット済み。
+ADR-001〜012 はコミットハッシュを `git cat-file` で実在確認した。ADR-013 以降は追記・更新している。
 コミットメッセージに理由が書かれていない箇所は **Speculative** と明記する。
 `952c2ab` 以降の `176d86b` は README / LP 文言（「JIS 規格」表現の削除）・`DESIGN.md` の件数更新・`docs/ADR.md` 反映のみで、アーキテクチャ上の決定を含まないため ADR は追加していない。
-ADR-019〜025 は `docs/ADR.md`（リポジトリ管理）の記述を引き継ぎ、「コミット前でハッシュ未確定」だった箇所を `git log` で確定したハッシュに置き換えた。ADR-026〜029 は `176d86b` 以降のコミットと PR #23〜#25、`z-ai/decision.jsonl` から追加した。
+ADR-019〜025 は、「コミット前でハッシュ未確定」だった箇所を `git log` で確定したハッシュに置き換えた。ADR-026〜029 は `176d86b` 以降のコミットと PR #23〜#25、`z-ai/decision.jsonl` から追加した。
+本文中のパスは各決定の当時のもので、現在は存在しないものがある。`src/main.ts` は削除され `src/main.tsx` に（`c48ff11`、`ecbac0b`）、`src/components/resume-form.ts` は `resume-form.tsx` に置き換わった（ADR-021、`ecbac0b`）。`src/icons-font.css` は ADR-025（`1ee93a9`）で削除し、`tests/e2e/screenshot.spec.ts` は `b1a8f18` で削除した（現行の `tests/e2e/screenshot.test.ts` は別ファイル）。現在の構成は `AGENTS.md` を参照する。
 
 | ADR | 概要 | Status |
 |---|---|---|
