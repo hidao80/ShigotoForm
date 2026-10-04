@@ -150,6 +150,12 @@ The offcanvas menu restores focus to its toggler when it closes. When it is clos
 - Biome's a11y and hooks rules apply to JSX (e.g. use `<main>` / `<fieldset>` rather than `role=`, no `href="#"`): fix the code instead of suppressing the rule
 - Tests: React tracks an input's `value`, so `el.value = x` followed by an event does not fire `onChange` — use the native prototype setter (`setNativeValue()` in `tests/e2e/mount-app.ts`, or RTL's `fireEvent.change`). State updates are asynchronous, so E2E assertions after a click use `vi.waitFor`. vitest inline projects do not inherit root plugins (React plugin is set per project) and the E2E project pre-bundles React deps (`optimizeDeps.include`) to avoid a duplicate React ("Invalid hook call")
 
+## Versioning and Commits
+
+- Follow [Semantic Versioning](https://semver.org/): update `"version"` in `package.json` whenever a PR is committed (breaking change → major, new feature → minor, fix → patch)
+- Keep the major version at `0` until the face photo upload and display feature works. Do not bump it to `1` before then
+- Write commit messages in the [Conventional Commits](https://www.conventionalcommits.org/) format: `<type>[optional scope]: <description>` (e.g. `fix: Keep name input and furigana intact with real mobile IME input`)
+
 ## Key Constraints
 
 - `dist/` is generated output — never commit manual changes to it
