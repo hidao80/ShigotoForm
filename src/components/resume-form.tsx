@@ -139,11 +139,7 @@ export function ResumeForm({ form, contactOpen, onContactToggle, onContactEntere
             error={errors.birthday}
             addon={
               <>
-                （満{' '}
-                <span id="age-display" role="status" aria-live="polite">
-                  {calculateAge(state.birthday) || ' '}
-                </span>{' '}
-                歳）
+                （満 <output id="age-display">{calculateAge(state.birthday) || ' '}</output> 歳）
               </>
             }
           />

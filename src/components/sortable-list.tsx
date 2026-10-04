@@ -72,7 +72,7 @@ export function SortableList({ ids, label, onMove, children }: SortableListProps
       onDragEnd={onDragEnd}
     >
       <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-        {children}
+        <ul className="list-unstyled mb-0">{children}</ul>
       </SortableContext>
     </DndContext>
   );
@@ -98,6 +98,7 @@ export function SortableRow({ id, label, bodyClassName, children }: SortableRowP
 
   return (
     <Card
+      as="li"
       ref={setNodeRef}
       className={`mb-2${isDragging ? ' shadow border-primary' : ''}`}
       style={{ transform: CSS.Translate.toString(transform), transition, zIndex: isDragging ? 1 : undefined }}

@@ -140,7 +140,9 @@ export function App() {
         本文へスキップ
       </a>
       <HelpModal show={helpOpen} onHide={() => setHelpOpen(false)} />
-      <AppNavbar menuOpen={menuOpen} onHelp={onHelp} onMenu={openMenu} />
+      <header>
+        <AppNavbar menuOpen={menuOpen} onHelp={onHelp} onMenu={openMenu} />
+      </header>
       <AppMenu
         show={menuOpen}
         restoreFocus={restoreMenuFocus}
