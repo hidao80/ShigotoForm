@@ -52,9 +52,7 @@ export function AppMenu({
       renderStaticNode
       tabIndex={-1}
       id="offcanvasNavbar"
-      role="navigation"
       aria-labelledby="offcanvasNavbarLabel"
-      aria-label="アプリメニュー"
     >
       <Offcanvas.Header>
         <Offcanvas.Title as="h2" className="fs-5" id="offcanvasNavbarLabel">
