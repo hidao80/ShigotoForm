@@ -13,7 +13,7 @@ interface AppNavbarProps {
  */
 export function AppNavbar({ menuOpen, onHelp, onMenu }: AppNavbarProps) {
   return (
-    <Navbar expand="lg" fixed="top" className="px-3 py-2" role="navigation" aria-label="主要ナビゲーション">
+    <Navbar expand="lg" fixed="top" className="px-3 py-2" aria-label="主要ナビゲーション">
       <Container fluid>
         <Navbar.Brand href="#app">
           <img

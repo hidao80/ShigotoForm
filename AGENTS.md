@@ -131,6 +131,7 @@ The offcanvas menu restores focus to its toggler when it closes. When it is clos
 - File names: `kebab-case` (exception: type files like `models/Resume.ts`); components are `.tsx`
 - Imports use relative paths from `src/`. Avoid module-level side effects
 - `any` is `warn`-level (Biome). Only allowed for external libraries without type stubs
+- Write semantic HTML: choose elements by meaning (`<main>`, `<header>`, `<nav>`, `<section>`, `<fieldset>` / `<legend>`, `<label>`, `<button>`, lists, tables for tabular data), not `<div>` / `<span>` with classes or `role=`
 - Formatting (indent width, quotes, semicolons, line width, trailing commas, import sorting) is enforced by `biome.json` and `.editorconfig` — run `bun run format` / `bun run lint` rather than hand-formatting
 
 ### CSS (resume.css)

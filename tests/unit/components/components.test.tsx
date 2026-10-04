@@ -129,7 +129,7 @@ describe('AppMenu', () => {
     expect((document.getElementById('theme-switch') as HTMLInputElement).checked).toBe(true);
     const status = document.getElementById('pwa-update-status');
     expect(status?.textContent).toBe('新しいバージョンがあります');
-    expect(status?.getAttribute('role')).toBe('status');
+    expect(status?.tagName).toBe('OUTPUT');
   });
 });
 

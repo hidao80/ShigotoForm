@@ -79,9 +79,9 @@ export function AppMenu({
           <button type="button" id="pwa-update-link" className="btn btn-link link-primary small p-0" onClick={onUpdate}>
             アプリのアップデート
           </button>
-          <span id="pwa-update-status" className="text-muted small ms-2" role="status" aria-live="polite">
+          <output id="pwa-update-status" className="text-muted small ms-2">
             {updateStatus}
-          </span>
+          </output>
         </div>
         <ul className="navbar-nav flex-grow-1">
           <li className="nav-item mb-5">
