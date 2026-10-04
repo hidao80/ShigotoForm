@@ -10,7 +10,7 @@ This file provides guidance to AI coding agents (Claude Code, Codex, etc.) when 
 
 Package manager is `bun` (scripts are in `package.json`). `bun run test` runs unit (jsdom) + E2E (Browser Mode, Chromium via Playwright); the first E2E run needs `bunx playwright install chromium`. Type-check only: `bunx tsc --noEmit`.
 
-CI (`.github/workflows/test.yml`) runs only what a pull request needs: `.github/scripts/detect-test-scope.sh` maps the changed files to `unit` / `e2e` / `full`, the `unit` job uses `vitest --changed` unless `full`, and the Playwright browser is cached. Pushes to `main` always run everything. Keep the aggregate job named `test` (it is the required check and also passes when jobs are skipped). When you add a path that affects tests (new config, new shared helper dir), add it to the script.
+CI (`.github/workflows/test.yml`) runs only what a pull request needs: `.github/scripts/detect-test-scope.sh` maps the changed files to `unit` / `e2e` / `full`; the `unit` job uses `vitest --changed` unless `full`. Test jobs run on `ubuntu-latest` (the 1 vCPU `ubuntu-slim` was about 5x slower for unit and made timing-sensitive tests flaky). Pushes to `main` always run everything. Keep the aggregate job named `test` (it is the required check and also passes when jobs are skipped). When you add a path that affects tests (new config, new shared helper dir), add it to the script.
 
 ## Architecture
 
