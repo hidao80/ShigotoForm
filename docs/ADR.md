@@ -1,8 +1,10 @@
 # Architecture Decision Records — ShigotoForm
 
-Git のコミット履歴（`git log`、2026-10-03 時点・HEAD `952c2ab`）から抽出したアーキテクチャ上の意思決定を記録する。日付はコミット日（JST）。
+Git のコミット履歴（`git log`、2026-10-04 時点・origin/main `9efbb17`）から抽出したアーキテクチャ上の意思決定を記録する。日付はコミット日（JST）。
 ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミットハッシュを `git cat-file` で実在確認した。ADR-013 以降は本ファイルで追記・更新している。`docs/ADR.md` は `afc786a` でコミット済み。
 コミットメッセージに理由が書かれていない箇所は **Speculative** と明記する。
+`952c2ab` 以降の `176d86b` は README / LP 文言（「JIS 規格」表現の削除）・`DESIGN.md` の件数更新・`docs/ADR.md` 反映のみで、アーキテクチャ上の決定を含まないため ADR は追加していない。
+ADR-019〜025 は `docs/ADR.md`（リポジトリ管理）の記述を引き継ぎ、「コミット前でハッシュ未確定」だった箇所を `git log` で確定したハッシュに置き換えた。ADR-026〜029 は `176d86b` 以降のコミットと PR #23〜#25、`z-ai/decision.jsonl` から追加した。
 
 | ADR | 概要 | Status |
 |---|---|---|
@@ -20,7 +22,7 @@ ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミット
 | 012 | pnpm → bun | Accepted |
 | 013 | E2E を Bun.WebView へ | Superseded by ADR-014 |
 | 014 | テスト基盤を Vitest（unit + Browser Mode）へ | Accepted |
-| 015 | main.ts / resume.ts を features/components に分割 | Superseded by ADR-021 |
+| 015 | main.ts / resume.ts を features/components に分割 | Superseded by ADR-021（components 部分） |
 | 016 | LP の CSS を外部ファイル（main.css + main.min.css）へ分離 | Accepted |
 | 017 | AI エージェント向けインターフェース（WebMCP 宣言的アノテーション + llms.txt） | Accepted |
 | 018 | Netlify 配信前提の HTTP ヘッダー定義（`public/_headers`、HSTS） | Accepted |
@@ -29,8 +31,12 @@ ADR-001〜012 は既存の `docs/ADR.md` の記述を引き継ぎ、コミット
 | 021 | UI を React + react-bootstrap へ全面移行 | Accepted |
 | 022 | ふりがな自動入力を @j1nn0/vanilla-autokana へ置き換え | Accepted |
 | 023 | プレビューのフォントは swap で先に表示し、PDF 化はフォントの読み込み完了を待つ | Accepted |
-| 024 | 学歴・職歴／免許・資格の行を、ドラッグ＆ドロップで並べ替え可能にする（@dnd-kit） | Accepted |
-| 025 | Font Awesome の font-display を、後勝ちの @font-face ではなくビルド時の PostCSS で swap にする | Accepted |
+| 024 | 学歴・職歴／免許・資格の行をドラッグ＆ドロップで並べ替え（@dnd-kit） | Accepted |
+| 025 | Font Awesome の font-display をビルド時の PostCSS で swap にする | Accepted |
+| 026 | ふりがな自動入力の状態反映を次タスクへ遅延し、漢字一括入力を巻き戻す | Accepted |
+| 027 | 品質計測・重複検出ツール（coverage / knip / jscpd）と CI 共通化 | Accepted |
+| 028 | セマンティック HTML を優先し、WAI-ARIA は必要最小限にする | Accepted |
+| 029 | バージョニング（SemVer・major 0 維持）とコミット規約（Conventional Commits） | Accepted |
 
 ---
 
@@ -113,7 +119,7 @@ Noto フォント（和文）と FontAwesome をバンドルに含めた結果�
 
 - Lighthouse パフォーマンススコアの改善（README にスコア記載）。
 - CSS 側は `.fonts-loaded` / `.icons-loaded` クラスに依存した切り替えが必須になり、CSS 変更時の制約として `AGENTS.md` に明文化されている。
-- 追補（2026-10-03, `b560cfd`）: Font Awesome の `font-display: block` を Lighthouse の「フォント表示」指摘への対策として `swap` に上書きするため、`src/icons-font.css`（`fa-regular-400.woff2` のみ対象の後勝ち `@font-face`）を新設。`lazyLoadIcons()` は `all.min.css` → `icons-font.css` の順で import し、`document.fonts.load()` 完了後に `icons-loaded` を付与する。`icons-font.css` は `all.min.css` より後に読み込む順序依存があり、使用中の `fa-regular` 以外のウェイトは対象外。コミットメッセージの接頭辞は `docs:` だが実体はコード変更。→ この方式（`icons-font.css`）は ADR-025 で PostCSS による書き換えへ置き換えた。
+- 追補（2026-10-03, `b560cfd`）: Font Awesome の `font-display: block` を Lighthouse の「フォント表示」指摘への対策として `swap` に上書きするため、`src/icons-font.css`（`fa-regular-400.woff2` のみ対象の後勝ち `@font-face`）を新設。`lazyLoadIcons()` は `all.min.css` → `icons-font.css` の順で import し、`document.fonts.load()` 完了後に `icons-loaded` を付与する。`icons-font.css` は `all.min.css` より後に読み込む順序依存があり、使用中の `fa-regular` 以外のウェイトは対象外。コミットメッセージの接頭辞は `docs:` だが実体はコード変更。
 
 ---
 
@@ -236,6 +242,7 @@ Claude Code / Codex など複数の AI コーディングツールを併用す�
 - ドキュメントの二重メンテナンスを回避できる。
 - 過去に `ebbea71` で `AGENTS.md`/`CLAUDE.md` が一時削除され、後で復活した経緯がある。
 - `AGENTS.md` は構造変更（ADR-014 / 015）のたびに更新が必要。
+- 追記（2026-10-03 18:52 JST、`z-ai/decision.jsonl`）: `AGENTS.md` は分割せず単一ファイルのまま維持する。`CONTRIBUTING.md` や階層別 `AGENTS.md` への分割案は不採用（採用しなかった理由は記録なし。Speculative: 二重管理を避ける本 ADR の方針の延長と推測される）。
 
 ---
 
@@ -335,7 +342,7 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 
 ## ADR-015: `main.ts` / `resume.ts` を `features/` と `components/` に責務分割
 
-- **Status**: Superseded by ADR-021（文字列 HTML・`setup*()`・`escapeHtml()`・`MutationObserver` による構成は React へ置き換え。`features/` は UI に依存しないロジック、`components/` は React コンポーネントに役割を変えた）
+- **Status**: Superseded by ADR-021（文字列 HTML・`setup*()`・`escapeHtml()`・`MutationObserver` による構成は React へ置換。`features/` の非 UI ロジックと `resume-json.ts` による変換の一元化は継続）
 - **Date**: 2026-10-03（`833664b`）
 
 ### Context
@@ -461,7 +468,7 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 ## ADR-020: フォーム入力の検証に Zod を適用（随時表示 + プレビュー時ブロック）
 
 - **Status**: Accepted
-- **Date**: 2026-10-03（コミット前。ハッシュは未確定）
+- **Date**: 2026-10-03（`7b551e1` 検証スキーマ・表示・ゲート、`a8e72dc` 表示ロジックの調整、`1be82bc` ドキュメント反映）
 
 ### Context
 
@@ -492,7 +499,7 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 ## ADR-021: UI を React + react-bootstrap へ全面移行
 
 - **Status**: Accepted
-- **Date**: 2026-10-03（`feat/react` ブランチ。コミット前でハッシュは未確定）
+- **Date**: 2026-10-03（`feat/react` ブランチ、PR #3。`fa6b3f8` 依存・設定、`ecbac0b` フックと状態管理への置換、`c48ff11` 旧コードの削除、`15f7c7b` ドキュメント反映、マージ `c92c100`）
 
 ### Context
 
@@ -527,7 +534,7 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 ## ADR-022: ふりがな自動入力を @j1nn0/vanilla-autokana へ置き換え
 
 - **Status**: Accepted（ADR-021 の vanilla-autokana と proxy input に関する記述を置き換える）
-- **Date**: 2026-10-03（`feat/replace-autokana` ブランチ。コミット前でハッシュは未確定）
+- **Date**: 2026-10-03（`feat/replace-autokana` ブランチ、PR #5。`eb95b91` 依存、`1204a37` フック、`51151cc` テスト、`737ccf8` ドキュメント、マージ `1887e94`）
 
 ### Context
 
@@ -561,7 +568,7 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 ## ADR-023: プレビューのフォントは swap で先に表示し、PDF 化はフォントの読み込み完了を待つ
 
 - **Status**: Accepted（ADR-004 の遅延読み込み・swap 方針を、描画完了まで拡張する）
-- **Date**: 2026-10-03（`feat/pdf-font-wait` ブランチ。コミット前でハッシュは未確定）
+- **Date**: 2026-10-03（`feat/pdf-font-wait` ブランチ、PR #6。`806bcdd`。`7f35ddd` は同内容を別ブランチへ移すための revert、マージ `c127ea4`）
 
 ### Context
 
@@ -585,7 +592,7 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 ## ADR-024: 学歴・職歴／免許・資格の行を、ドラッグ＆ドロップで並べ替え可能にする（@dnd-kit）
 
 - **Status**: Accepted
-- **Date**: 2026-10-03（`feat/reorder-rows` ブランチ。コミット前でハッシュは未確定）
+- **Date**: 2026-10-03（`feat/reorder-rows` ブランチ、PR #7。`451b437`、マージ `7ee1e29`）
 
 ### Context
 
@@ -614,7 +621,7 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 ## ADR-025: Font Awesome の font-display を、ビルド時の PostCSS で swap にする
 
 - **Status**: Accepted（ADR-004 追補と ADR-023 の、`icons-font.css` による上書きを置き換える）
-- **Date**: 2026-10-03（`fix/font-display-swap` ブランチ。コミット前でハッシュは未確定）
+- **Date**: 2026-10-03（`fix/font-display-swap` ブランチ、PR #19。`1ee93a9`、マージ `c812dd5`）
 
 ### Context
 
@@ -634,6 +641,111 @@ GitHub Pages で公開する LP のシェア時プレビューと検索エンジ
 - ビルド成果物（`dist/assets/*.css`）に `font-display: block` と `auto` が無く、実ブラウザの `document.fonts` の全 `FontFace` が `swap`。`fa-regular-400.woff2` は 1 回だけ要求される。
 - `@fortawesome` 以外の CSS は書き換えない。Noto（`@fontsource`）は元から `swap`。
 - 未実施: Lighthouse での再計測（スコアは README のものから未更新）。
+
+---
+
+## ADR-026: ふりがな自動入力の状態反映を次タスクへ遅延し、漢字一括入力を巻き戻す
+
+- **Status**: Accepted（ADR-022 の `hooks/use-autokana.ts` の実装を補強する）
+- **Date**: 2026-10-03（`8b443ce`, `d7c29f5`。PR #22、マージ `1a07700`。Issue #20 / #21）
+
+### Context
+
+- スマートフォン・タブレットで氏名が入力できない不具合（Issue #20）。ライブラリの `input` リスナーは React のルートリスナーより先に走る。実際の（trusted な）入力では両者の間にマイクロタスクのチェックポイントがあり、ふりがなの state 更新が先に描画され、氏名欄が古い state で再描画されて IME の変換中の文字が消えていた。合成イベント（`dispatchEvent`）のテストでは再現しない。
+- キーボード候補・貼り付けなどで漢字を一度に入力すると、ライブラリはかなに変換できず、ふりがな欄を空白だけで上書きする。「ふりがなはひらがなで入力してください」のトーストが出て「履歴書を表示」がブロックされた（Issue #21）。
+
+### Decision
+
+- `onChange` の転送を同期ではなく `setTimeout` で次のタスクへ遅延し、React のルートリスナーが先に走るようにする（`8b443ce`）。
+- 氏名が空でなく、ふりがなにひらがながあったのに、更新後のふりがなにひらがなが無い場合は、その更新を巻き戻す。ふりがな入力を復元し、氏名欄へ `focus` イベントを発火してライブラリを再同期する（`d7c29f5`）。
+- テスト: CDP の `Input.imeSetComposition` による実 IME 入力と、漢字の一括入力の E2E を追加（`tests/e2e/integration.test.ts`）。
+
+### Consequences
+
+- ADR-022 の「タイマーではなくイベントで追跡する」利点を保ちつつ、ライブラリ内部のリスナー順序と React のイベント委譲に依存する回避策が加わった。ライブラリや React のイベント処理が変わると再検討が必要（E2E の IME テストで検出する想定）。
+- 状態反映が 1 タスク遅れるため、ふりがなの更新は氏名の入力より僅かに遅れて描画される。
+- 漢字一括入力ではふりがなが自動入力されず、ユーザーが手入力する。
+- Speculative: ライブラリ側で修正されれば回避策は削除できると推測されるが、本リポジトリには上流への報告の記録はない（未確認）。
+- 詳細は `AGENTS.md`「Furigana auto-fill」節にも記載済み。
+
+---
+
+## ADR-027: 品質計測・重複検出ツール（coverage / knip / jscpd）と CI 共通化
+
+- **Status**: Accepted
+- **Date**: 2026-10-03（`22ca50f`, `75210c1`, `46e4d37`, `f2a8c5e`, `232a8bb`, `ddd0feb`, `7fc17a5`, `bafc871`。PR #11〜#18）
+
+### Context
+
+- テストは unit / E2E の 2 project（ADR-014）に分かれ、全体のカバレッジを 1 つのレポートで見る手段がなかった。
+- Speculative: React 移行（ADR-021）後に未使用の依存・export・重複コードが残りやすくなったため、検出ツールを導入したと推測される（コミットメッセージに動機の記載なし）。
+
+### Decision
+
+- `bun run coverage`（`vitest run --coverage`）を追加。`src/` を対象に V8 カバレッジを unit（jsdom）と E2E（Chromium）の両 project で統合し、text / HTML / lcov を `coverage/`（git 管理外）へ出力（`22ca50f`）。
+- knip（`knip.json`: `docs/**` と `act` バイナリを無視）と jscpd（`.jscpd.json`: HTML・コンソールレポート、生成物ディレクトリを無視。`report/` は git 管理外）の設定ファイルを追加（`75210c1`）。
+- knip の報告に基づき、未使用の依存（`browserslist`, `fast-uri`。どちらも推移的には導入される。`fast-uri` の override は維持）と、自ファイル内でしか使わないスキーマの export を削除（`46e4d37`, `bafc871`）。jscpd の報告に基づき、LP のコピーボタンのアイコン定義・テストの重複コードをまとめた（`232a8bb`, `ddd0feb`）。
+- CI の Takumi Guard + Bun + install の手順を、ローカル composite action（`.github/actions/setup-bun`）に共通化し、audit / lint / test の 3 ワークフローから使う。Dependabot の監視対象に `.github/actions/*` を追加（`f2a8c5e`）。`flatt-security/setup-takumi-guard-npm` を 1.2.0 → 1.4.0 に更新（`7fc17a5`、Dependabot）。
+
+### Consequences
+
+- knip / jscpd は `package.json` の依存・スクリプトに含まれず、設定ファイルのみがリポジトリにある。実行方法の記載は確認できていない（Speculative: `bunx` での都度実行と推測される）。CI にも組み込まれていない（`.github` と `package.json` に knip / jscpd の記述なしを確認）ため、検出は手動運用。
+- CI のセットアップ手順の変更点が 1 か所になる。composite action 内の Takumi Guard の更新は Dependabot が追う。
+- カバレッジの数値基準（しきい値）は設定されていない（`vitest.config.ts` に `threshold` の記述なしを確認）。
+
+---
+
+## ADR-028: セマンティック HTML を優先し、WAI-ARIA は必要最小限にする
+
+- **Status**: Accepted
+- **Date**: 2026-10-03（`fc501ea` fieldset の legend）、2026-10-04（`5040fbc`, `939821f`。PR #23 マージ `3ff501b`、PR #24 マージ `277cb60`）
+
+### Context
+
+- ADR-021 の React 移行で `role="main"` / `role="group"` を `<main>` / `<fieldset>` に置き換えた（Biome の a11y ルール）後も、`<span role="status" aria-live="polite">`、`<nav>` 上の `role="navigation"`、リストでない行の並び、役割のない `div` への `aria-labelledby` などが残っていた。
+- スクリーンリーダーとフォーカスの観点では、ARIA の過剰（上書き・無効・二重読み上げ）と過小（英語のまま読まれる文言、同一ラベルの行、操作後にフォーカスが失われる）の両方があった。
+- Speculative: 動機はユーザーからの改善依頼（セマンティック HTML 化、ARIA の過剰・過小の是正）。
+
+### Decision
+
+- 規約: 意味に合う要素を選び、`<div>` / `<span>` に class や `role=` を付けて代用しない。`AGENTS.md` の Coding Conventions に明記（PR #23、`5040fbc`）。
+- セマンティック化（`5040fbc`）: ナビバーを `<header>` で包み `<nav>` 上の冗長な `role="navigation"` を削除。年齢表示とアプリ更新状態を `<output>`（暗黙の `role=status`）に変更。並べ替え可能な行を `<ul>` / `<li>`（`Card as="li"`）にする。履歴書プレビューは、1 行に 2 組の `th` があり `scope="row"` が不正確になること、ラッパー追加が PDF レイアウトに影響しうることから変更しない。
+- ARIA の是正（`939821f`）:
+  - 過剰: メニュー（offcanvas）の `role="navigation"` を削除（react-bootstrap の `role="dialog"` を上書きしていた。中身はリンクでなくボタン）と、`aria-labelledby` に負けていた `aria-label` を削除。役割のないアコーディオンの collapse の `aria-labelledby` を削除。トースト領域に `aria-atomic="false"`（`role=status` が暗黙に持つ `aria-atomic=true` で、追加のたびに全件を再読み上げするため）。
+  - 過小: ドラッグハンドルの `aria-roledescription` を日本語化（既定は英語の "sortable"）。行グループの名前に位置を含める（例: 学歴・職歴の1番目）。行の追加後は新しい行の最初の入力欄へ、削除後は追加ボタンへフォーカスを移す（`flushSync` で DOM 反映後に移動）。
+- 意図的に変更しない: 欄ごとのエラーへの `role="alert"`（復元・インポート・一括検証で多数が同時に読み上げられるため）。
+
+### Consequences
+
+- 実機のスクリーンリーダー（NVDA / VoiceOver）での確認は未実施（PR のテスト計画に未チェック項目として残した）。ナビバーと行表示の目視確認も未実施。
+- 未解決: 「履歴書を表示」の `aria-haspopup="dialog"` は、検証エラー時にダイアログが開かないため不正確（ADR-021 でユーザー判断により維持）。`role="status"` の領域内に `role="alert"` のエラートーストがあり、環境により二重に読み上げられうる（トーストのテストがこの構成を前提とするため未変更）。
+- 行の追加時に最初の入力欄へフォーカスを移すため、モバイルではキーボードが開く可能性がある（未確認）。
+- 規約は人が守る前提で、ARIA の過不足を機械的に検出する仕組みは追加していない（Biome の a11y ルールのみ）。
+
+---
+
+## ADR-029: バージョニング（SemVer・major 0 維持）とコミット規約（Conventional Commits）
+
+- **Status**: Accepted
+- **Date**: 2026-10-03（`a53cdc6` 0.0.8 alpha）、2026-10-04（`2b0fdb6`。PR #25、マージ `9efbb17`）
+
+### Context
+
+- `package.json` の `version` は `0.0.8 alpha` で、更新の基準が明文化されていなかった。コミットメッセージは `feat:` / `fix:` / `docs:` / `chore:` / `refactor:` などの Conventional Commits 形式が多くのコミットで使われていた（一部は `Add ...` など形式外）（`git log` で確認）。
+- Speculative: 変更種別とバージョンの対応を、人と AI エージェントの双方に明示するために明文化したと推測される。
+
+### Decision
+
+- `AGENTS.md` に「Versioning and Commits」節を追加（`2b0fdb6`）。
+  - Semantic Versioning に従い、PR をコミットするたびに `package.json` の `version` を更新する（破壊的変更は major、機能追加は minor、修正は patch）。
+  - 顔写真のアップロード・表示機能が動くまで major は `0` のままにし、`1` へ上げない。
+  - コミットメッセージは Conventional Commits（`<type>[optional scope]: <description>`）。
+
+### Consequences
+
+- 規約の追加後、`origin/main` の `package.json` は `0.0.8 alpha` のままで、PR #23〜#25 では `version` を更新していない（`package.json` をコミット対象から外すユーザー指示による。作業ツリーには `0.0.9` の未コミット変更がある）。規約と運用が乖離している。
+- `1.0.0` の条件が「顔写真機能」に結び付いており、機能のスコープ変更時に本 ADR の見直しが必要。顔写真機能自体は未決定（付録参照）。
+- バージョン更新を機械的に強制する仕組み（CI チェック等）は確認できていない。
 
 ---
 
